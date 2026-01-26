@@ -6,7 +6,7 @@ namespace App\Models;
 
 use App\Models\GeneralSettings\GlobalAttachment;
 use App\Models\Vapp\FunctionalArea;
-use App\Models\Gms\Event;
+use App\Models\Ypi\Event;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;

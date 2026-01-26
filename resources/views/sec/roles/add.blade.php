@@ -1,4 +1,4 @@
-@extends('vapp.admin.layout.admin_template')
+@extends('ypi.layout.admin_template')
 @section('main')
 
     <div class="border-bottom mb-7 mx-n3 px-2 mx-lg-n6 px-lg-6">

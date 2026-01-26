@@ -197,7 +197,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('vapp.setting.application') }}">
+                        <a class="nav-link" href="{{ route('ypi.setting.application') }}">
                             <div class="d-flex align-items-center">
                                 <span class="nav-link-text">Application Settings</span>
                             </div>

@@ -1,4 +1,4 @@
-@extends('vapp.admin.layout.admin_template')
+@extends('ypi.layout.admin_template')
 @section('main')
 
     {{-- <div class="container-fluid bg-body-tertiary"> --}}

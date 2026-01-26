@@ -175,6 +175,6 @@
     });
 </script>
 
-@include('vapp.partials.event-js')
+{{-- @include('ypi.partials.event-js') --}}
 
 @endpush

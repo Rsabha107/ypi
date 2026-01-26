@@ -37,7 +37,7 @@
     </a>
     <x-ypi.admin.participant-drawer id="" formAction="{{ route('ypi.admin.participant.store') }}"
         formId="add_participant_slot_form" :events="$events" :participantTypes="$participant_types" :genders="$genders" :clientGroups="$client_groups"
-        :hostedBy="$hosted_by" :designations="$designations" :nationalities="$nationalities" :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes" :jacketSizes="$jacket_sizes"
+        :designations="$designations" :nationalities="$nationalities" :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes" :jacketSizes="$jacket_sizes"
         :shoeSizes="$shoe_sizes" />
 </div>
 

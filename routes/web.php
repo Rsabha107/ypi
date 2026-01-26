@@ -6,46 +6,46 @@ use App\Http\Controllers\Auth\MicrosoftController;
 use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\SendMailController;
 // use App\Http\Controllers\Cms\Customer\OrderController as CustomerOrderController;
-use App\Http\Controllers\Gms\Setting\EventController;
+use App\Http\Controllers\Ypi\Setting\EventController;
 use App\Http\Controllers\GeneralSettings\AttachmentController;
 use App\Http\Controllers\GeneralSettings\EventDocumentController;
 use App\Http\Controllers\GeneralSettings\ParticipantDocumentController;
 use App\Http\Controllers\GeneralSettings\GuardianDocumentController;
 use App\Http\Controllers\GeneralSettings\UploadController;
-use App\Http\Controllers\Gms\Admin\AccommodationController;
-use App\Http\Controllers\Gms\Admin\FlightController;
-use App\Http\Controllers\Gms\Admin\GuestController;
-use App\Http\Controllers\Gms\Setting\AirlineController;
-use App\Http\Controllers\Gms\Setting\AirportController;
-use App\Http\Controllers\Gms\Setting\CabinTypeController;
-use App\Http\Controllers\Gms\Setting\ClientGroupController;
-use App\Http\Controllers\Gms\Setting\DesignationController;
-use App\Http\Controllers\Gms\Setting\FlightStatusController;
-use App\Http\Controllers\Gms\Setting\FlightTypeController;
-use App\Http\Controllers\Gms\Setting\ParticipantTypeController;
-use App\Http\Controllers\Gms\Setting\HostedByController;
-use App\Http\Controllers\Gms\Setting\NationalityController;
+use App\Http\Controllers\Ypi\Admin\AccommodationController;
+use App\Http\Controllers\Ypi\Admin\FlightController;
+use App\Http\Controllers\Ypi\Admin\GuestController;
+use App\Http\Controllers\Ypi\Setting\AirlineController;
+use App\Http\Controllers\Ypi\Setting\AirportController;
+use App\Http\Controllers\Ypi\Setting\CabinTypeController;
+use App\Http\Controllers\Ypi\Setting\ClientGroupController;
+use App\Http\Controllers\Ypi\Setting\DesignationController;
+use App\Http\Controllers\Ypi\Setting\FlightStatusController;
+use App\Http\Controllers\Ypi\Setting\FlightTypeController;
+use App\Http\Controllers\Ypi\Setting\ParticipantTypeController;
+use App\Http\Controllers\Ypi\Setting\HostedByController;
+use App\Http\Controllers\Ypi\Setting\NationalityController;
 use App\Http\Controllers\Vapp\Setting\FunctionalAreaController;
 
 // use App\Http\Controllers\Mds\Admin\DashboardController;
 use App\Http\Controllers\Security\ActivityAuditController;
 use App\Http\Controllers\Security\RoleController as SecurityRoleController;
-use App\Http\Controllers\Gms\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Ypi\Admin\UserController as AdminUserController;
 
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\Vapp\Setting\VenueController;
+use App\Http\Controllers\Ypi\Setting\VenueController;
 use App\Http\Controllers\UtilController;
 use App\Http\Controllers\Vapp\Admin\BookingController;
-use App\Http\Controllers\Gms\Auth\AdminController as GmsAuthAdminController;
-use App\Http\Controllers\Gms\Customer\GuardianController;
-use App\Http\Controllers\Gms\Customer\GuestController as CustomerGuestController;
-use App\Http\Controllers\Gms\Setting\SizeController;
+use App\Http\Controllers\Ypi\Auth\AdminController as GmsAuthAdminController;
+use App\Http\Controllers\Ypi\Customer\GuardianController;
+use App\Http\Controllers\Ypi\Customer\GuestController as CustomerGuestController;
+use App\Http\Controllers\Ypi\Setting\SizeController;
 use App\Http\Controllers\Vapp\Customer\BookingController as CustomerBookingController;
 use App\Http\Controllers\Vapp\Operator\BookingController as OperatorBookingController;
-use App\Http\Controllers\Vapp\Setting\AppSettingController;
+use App\Http\Controllers\Ypi\Setting\AppSettingController;
 
-use App\Http\Controllers\Gms\Setting\EventImageController;
-use App\Models\Gms\Participant;
+use App\Http\Controllers\Ypi\Setting\EventImageController;
+use App\Models\Ypi\Participant;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Guard;
@@ -371,12 +371,12 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
 
     //Applicaiton Setting
     Route::controller(AppSettingController::class)->group(function () {
-        Route::get('/vapp/setting/application', 'index')->name('vapp.setting.application');
-        Route::get('/vapp/setting/application/list', 'list')->name('vapp.setting.application.list');
-        Route::get('/vapp/setting/application/get/{id}', 'get')->name('vapp.setting.application.get');
-        Route::post('vapp/setting/application/update', 'update')->name('vapp.setting.application.update');
-        Route::delete('/vapp/setting/application/delete/{id}', 'delete')->name('vapp.setting.application.delete');
-        Route::post('/vapp/setting/application/store', 'store')->name('vapp.setting.application.store');
+        Route::get('/ypi/setting/application', 'index')->name('ypi.setting.application');
+        Route::get('/ypi/setting/application/list', 'list')->name('ypi.setting.application.list');
+        Route::get('/ypi/setting/application/get/{id}', 'get')->name('ypi.setting.application.get');
+        Route::post('ypi/setting/application/update', 'update')->name('ypi.setting.application.update');
+        Route::delete('/ypi/setting/application/delete/{id}', 'delete')->name('ypi.setting.application.delete');
+        Route::post('/ypi/setting/application/store', 'store')->name('ypi.setting.application.store');
     });
 
     // // Event Image

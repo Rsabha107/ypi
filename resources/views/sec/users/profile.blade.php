@@ -1,4 +1,4 @@
-@extends('vapp.admin.layout.admin_template')
+@extends('ypi.layout.admin_template')
 @section('main')
 
     <!-- ===============================================-->
@@ -14,7 +14,7 @@
                     <li class="breadcrumb-item">
                         <a href="{{ route('home') }}"><?= get_label('home', 'Home') ?></a>
                     </li>
-                    <li class="breadcrumb-item"><a href="{{ route('vapp.admin.booking') }}">
+                    <li class="breadcrumb-item"><a href="{{ route('ypi.admin.booking') }}">
                             <?= get_label('profile', 'Profile') ?></a>
                     </li>
                     <li class="breadcrumb-item active">
@@ -598,7 +598,7 @@
                 </div>
             </div>
         </div> -->
-    @include('vapp.admin.partials.booking_modals')
+    @include('ypi.admin.partials.booking_modals')
 
 @endsection
 

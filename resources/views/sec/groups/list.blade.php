@@ -1,5 +1,5 @@
-{{-- @extends('vapp.admin.layout.admin_template') --}}
-@extends('vapp.admin.layout.admin_template')
+{{-- @extends('ypi.layout.admin_template') --}}
+@extends('ypi.layout.admin_template')
 @section('main')
 
 

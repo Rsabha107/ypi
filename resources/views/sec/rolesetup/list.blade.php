@@ -1,4 +1,4 @@
-@extends('vapp.admin.layout.admin_template')
+@extends('ypi.layout.admin_template')
 @section('main')
 
 <!-- ===============================================-->
@@ -179,6 +179,6 @@
         });
     </script>
 
-    @include('vapp.partials.event-js')
+    @include('ypi.partials.event-js')
 
     @endpush

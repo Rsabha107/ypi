@@ -133,12 +133,12 @@
                         </div>
                         <div class="overflow-auto scrollbar">
                             <ul class="nav d-flex flex-column mb-2 pb-1">
-                                <li class="nav-item">
+                                {{-- <li class="nav-item">
                                     <a class="nav-link px-3 d-block" href="{{ route('ypi.customer') }}"> <span
                                             class="me-2 text-body align-bottom" data-feather="user"></span><span>My
                                             Requests</span>
                                     </a>
-                                </li>
+                                </li> --}}
                                 @if ($user->hasRole('Manager'))
                                     <li class="nav-item">
                                         <a class="nav-link px-3 d-block" href="{{ route('ypi.manager') }}"> <span
