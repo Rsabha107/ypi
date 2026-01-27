@@ -135,17 +135,119 @@
                         <div class=" gy-3">
                             <hr />
                         </div>
-                        <input type="hidden" name="qid_server_ids" id="qid_server_ids_edit" value="[]">
-                        <input type="hidden" name="delete_doc_ids" id="delete_doc_ids_edit" value="[]">
-                        <div class="col mb-3">
-                            <label class="form-label" for="qid_files">QID Image</label>
-                            <input class="form-control" id="qid_upload_edit" name="qid_files[]" type="file" multiple
-                                required />
-                            <small class="form-text text-muted">Max size: 2MB. Accepted formats: JPG, PNG,
-                                GIF</small>
+                        {{-- @php
+                            $doc = route('participant.docs.view', $participant->qidDocument?->id);
+                            Log::info('inside edit blade doc: ' . $doc);
+                        @endphp --}}
+                        {{-- <div class="text-center mb-3">
+                            <div class="mb-3 text-start">
+                                <label class="form-label">Upload Participant QID <span class='text-danger'>(Extensions: jpg,jpeg,png,pdf Max 2MB)</span></label>
+                                <input type="file" required name="qid_file" class="dropify" data-height="100"
+                                    data-allowed-file-extensions="jpg jpeg png pdf" data-max-file-size="2M" 
+                                    data-default-file="{{ route('participant.docs.view', $participant->qidDocument->id) }}" />
+                            </div>
+                        </div> --}}
+
+                        {{-- <label class="form-label fw-semibold">
+    Participant QID
+    <span class="text-danger">(jpg, jpeg, png, pdf • max 2MB)</span>
+</label> --}}
+
+                        {{-- <div class="border rounded p-3 bg-white">
+
+    @if ($participant->qidDocument)
+        @php
+            $doc = $participant->qidDocument;
+        @endphp
+
+        <div class="mb-2">
+            <div class="small text-muted mb-1">Current file:</div>
+
+            @if (Str::startsWith($doc->mime, 'image/'))
+                <img
+                    src="{{ route('participant.docs.view', $doc->id) }}"
+                    style="max-height:140px;border:1px solid #ddd;padding:4px;background:#fff;"
+                >
+            @else
+                <a href="{{ route('participant.docs.view', $doc->id) }}"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="fa fa-file-pdf me-1"></i> View current document
+                </a>
+            @endif
+        </div>
+    @else
+        <div class="text-muted small mb-2">
+            No QID document uploaded yet.
+        </div>
+    @endif
+
+    <input
+        type="file"
+        name="qid_file"
+        class="form-control mt-2"
+        accept="image/*,application/pdf"
+    >
+
+    @error('qid_file')
+        <div class="text-danger small mt-1">{{ $message }}</div>
+    @enderror
+</div> --}}
+                        <label class="form-label fw-semibold text-uppercase small mb-2">
+                            Participant QID
+                            <span class="text-danger">(jpg, jpeg, png, pdf • max 2MB)</span>
+                        </label>
+
+                        <div class="border rounded-3 p-3 bg-body">
+                            <div class="d-flex align-items-start gap-3 flex-wrap">
+                                <div class="qid-dropzone">
+                                    <div
+                                        class="qid-preview border rounded-3 bg-white d-flex align-items-center justify-content-center">
+                                        @if ($participant->qidDocument)
+                                            @php $doc = $participant->qidDocument; @endphp
+
+                                            @if (Str::startsWith($doc->mime, 'image/'))
+                                                <img src="{{ route('participant.docs.view', $doc->id) }}" alt="QID"
+                                                    class="qid-preview-img">
+                                            @else
+                                                <div class="text-center p-3">
+                                                    <i class="fa-solid fa-file-pdf fa-2x text-danger"></i>
+                                                    <div class="small mt-2">PDF Document</div>
+                                                    <a class="btn btn-sm btn-outline-primary mt-2" target="_blank"
+                                                        href="{{ route('participant.docs.view', $doc->id) }}">
+                                                        View
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        @else
+                                            <div class="text-center p-3">
+                                                <i class="fa-regular fa-image fa-2x text-body-tertiary"></i>
+                                                <div class="small text-body-tertiary mt-2">No file uploaded</div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                    onclick="document.getElementById('qid_file').click()">
+                                    Replace QID File
+                                </button>
+                                <input type="file" name="qid_file" id="qid_file" class="d-none"
+                                    accept="image/*,application/pdf">
+                            </div>
                         </div>
 
-
+                        {{-- <div class="form-group">
+                            <label for="photoUpload">Photo Uploads (Max 10 MB)</label>
+                            <div class="photo-upload-area" id="photoUploadArea">
+                                <input type="file" id="photoUpload" name="qid_file" accept="image/*" />
+                                <div class="upload-placeholder">
+                                    <span class="material-icons">cloud_upload</span>
+                                    <p>Click to upload photos or drag and drop</p>
+                                    <span>Support for multiple photos</span>
+                                </div>
+                            </div>
+                            <div id="photoPreview" class="photo-preview"></div>
+                        </div> --}}
 
                         <div class=" gy-3">
                             <hr />
@@ -232,8 +334,7 @@
                                 Please specify food allergies
                             </label>
                             <input type="text" class="form-control" name="food_allergy_details"
-                                id="food_allergy_details" placeholder="e.g. nuts, dairy, shellfish"
-                                value="{{ $participant->food_allergy_details }}">
+                                id="food_allergy_details" placeholder="e.g. nuts, dairy, shellfish" value="{{ $participant->food_allergy_details }}">
                         </div>
                         <div class="mb-1">
                             <div class="form-check form-switch">
@@ -250,9 +351,8 @@
                             <label class="form-label">
                                 Please specify health issues
                             </label>
-                            <input type="text" class="form-control" id="health_issues_details"
-                                value="{{ $participant->health_issues_details }}" name="health_issues_details"
-                                placeholder="e.g. nuts, dairy, shellfish">
+                            <input type="text" class="form-control" id="health_issues_details" value="{{ $participant->health_issues_details }}"
+                                name="health_issues_details" placeholder="e.g. nuts, dairy, shellfish">
                         </div>
 
 
@@ -269,27 +369,12 @@
                             </div>
                         </div>
                     </form>
-                    @php
-                        $editDocuments = ($participant->documents ?? collect())
-                            ->map(function ($d) {
-                                return [
-                                    'id' => $d->id,
-                                    'original_name' => $d->original_name,
-                                    'size' => (int) $d->size,
-                                    'download_url' => route('participant.docs.view', $d->id),
-                                ];
-                            })
-                            ->values();
-
-                        Log::info('editDocuments: ' . print_r($editDocuments, true));
-                    @endphp
                 </div>
             </div>
         </div>
     </div>
 
     <script src="{{ asset('assets/js/pages/ypi/customer/create.js') }}"></script>
-    <script src="{{ asset('assets/js/pages/ypi/edit_upload.js') }}"></script>
     {{-- <script src="{{ asset('assets/js/pages/ypi/customer/photo_upload.js') }}"></script> --}}
     {{-- <link href="{{ asset('assets/css/photo_upload.css') }}" rel="stylesheet"> --}}
 
@@ -302,8 +387,16 @@
         $(document).ready(function() {
             console.log('ready');
             $('.dropify').dropify();
+
+            //             var drEvent = $('.dropify').dropify();
+            // drEvent = drEvent.data('dropify');
+            // console.log('drEvent', drEvent);
+            // // If you changed the attribute via JS, you must reset it like this:
+            // drEvent.resetPreview();
+            // drEvent.clearElement();
+            // drEvent.settings.defaultFile = "{{ route('participant.docs.view', 15) }}";
+            // drEvent.destroy();
+            // drEvent.init();
         });
-        
-        window.editDocuments = @json($editDocuments);
     </script>
 @endpush

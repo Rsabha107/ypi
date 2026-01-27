@@ -15,13 +15,13 @@ class EventImageController extends Controller
     //
     public function getPrivateFile($id)
     {
-        Log::info('EventImageController::getPrivateFile called with id: ' . $id);
+        // Log::info('EventImageController::getPrivateFile called with id: ' . $id);
 
         $doc = EventDocument::where('event_id', $id)
             ->first();
 
         $path = $doc->path;
-        Log::info('EventImageController::getPrivateFile document path: ' . $path);
+        // Log::info('EventImageController::getPrivateFile document path: ' . $path);
 
         // $file_path = 'uploads/events/' . $id . '/logo/' . $file;
         // $file_path = 'app/private/vapp/event/logo/' . $file;
@@ -30,7 +30,7 @@ class EventImageController extends Controller
         }
         // $path = storage_path($file_path);
 
-        appLog('EventImageController::getPrivateFile path: ' . $path);
+        // appLog('EventImageController::getPrivateFile path: ' . $path);
 
         // return response()->file($path);
         return Storage::disk('private')->response($path);
