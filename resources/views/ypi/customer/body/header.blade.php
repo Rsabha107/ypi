@@ -1,7 +1,7 @@
 @php
 
     $current_event_id = session()->get('EVENT_ID');
-    $event = App\Models\Vapp\Event::find($current_event_id);
+    $event = App\Models\Ypi\Event::find($current_event_id);
 
     appLog('Current Event:', ['event' => $event]);
 

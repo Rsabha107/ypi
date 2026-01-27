@@ -7,7 +7,7 @@ use App\Models\Ypi\EventDocument;
 use App\Models\Ypi\ParticipantDocument;
 use App\Models\Ypi\TempUpload;
 use App\Models\Ypi\Event;
-use App\Models\Vapp\Venue;
+use App\Models\Ypi\Venue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +41,9 @@ class EventController extends Controller
 
             $filename = basename($temp->path);
             $newPath = "uploads/events/{$model_id}/{$filename}";
+
+            Log::info('EventController::commitFilepondUploads: Moving file to final path: ' . $newPath);
+            Log::info('EventController::commitFilepondUploads: From disk: ' . $temp->disk . ' path: ' . $temp->path);
 
             Storage::disk($temp->disk)->move($temp->path, $newPath);
 

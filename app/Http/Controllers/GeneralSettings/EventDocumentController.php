@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\GeneralSettings;
 
 use App\Http\Controllers\Controller;
-use App\Models\Gms\EventDocument;
+use App\Models\Ypi\EventDocument;
 use App\Models\Gms\TempUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

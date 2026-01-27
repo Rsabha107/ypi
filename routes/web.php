@@ -46,8 +46,10 @@ use App\Http\Controllers\Ypi\Setting\AppSettingController;
 
 use App\Http\Controllers\Ypi\Setting\EventImageController;
 use App\Models\Ypi\Participant;
+use App\Models\Ypi\ParticipantDocument;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Guard;
 
 /*
@@ -414,6 +416,24 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
     Route::get('/participant/docs/{document}/download', [ParticipantDocumentController::class, 'download'])
         ->name('participant.docs.download');
 
+    // Route::get('/participant/docs/{id}/view', [ParticipantDocumentController::class, 'view'])
+    //     ->name('participant.docs.view');
+
+    Route::middleware('auth')->get('/participant/docs/view/{id}', function ($id) {
+    $doc = ParticipantDocument::findOrFail($id);
+
+    abort_unless(Storage::disk($doc->disk)->exists($doc->path), 404);
+
+    return response(
+        Storage::disk($doc->disk)->get($doc->path),
+        200,
+        [
+            'Content-Type' => Storage::disk($doc->disk)->mimeType($doc->path),
+            'Content-Disposition' => 'inline; filename="'.basename($doc->path).'"',
+        ]
+    );
+})->name('participant.docs.view');
+
     Route::delete('/participant/docs/{document}', [ParticipantDocumentController::class, 'destroy'])
         ->name('participant.docs.destroy');
 
@@ -431,10 +451,6 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
 
 Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', 'role:Customer',  'prevent-back-history', 'auth.session'])->group(function () {
 
-    // Route::controller(DashboardController::class)->group(function () {
-    //     Route::get('/cms/admin/dashboard', 'dashboard')->name('cms.admin.dashboard');
-    // });
-
     Route::controller(GuardianController::class)->group(function () {
         Route::get('/ypi/customer', 'index')->name('ypi.customer');
         Route::get('/ypi/customer/guardian', 'index')->name('ypi.customer.guardian');
@@ -444,6 +460,8 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
         Route::post('/ypi/customer/guardian/update', 'update')->name('ypi.customer.guardian.update');
         Route::delete('/ypi/customer/guardian/delete/{id}', 'delete')->name('ypi.customer.guardian.delete');
         Route::post('/ypi/customer/guardian/store', 'store')->name('ypi.customer.guardian.store');
+        Route::get('/ypi/customer/participant/create', 'create')->name('ypi.customer.participant.create');
+        Route::get('/ypi/customer/participant/edit/{id}', 'edit')->name('ypi.customer.participant.edit');
 
         // for event switching
         Route::get('/ypi/customer/events/{id}/switch',  'switch')->name('ypi.customer.guardian.switch');

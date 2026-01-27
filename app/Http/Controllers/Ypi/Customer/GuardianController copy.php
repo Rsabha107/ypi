@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\Guard;
 
-class GuardianController extends Controller
+class GuardianControllerold extends Controller
 {
     //
     public function index()
@@ -216,13 +216,10 @@ class GuardianController extends Controller
 
             $actions = '<div class="font-sans-serif btn-reveal-trigger position-static">';
 
-            $edit_actions_js =
+            $edit_actions =
                 '<a href="javascript:void(0)" class="btn btn-sm" id="edit_participant_offcanvas" data-id="' .
                 $op->id .
                 '" data-table="participant_table" data-bs-toggle="tooltip" data-bs-placement="right" title="Update">' .
-                '<i class="fa-solid fa-pen-to-square text-primary"></i></a>';
-            $edit_actions =
-                '<a href="' . route('ypi.customer.participant.edit', $op->id) . '" class="btn btn-sm" data-bs-toggle="tooltip" data-bs-placement="right" title="Update">' .
                 '<i class="fa-solid fa-pen-to-square text-primary"></i></a>';
             $delete_actions =
                 '<a href="javascript:void(0)" class="btn btn-sm" data-table="participant_table" data-id="' .
@@ -292,34 +289,6 @@ class GuardianController extends Controller
         ));
     }
 
-    public function edit($id)
-    {
-        $participant = Participant::findOrFail($id);
-        $event = Event::findOrFail(session()->get('EVENT_ID'));
-        $participant_types = ParticipantType::all();
-        $genders = Gender::all();
-        $nationalities = Nationality::all();
-        $pant_sizes   = SizeLookup::type('pant')->get();
-        $jersey_sizes = SizeLookup::type('jersey')->get();
-        $shoe_sizes   = SizeLookup::type('shoe')->get();
-        $jacket_sizes = SizeLookup::type('jacket')->get();
-
-        $age = age_from_dob($participant->date_of_birth, 'Y-m-d');
-
-        return view('ypi.customer.guardian.edit', compact(
-            'participant',
-            'event',
-            'participant_types',
-            'genders',
-            'nationalities',
-            'pant_sizes',
-            'jersey_sizes',
-            'shoe_sizes',
-            'jacket_sizes',
-            'age'
-        ));
-    }
-
     public function store(Request $request)
     {
         //
@@ -340,7 +309,6 @@ class GuardianController extends Controller
             'jersey_size_id' => 'required',
             'jacket_size_id' => 'required',
             'shoe_size_id' => 'required',
-            'qid_file' => 'required|file|max:2048|mimes:jpg,jpeg,png,pdf',
             // 'food_allergy' => 'required',
             // 'health_issues' => 'required',
             // FilePond temp ids
@@ -364,6 +332,29 @@ class GuardianController extends Controller
         DB::beginTransaction();
         try {
             $op = new Participant();
+
+            if ($request->hasFile('file_name')) {
+
+                $file = $request->file('file_name');
+                $fileNameWithExt = $file->getClientOriginalName();
+                // get file name
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                // get extension
+                $extension = $request->file('file_name')->getClientOriginalExtension();
+
+                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+
+                Log::info($fileNameWithExt);
+                Log::info($filename);
+                Log::info($extension);
+                Log::info($fileNameToStore);
+
+                // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
+                // $path = $file->move('upload/profile_images/', $fileNameToStore);
+                // Log::info($path);
+
+                $op->photo = $fileNameToStore;
+            }
 
             $userId = auth()->id();
 
@@ -393,63 +384,13 @@ class GuardianController extends Controller
             $op->updated_by = $user_id;
 
             $op->save();
-
-            if ($request->hasFile('qid_file')) {
-
-                $file = $request->file('qid_file');
-                // $fileNameWithExt = $file->getClientOriginalName();
-                // // get file name
-                // $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-                // // get extension
-                // $extension = $request->file('qid_file')->getClientOriginalExtension();
-
-                // $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-
-                // Log::info($fileNameWithExt);
-                // Log::info($filename);
-                // Log::info($extension);
-                // Log::info($fileNameToStore);
-
-                // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
-                // $path = $file->move('upload/profile_images/', $fileNameToStore);
-                // Log::info($path);
-
-                // $dir = "reports/{$report->id}";
-                $dir = "uploads/participants/{$op->id}";
-                // $filename = uniqid() . '.jpg'; // normalize to jpg
-
-                // // 🔥 Resize image
-                // // $image = Image::read($photo);
-                // $manager = new ImageManager(new Driver());
-
-                // // ✅ Read image
-                // $image = $manager->read($photo)
-                //     ->orient() // replaces orientate()
-                //     ->resize(1600, null, function ($constraint) {
-                //         $constraint->aspectRatio();
-                //         $constraint->upsize();
-                //     })
-                //     ->toJpeg(85); // encode
-
-
-                // // 🔥 Store in PRIVATE disk
-                // $path = Storage::disk('private')->put(
-                //     "{$dir}/{$filename}",
-                //     $image
-                // );
-                $path = $file->store($dir, 'private');
-
-                ParticipantDocument::create([
-                    'participant_id' => $op->id,
-                    'disk' => 'private',
-                    'path' => $path,
-                    'original_name' => $file->getClientOriginalName(),
-                    'mime' => $file->getClientMimeType(),
-                    'size' => $file->getSize(),
-                    'created_by' => auth()->id(),
-                ]);
+            // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
+            // =========================
+            // Commit FilePond uploads
+            // =========================
+            if (!empty($serverIds)) {
+                $this->commitFilepondUploads($serverIds, $op->id, 'qid');
             }
-
 
             DB::commit();
 
@@ -457,13 +398,7 @@ class GuardianController extends Controller
             // $type = 'success';
             $message = 'Participant created succesfully.';
 
-            // return response()->json(['error' => $error, 'message' => $message]);
-            $toastr_message = [
-                'alert-type' => 'success',
-                'message' => 'Report submitted successfully!',
-            ];
-
-            return redirect()->route('home')->with($toastr_message);
+            return response()->json(['error' => $error, 'message' => $message]);
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -480,8 +415,6 @@ class GuardianController extends Controller
 
     public function update(Request $request)
     {
-        Log::info('inside GuardianController update');
-        Log::info('request data: ' . json_encode($request->all()));
         //
         // dd($request);
 
@@ -525,28 +458,28 @@ class GuardianController extends Controller
         try {
             $op = Participant::findOrFail($request->participant_id);
 
-            // if ($request->hasFile('file_name')) {
+            if ($request->hasFile('file_name')) {
 
-            //     $file = $request->file('file_name');
-            //     $fileNameWithExt = $file->getClientOriginalName();
-            //     // get file name
-            //     $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            //     // get extension
-            //     $extension = $request->file('file_name')->getClientOriginalExtension();
+                $file = $request->file('file_name');
+                $fileNameWithExt = $file->getClientOriginalName();
+                // get file name
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                // get extension
+                $extension = $request->file('file_name')->getClientOriginalExtension();
 
-            //     $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
 
-            //     Log::info($fileNameWithExt);
-            //     Log::info($filename);
-            //     Log::info($extension);
-            //     Log::info($fileNameToStore);
+                Log::info($fileNameWithExt);
+                Log::info($filename);
+                Log::info($extension);
+                Log::info($fileNameToStore);
 
-            //     // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
-            //     // $path = $file->move('upload/profile_images/', $fileNameToStore);
-            //     // Log::info($path);
+                // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
+                // $path = $file->move('upload/profile_images/', $fileNameToStore);
+                // Log::info($path);
 
-            //     $op->photo = $fileNameToStore;
-            // }
+                $op->photo = $fileNameToStore;
+            }
 
             $userId = auth()->id();
 
@@ -585,53 +518,24 @@ class GuardianController extends Controller
             // 4) Delete docs ONLY ON SAVE (staged deletes)
             // =========================
             // Ensure the table has: id, event_id, disk, path (or equivalents)
-            // if (!empty($deleteIds)) {
-            //     $docs = ParticipantDocument::where('participant_id', $op->id)
-            //         ->whereIn('id', $deleteIds)
-            //         ->get();
+            if (!empty($deleteIds)) {
+                $docs = ParticipantDocument::where('participant_id', $op->id)
+                    ->whereIn('id', $deleteIds)
+                    ->get();
 
-            //     foreach ($docs as $doc) {
-            //         Storage::disk($doc->disk ?? 'private')->delete($doc->path);
-            //         $doc->delete();
-            //     }
-            // }
-
-            if ($request->hasFile('qid_file')) {
-
-                // delete old file (optional but recommended)
-                if ($op->qidDocument) {
-                    Storage::disk($op->qidDocument->disk)
-                        ->delete($op->qidDocument->path);
-                    $op->qidDocument->delete();
+                foreach ($docs as $doc) {
+                    Storage::disk($doc->disk ?? 'private')->delete($doc->path);
+                    $doc->delete();
                 }
-
-                $file = $request->file('qid_file');
-                $path = $file->store('participants/qid', 'private');
-
-                ParticipantDocument::create([
-                    'participant_id' => $op->id,
-                    'disk'           => 'private',
-                    'path'           => $path,
-                    'original_name'  => $file->getClientOriginalName(),
-                    'mime'           => $file->getClientMimeType(),
-                    'size'           => $file->getSize(),
-                ]);
             }
 
             DB::commit();
 
-            $toastr_message = [
-                'alert-type' => 'success',
-                'message' => 'Report submitted successfully!',
-            ];
+            $error = false;
+            // $type = 'success';
+            $message = 'Participant updated successfully.';
 
-            return redirect()->route('home')->with($toastr_message);
-
-            // $error = false;
-            // // $type = 'success';
-            // $message = 'Participant updated successfully.';
-
-            // return response()->json(['error' => $error, 'message' => $message]);
+            return response()->json(['error' => $error, 'message' => $message]);
         } catch (\Throwable $e) {
             DB::rollBack();
 

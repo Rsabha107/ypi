@@ -18,8 +18,11 @@
             </nav>
         </div>
         <div>
-            <x-button_insert_js title='Add participant' selectionId="offcanvas-add-participant" dataId="{{ session()->get('EVENT_ID') }}"
-                table="participant_table" />
+            {{-- <x-button_insert_js title='Add participant' selectionId="offcanvas-add-participant" dataId="{{ session()->get('EVENT_ID') }}"
+                table="participant_table" /> --}}
+            
+            <x-formy.button url="{{ route('ypi.customer.participant.create') }}" title="New Report" icon="fa-solid fa-plus"
+                class="btn btn-subtle-primary px-3 px-sm-5 me-2" />
             <button class="btn px-3 btn-phoenix-secondary" type="button" data-bs-toggle="offcanvas"
                 data-bs-target="#participantFilterOffcanvas" aria-haspopup="true" aria-expanded="false"
                 data-bs-reference="parent"><svg class="svg-inline--fa fa-filter text-primary" data-fa-transform="down-3"

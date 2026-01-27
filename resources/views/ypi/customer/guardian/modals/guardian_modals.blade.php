@@ -12,8 +12,8 @@
         </span>
     </a>
     <x-ypi.customer.participant-drawer-edit id="" formAction="{{ route('ypi.customer.guardian.update') }}"
-        formId="edit_participant_slot_form" :events="$events" :participantTypes="$participant_types" :genders="$genders" :clientGroups="$client_groups"
-        :designations="$designations" :nationalities="$nationalities" :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes" :jacketSizes="$jacket_sizes"
+        formId="edit_participant_slot_form" :events="$events" :participantTypes="$participant_types" :genders="$genders" 
+        :nationalities="$nationalities" :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes" :jacketSizes="$jacket_sizes"
         :shoeSizes="$shoe_sizes" />
 
 
@@ -33,8 +33,8 @@
         </span>
     </a>
     <x-ypi.customer.participant-drawer id="" formAction="{{ route('ypi.customer.guardian.store') }}"
-        formId="add_participant_slot_form" :events="$events" :participantTypes="$participant_types" :genders="$genders" :clientGroups="$client_groups"
-        :designations="$designations" :nationalities="$nationalities" :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes"
+        formId="add_participant_slot_form" :events="$events" :participantTypes="$participant_types" :genders="$genders" 
+        :nationalities="$nationalities" :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes"
         :jacketSizes="$jacket_sizes" :shoeSizes="$shoe_sizes" />
 
 

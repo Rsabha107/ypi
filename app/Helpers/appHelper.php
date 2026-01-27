@@ -3,12 +3,12 @@
 // namespace App\Http\Helpers;
 
 use App\Models\Event;
-use App\Models\Gms\ParticipantStatus;
-use App\Models\Vapp\MatchCategory;
+use App\Models\Ypi\ParticipantStatus;
 use App\Models\Vapp\ParkingCapacity;
 use App\Models\Vapp\VappRequest;
 use App\Models\Vapp\VappRequestStatus;
 use App\Models\Vapp\Venue;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Lang;
@@ -17,6 +17,24 @@ use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\Permission\Models\Role;
 
+if (! function_exists('age_from_dob')) {
+    function age_from_dob($dob, $format = null): ?int
+    {
+        if (empty($dob)) {
+            return null;
+        }
+
+        try {
+            $date = $format
+                ? Carbon::createFromFormat($format, $dob)
+                : Carbon::parse($dob);
+
+            return $date->age; // Carbon handles leap years correctly
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+}
 
 if (! function_exists('getNameById')) {
     /**

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\GeneralSettings;
 
 use App\Http\Controllers\Controller;
-use App\Models\Gms\TempUpload;
+use App\Models\Ypi\TempUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -80,13 +80,13 @@ class UploadController extends Controller
             return response('File too large', 422);
         }
 
-        $path = $file->store('tmp/qid', 'public');
+        $path = $file->store('tmp/qid', 'private');
         $serverId = (string) Str::uuid();
 
         $temp = TempUpload::create([
             'id' => $serverId,
             'path'          => $path,
-            'disk'          => 'public',
+            'disk'          => 'private',
             'user_id'        => auth()->id(), // will be null for guest registration - ok
             'original_name' => $file->getClientOriginalName(),
             'mime'          => $mime,
@@ -102,10 +102,10 @@ class UploadController extends Controller
     public function revert(Request $request)
     {
         // FilePond sends the "server id" as raw body (the string we returned in process)
-        Log::info('UploadController::Revert called with body: ' . $request->all());
+        // Log::info('UploadController::Revert called with body: ' . $request->all());
         $serverId = trim($request->getContent() ?? '');
 
-        Log::info('UploadController::Revert called with serverId: ' . $serverId);
+        // Log::info('UploadController::Revert called with serverId: ' . $serverId);
         if (!$serverId) {
             return response('', 200);
         }

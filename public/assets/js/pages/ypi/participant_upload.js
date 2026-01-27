@@ -73,6 +73,7 @@ $(document).ready(function () {
             pond = FilePond.create(input, {
                 name: "qid_files",
                 allowMultiple: true,
+                required: true,
                 maxFiles,
                 allowImagePreview: true,
                 imagePreviewHeight: 140,

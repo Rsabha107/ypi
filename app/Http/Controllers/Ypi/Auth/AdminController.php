@@ -516,8 +516,8 @@ class AdminController extends Controller
     {
 
         $event = Event::findOrFail($event_id);
-        $functional_areas = FunctionalArea::all();
-        return view('auth.register', compact('event', 'functional_areas'));
+        // $functional_areas = FunctionalArea::all();
+        return view('auth.register', compact('event'));
     }
 
     public function storeRegister(Request $request)

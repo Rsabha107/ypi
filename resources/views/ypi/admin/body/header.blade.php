@@ -2,7 +2,7 @@
 
 
     $current_event_id = session()->get('EVENT_ID');
-    $event = App\Models\Vapp\Event::find($current_event_id);
+    $event = App\Models\Ypi\Event::find($current_event_id);
 
     $id = Auth::user()->id;
     $profileData = App\Models\User::find($id);
@@ -32,7 +32,7 @@
         </div>
         @php
 
-            $user_events = App\Models\Vapp\Event::where('active_flag', 1)->orderBy('name')->get();
+            $user_events = App\Models\Ypi\Event::where('active_flag', 1)->orderBy('name')->get();
         @endphp
 
 
@@ -153,16 +153,12 @@
                                     placeholder="Update your status" />
                             </div> --}}
                         </div>
-                        <div class="overflow-auto scrollbar" style="height: 10rem;">
+                        {{-- <div class="overflow-auto scrollbar" style="height: 10rem;">
                             <ul class="nav d-flex flex-column mb-2 pb-1">
                                 <li class="nav-item"><a class="nav-link px-3 d-block"
                                         href="{{ route('admin.users.profile') }}"> <span
                                             class="me-2 text-body align-bottom"
                                             data-feather="user"></span><span>Profile</span></a></li>
-                                {{-- <li class="nav-item"><a class="nav-link px-3 d-block"
-                                        href="{{ route('mds.admin.dashboard') }}"><span
-                                            class="me-2 text-body align-bottom"
-                                            data-feather="pie-chart"></span>Dashboard</a></li> --}}
                                 <li class="nav-item"><a class="nav-link px-3 d-block" href="#!"> <span
                                             class="me-2 text-body align-bottom"
                                             data-feather="settings"></span>Settings &amp; Privacy </a></li>
@@ -173,7 +169,7 @@
                                             class="me-2 text-body align-bottom"
                                             data-feather="globe"></span>Language</a></li>
                             </ul>
-                        </div>
+                        </div> --}}
                         <div class="card-footer p-2">
                             {{-- <div class="card-footer p-0 border-top border-translucent"> --}}
                             {{-- <ul class="nav d-flex flex-column my-3">

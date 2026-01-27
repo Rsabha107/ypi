@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\GeneralSettings;
 
 use App\Http\Controllers\Controller;
-use App\Models\Gms\GuardianDocument;
 use App\Models\Gms\ParticipantDocument;
+use App\Models\Ypi\GuardianDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;

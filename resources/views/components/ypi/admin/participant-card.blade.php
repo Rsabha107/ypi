@@ -12,7 +12,7 @@
         background-color: #d4edda !important;
     }
 </style>
-<div class="card mt-4">
+<div class="card mt-4 mb-5">
     <div class="card-body">
         <div class="table-responsive text-nowrap">
             {{ $slot }}
