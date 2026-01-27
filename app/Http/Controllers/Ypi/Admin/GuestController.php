@@ -3,26 +3,17 @@
 namespace App\Http\Controllers\Ypi\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Ypi\ClientGroup;
 use App\Models\Ypi\Event;
 use App\Models\Ypi\AirlineCarriers;
 use App\Models\Ypi\Airport;
-use App\Models\Ypi\Designation;
 use App\Models\Ypi\FlightCabin;
 use App\Models\Ypi\FlightStatus;
 use App\Models\Ypi\FlightType;
 use App\Models\Ypi\Gender;
-use App\Models\Ypi\GuestType;
-use App\Models\Ypi\HostedBy;
-use App\Models\Ypi\JacketSize;
-use App\Models\Ypi\JerseySize;
-use App\Models\Ypi\Prefix;
 use App\Models\Ypi\Nationality;
-use App\Models\Ypi\PantSize;
 use App\Models\Ypi\Participant;
 use App\Models\Ypi\ParticipantStatus;
 use App\Models\Ypi\ParticipantType;
-use App\Models\Ypi\ShoeSize;
 use App\Models\Ypi\SizeLookup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -38,11 +29,8 @@ class GuestController extends Controller
     {
         $participants = Participant::all();
         $events = Event::all();
-        $client_groups = ClientGroup::all();
         $participant_types = ParticipantType::all();
         $genders = Gender::all();
-        $client_groups = ClientGroup::all();
-        $designations = Designation::all();
         $nationalities = Nationality::all();
         $pant_sizes   = SizeLookup::type('pant')->get();
         $jersey_sizes = SizeLookup::type('jersey')->get();
@@ -57,8 +45,6 @@ class GuestController extends Controller
             'events',
             'participant_types',
             'genders',
-            'client_groups',
-            'designations',
             'nationalities',
             'pant_sizes',
             'jersey_sizes',

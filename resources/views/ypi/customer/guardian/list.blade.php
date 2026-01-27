@@ -38,7 +38,7 @@
                     </g>
                 </svg><!-- <span class="fa-solid fa-filter text-primary" data-fa-transform="down-3"></span> Font Awesome fontawesome.com -->
             </button>
-            <button class="btn px-3 btn-phoenix-secondary bg-body-emphasis bg-body-hover action-btn" type="button"
+            {{-- <button class="btn px-3 btn-phoenix-secondary bg-body-emphasis bg-body-hover action-btn" type="button"
                 data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false"
                 data-bs-reference="parent"><svg class="svg-inline--fa fa-ellipsis" data-fa-transform="shrink-2"
                     aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis" role="img"
@@ -52,12 +52,12 @@
                         </g>
                     </g>
                 </svg><!-- <span class="fas fa-ellipsis-h" data-fa-transform="shrink-2"></span> Font Awesome fontawesome.com -->
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" style="">
+            </button> --}}
+            {{-- <ul class="dropdown-menu dropdown-menu-end" style=""> --}}
                 {{-- <li><a class="dropdown-item ms-2 text-warning" href="{{ route('mds.setting.schedule.import') }}">
                     <span class="fa-solid fa-upload text-warning me-2"></span>Import</a></li> --}}
-                <li>
-                    <form method="POST" action="#" id="filter_booking_export_form">
+                {{-- <li> --}}
+                    {{-- <form method="POST" action="#" id="filter_booking_export_form">
                         @csrf
                         <input type="hidden" id="export_client_group_filter" name="export_client_group_filter"
                             value="">
@@ -66,20 +66,20 @@
                         <input type="hidden" id="export_event_filter" name="export_event_filter" value="">
                         <input type="hidden" id="export_venue_filter" name="export_venue_filter" value="">
                         <input type="hidden" id="export_rsp_filter" name="export_rsp_filter" value="">
-                        <input type="hidden" id="export_date_range_filter" name="export_date_range_filter" value="">
+                        <input type="hidden" id="export_date_range_filter" name="export_date_range_filter" value=""> --}}
                         {{-- <button type="submit">export</button> --}}
-                        <button type="submit" class="btn btn-link p-2 m-2 align-baseline">
+                        {{-- <button type="submit" class="btn btn-link p-2 m-2 align-baseline">
                             Export Filtered Results
-                        </button>
+                        </button> --}}
                         {{-- <a class="dropdown-item ms-2 text-success me-2" href="{{ route('ypi.admin.guest.test.email') }}"> --}}
-                    <span class="fa-solid fa-download text-success me-2"></span>Dynamic Email Test
+                    {{-- <span class="fa-solid fa-download text-success me-2"></span>Dynamic Email Test --}}
                 </a>
                     </form>
                     {{-- <a class="dropdown-item ms-2 text-success me-2" href="{{ route('mds.admin.booking.export') }}">
                     <span class="fa-solid fa-download text-success me-2"></span>Export
                 </a> --}}
-                </li>
-            </ul>
+                {{-- </li>
+            </ul> --}}
         </div>
     </div>
     <x-ypi.customer.participant-card />

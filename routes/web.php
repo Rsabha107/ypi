@@ -150,7 +150,7 @@ Route::group(['middleware' => 'prevent-back-history', 'XssSanitizer'], function 
 
 
 // Booking MANAGEMENT ******************************************************************** Admin All Route
-Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmin|SuperMDS', 'prevent-back-history', 'auth.session'])->group(function () {
+Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmin', 'prevent-back-history', 'auth.session'])->group(function () {
 
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/mds/admin/dashboard', 'dashboard')->name('mds.admin.dashboard');

@@ -21,6 +21,7 @@ class AppSettingController extends Controller
 
     public function get($id)
     {
+        Log::info('Getting Application Setting with ID: ' . $id);
         $op = Setting::findOrFail($id);
         return response()->json(['op' => $op]);
     }

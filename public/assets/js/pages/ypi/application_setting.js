@@ -14,7 +14,7 @@ $(document).ready(function () {
         // var spinner = new Spinner().spin(target);
         // $("#edit_venues_modal").modal("show");
         $.ajax({
-            url: "ypi/setting/application/get/" + id,
+            url: "/ypi/setting/application/get/" + id,
             type: "get",
             headers: {
                 "X-CSRF-TOKEN": $('input[name="_token"]').attr("value"), // Replace with your method of getting the CSRF token
