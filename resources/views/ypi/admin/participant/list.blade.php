@@ -3,7 +3,7 @@
     <!-- ===============================================-->
     <!--    Main Content-->
     <!-- ===============================================-->
-        <div class="d-flex justify-content-between m-2">
+    <div class="d-flex justify-content-between m-2">
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb breadcrumb-style1">
@@ -17,8 +17,8 @@
             </nav>
         </div>
         <div>
-            <x-button_insert_js title='Add participant' selectionId="offcanvas-add-participant" dataId="{{ session()->get('EVENT_ID') }}"
-                table="participant_table" />
+            {{-- <x-button_insert_js title='Add participant' selectionId="offcanvas-add-participant" dataId="{{ session()->get('EVENT_ID') }}"
+                table="participant_table" /> --}}
             <button class="btn px-3 btn-phoenix-secondary" type="button" data-bs-toggle="offcanvas"
                 data-bs-target="#bookingFilterOffcanvas" aria-haspopup="true" aria-expanded="false"
                 data-bs-reference="parent"><svg class="svg-inline--fa fa-filter text-primary" data-fa-transform="down-3"
@@ -50,10 +50,8 @@
                 </svg><!-- <span class="fas fa-ellipsis-h" data-fa-transform="shrink-2"></span> Font Awesome fontawesome.com -->
             </button>
             <ul class="dropdown-menu dropdown-menu-end" style="">
-                {{-- <li><a class="dropdown-item ms-2 text-warning" href="{{ route('mds.setting.schedule.import') }}">
-                    <span class="fa-solid fa-upload text-warning me-2"></span>Import</a></li> --}}
                 <li>
-                    <form method="POST" action="#" id="filter_booking_export_form">
+                    <form method="POST" action="{{ route('ypi.admin.report.export') }}" id="filter_booking_export_form">
                         @csrf
                         <input type="hidden" id="export_client_group_filter" name="export_client_group_filter"
                             value="">
@@ -67,13 +65,11 @@
                         <button type="submit" class="btn btn-link p-2 m-2 align-baseline">
                             Export Filtered Results
                         </button>
-                        <a class="dropdown-item ms-2 text-success me-2" href="{{ route('ypi.admin.participant.test.email') }}">
-                    <span class="fa-solid fa-download text-success me-2"></span>Dynamic Email Test
-                </a>
+                        {{-- <a class="dropdown-item ms-2 text-success me-2"
+                            href="{{ route('ypi.admin.participant.test.email') }}">
+                            <span class="fa-solid fa-download text-success me-2"></span>Dynamic Email Test
+                        </a> --}}
                     </form>
-                    {{-- <a class="dropdown-item ms-2 text-success me-2" href="{{ route('mds.admin.booking.export') }}">
-                    <span class="fa-solid fa-download text-success me-2"></span>Export
-                </a> --}}
                 </li>
             </ul>
         </div>

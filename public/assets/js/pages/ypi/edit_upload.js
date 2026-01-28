@@ -26,6 +26,40 @@ $(document).ready(function () {
         let suppressDbDelete = false;
         let pendingDeleteDocIds = [];
 
+        // ===== Save/Register button handling =====
+        const $saveBtn = saveButtonSelector ? $(saveButtonSelector) : $();
+
+        const setSaveDisabled = (disabled, text = null) => {
+            if (!$saveBtn.length) return;
+
+            // store original button HTML once
+            $saveBtn.each(function () {
+                const $b = $(this);
+                if ($b.data("orig-html") == null) {
+                    $b.data("orig-html", $b.html());
+                }
+            });
+
+            $saveBtn.prop("disabled", disabled);
+
+            if (text !== null) {
+                if (disabled) {
+                    $saveBtn.html(text);
+                } else {
+                    $saveBtn.each(function () {
+                        const $b = $(this);
+                        const orig = $b.data("orig-html");
+                        if (orig != null) $b.html(orig);
+                    });
+                }
+            }
+        };
+
+        const anyUploading = () =>
+            pond
+                ?.getFiles?.()
+                .some((f) => f.status === FilePond.FileStatus.PROCESSING);
+
         const setDeleteIds = () =>
             $(deleteIdsSelector).val(JSON.stringify(pendingDeleteDocIds));
         const resetDeletes = () => {
@@ -77,33 +111,35 @@ $(document).ready(function () {
                 },
             });
 
-            let isUploading = false;
-            let originalSaveHtml = null;
+            // ===== Disable Save/Register while uploading =====
+            pond.on("processfilestart", () => {
+                setSaveDisabled(true, "Uploading...");
+            });
 
-            // if (containerEl && blockCloseWhileUploading) {
-            //     containerEl.addEventListener("hide.bs.modal", function (e) {
-            //         if (!isUploading) return;
+            pond.on("processfile", () => {
+                if (!anyUploading())
+                    setSaveDisabled(false, "Update Participant");
+            });
 
-            //         // block close
-            //         e.preventDefault();
-            //         e.stopPropagation();
+            pond.on("processfileabort", () => {
+                if (!anyUploading())
+                    setSaveDisabled(false, "Update Participant");
+            });
 
-            //         if (showToastOnBlockedClose && window.toastr) {
-            //             toastr.warning("Upload still in progress");
-            //         }
-            //     });
-            // }
+            pond.on("processfileerror", () => {
+                if (!anyUploading())
+                    setSaveDisabled(false, "Update Participant");
+            });
+
+            pond.on("removefile", () => {
+                if (!anyUploading())
+                    setSaveDisabled(false, "Update Participant");
+            });
 
             pond.on("processfile", syncServerIds);
             pond.on("removefile", syncServerIds);
             pond.on("revertfile", syncServerIds);
 
-            // If user removes a file mid-upload
-            pond.on("removefile", () => {
-                const isUploading = pond
-                    .getFiles()
-                    .some((f) => f.status === FilePond.FileStatus.PROCESSING);
-            });
             // open file (DB preload uses metadata.download_url)
             pond.on("activatefile", (file) => {
                 const meta = file.getMetadata?.() || {};
@@ -178,7 +214,7 @@ $(document).ready(function () {
         inputSelector: "#qid_upload_edit",
         serverIdsSelector: "#qid_server_ids_edit",
         deleteIdsSelector: "#delete_doc_ids_edit",
-        saveButtonSelector: ".js-save-btn", // ← class
+        saveButtonSelector: "#saveParticipantBtn", // ← class
         maxFiles: 1,
     });
 

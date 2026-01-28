@@ -42,6 +42,7 @@ use App\Http\Controllers\Ypi\Customer\GuestController as CustomerGuestController
 use App\Http\Controllers\Ypi\Setting\SizeController;
 use App\Http\Controllers\Vapp\Customer\BookingController as CustomerBookingController;
 use App\Http\Controllers\Vapp\Operator\BookingController as OperatorBookingController;
+use App\Http\Controllers\Ypi\Admin\ImportExportController;
 use App\Http\Controllers\Ypi\Setting\AppSettingController;
 
 use App\Http\Controllers\Ypi\Setting\EventImageController;
@@ -157,7 +158,14 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
     });
 
 
-    // GMS
+    //export participant
+        //Import and Export
+    Route::controller(ImportExportController::class)->group(function () {
+        Route::get('/ypi/admin/report/import', 'showImportForm')->name('ypi.admin.report.import');
+        Route::post('/ypi/admin/report/import', 'import')->name('ypi.admin.report.import.store');
+        Route::post('/ypi/admin/report/export', 'export')->name('ypi.admin.report.export');
+    });
+    // ypi
     Route::controller(GuestController::class)->group(function () {
 
         Route::post('/ypi/admin/participant/status/update', 'updateStatus')->name('ypi.admin.participant.status.update');

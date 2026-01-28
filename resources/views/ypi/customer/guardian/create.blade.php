@@ -252,7 +252,7 @@
                                         onclick="window.location='{{ route('home') }}'" type="button">Cancel</button>
                                 </div>
                                 <div class="col-auto">
-                                    <button class="btn btn-primary px-5 px-sm-15" type="submit">Save Participant</button>
+                                    <button class="btn btn-primary px-5 px-sm-15" id="saveParticipantBtn" type="submit">Save Participant</button>
                                 </div>
                             </div>
                         </div>

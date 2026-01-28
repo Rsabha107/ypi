@@ -75,7 +75,7 @@
             <form method="POST" action="{{ route('admin.register.store') }}" class="forms-sample needs-validation"
                 enctype="multipart/form-data" novalidate>
                 @csrf
-                <input type="hidden" name="event_id" value="{{ request('event_id') }}">
+                <input type="hidden" name="event_id" value="{{ $event->id }}">
                 <div class="row flex-center min-vh-100 py-5">
                     <div class="col-sm-10 col-md-8 col-lg-5 col-xl-5 col-xxl-4">
                         <div class="card shadow-sm">
@@ -190,7 +190,7 @@
                                             href="{{ route('auth.forgot') }}">Forgot
                                             Password?</a></div>
                                 </div> --}}
-                                <button class="btn btn-primary w-100 mb-3">Register</button>
+                                <button type="submit" id="registerBtn" class="btn btn-primary w-100 mb-3">Register</button>
                             </div>
                         </div>
                     </div>

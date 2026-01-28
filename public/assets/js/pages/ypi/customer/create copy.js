@@ -109,25 +109,9 @@ $(document).ready(function () {
         FilePondPluginFileValidateSize,
     );
 
-    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+    const csrf = $('meta[name="csrf-token"]').attr("content");
 
-    const input = document.querySelector("#qid_files");
-    const saveParticipantBtn = document.getElementById("saveParticipantBtn");
-    const serverIdInput = document.getElementById("qid_server_id");
-
-    if (!input) return;
-
-    const setButtonDisabled = (disabled) => {
-        saveParticipantBtn.disabled = disabled;
-        saveParticipantBtn.classList.toggle("is-disabled", disabled);
-        saveParticipantBtn.dataset.originalText ??=
-            saveParticipantBtn.innerText;
-        saveParticipantBtn.innerText = disabled
-            ? "Uploading…"
-            : saveParticipantBtn.dataset.originalText;
-    };
-
-    const pond = FilePond.create(document.querySelector("#qid_files"), {
+    FilePond.create(document.querySelector("#qid_files"), {
         name: "qid_files[]",
         allowMultiple: true,
         maxFiles: 2,
@@ -154,27 +138,5 @@ $(document).ready(function () {
                 headers: { "X-CSRF-TOKEN": csrf },
             },
         },
-    });
-
-    const anyUploading = () =>
-        pond
-            .getFiles()
-            .some((f) => f.status === FilePond.FileStatus.PROCESSING);
-
-    // Disable immediately when upload starts
-    pond.on("processfilestart", () => setButtonDisabled(true));
-
-    // Re-enable when upload completes and nothing else uploading
-    pond.on("processfile", () => {
-        if (!anyUploading()) setButtonDisabled(false);
-    });
-
-    // If upload is aborted or errors out
-    pond.on("processfileabort", () => setButtonDisabled(false));
-    pond.on("processfileerror", () => setButtonDisabled(false));
-
-    // Removing file should re-enable (unless another upload still running)
-    pond.on("removefile", () => {
-        if (!anyUploading()) setButtonDisabled(false);
     });
 });

@@ -177,7 +177,7 @@ class GuestController extends Controller
                 '" id="uploadImagesGuest" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">' .
                 '<i class="bx bx-arrow-to-top text-success"></i></a>';
 
-            $actions .=  $actions . (($op->status?->title == 'Approved')? $upload_img_actions: '') . $edit_actions . $delete_actions;
+            $actions .=  $actions . (($op->status?->title == 'Approved')? $upload_img_actions: '') . $delete_actions;
             $actions .= '</div>';
 
             $order_status =  '<span class="badge badge-phoenix fs--2 ms-2 badge-phoenix-' . $op->status?->color . ' "><span class="badge-label" id="change_participant_status" style="cursor:pointer" data-id="' . $op->id . '"data-status_id="' . $op->status?->id . '" data-table="participant_table">' . $op->status?->title . '</span><span class="ms-1" data-feather="x" style="height:12.8px;width:12.8px;cursor:pointer"></span></span>';
