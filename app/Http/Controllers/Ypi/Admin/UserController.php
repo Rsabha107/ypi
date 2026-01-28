@@ -37,8 +37,7 @@ class UserController extends Controller
         public function showForm()
     {
         $events = Event::all();
-        $functional_areas = FunctionalArea::all();
-        return view('ypi.admin.users.invite-user', compact('events', 'functional_areas'));
+        return view('ypi.admin.users.invite-user', compact('events'));
     }
 
     public function sendInvite(Request $request)

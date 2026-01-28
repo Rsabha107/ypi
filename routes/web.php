@@ -253,16 +253,14 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
     Route::get('/auth/ms-signup', [YpiAuthAdminController::class, 'msSignUp'])->name('auth.ms.signup');
     Route::post('/signup/ms/store', [UserController::class, 'msStore'])->name('admin.signup.ms.store');
 
-    // Route::controller(AdminUserController::class)->group(function () {
-    //     Route::get('/vapp/admin/users/profile', 'profile')->name('vapp.admin.users.profile');
-    //     Route::post('/vapp/admin/users/profile/update', 'update')->name('vapp.admin.users.profile.update');
-    //     Route::post('/vapp/admin/users/profile/password/update', 'updatePassword')->name('vapp.admin.users.profile.password.update');
-    //     Route::get('/ypi/admin/users/invite-user', 'showForm')->name('ypi.admin.users.invite.form');
-    //     Route::get('/register', function () {
-    //         return view('/ypi/admin/users/invite-link')->name('ypi.admin.users.invite.link');
-    //     });
-    //     Route::post('/ypi/invite-user', 'sendInvite')->name('ypi.admin.users.invite.send');
-    // });
+    Route::controller(AdminUserController::class)->group(function () {
+        Route::get('/vapp/admin/users/profile', 'profile')->name('vapp.admin.users.profile');
+        Route::post('/vapp/admin/users/profile/update', 'update')->name('vapp.admin.users.profile.update');
+        Route::post('/vapp/admin/users/profile/password/update', 'updatePassword')->name('vapp.admin.users.profile.password.update');
+        Route::get('/ypi/admin/users/invite-user', 'showForm')->name('ypi.admin.users.invite.form');
+
+        Route::post('/ypi/invite-user', 'sendInvite')->name('ypi.admin.users.invite.send');
+    });
 
     //Applicaiton Setting
     Route::controller(AppSettingController::class)->group(function () {
