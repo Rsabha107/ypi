@@ -9,6 +9,7 @@ use App\Models\Vapp\VappRequest;
 use App\Models\Vapp\VappRequestStatus;
 use App\Models\Vapp\Venue;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Lang;
@@ -16,6 +17,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\Permission\Models\Role;
+
+if (!function_exists('registerUrl')) {
+    function registerUrl(int $id): string
+    {
+        $event_id = Crypt::encrypt((string) $id);   // encrypted payload
+        return route('auth.register', $event_id);
+    }
+}
 
 if (! function_exists('age_from_dob')) {
     function age_from_dob($dob, $format = null): ?int
@@ -512,9 +521,9 @@ if (!function_exists('get_project_progress')) {
             $progress_value = round(($task_progress_sum / $task_count), 2);
         }
 
-        appLog('Helper::appHelper $task_count: '.$task_count);
-        appLog('Helper::appHelper $task_progress_sum: '.$task_progress_sum);
-        appLog('Helper::appHelper $progress_value: '.$progress_value);
+        appLog('Helper::appHelper $task_count: ' . $task_count);
+        appLog('Helper::appHelper $task_progress_sum: ' . $task_progress_sum);
+        appLog('Helper::appHelper $progress_value: ' . $progress_value);
 
         return $progress_value;
     }

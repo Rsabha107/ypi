@@ -121,7 +121,7 @@ Route::group(['middleware' => 'prevent-back-history', 'XssSanitizer'], function 
 
 
     // Email Templates
-    Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmin|SuperMDS', 'prevent-back-history', 'auth.session'])
+    Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmin', 'prevent-back-history', 'auth.session'])
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
@@ -165,6 +165,8 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         Route::get('/ypi/admin/participant/create', function () {
             return view('/ypi/admin/participant/createme');
         })->name('ypi.admin.participant.create');
+
+        Route::get('/register/enc/{token}', [YpiAuthAdminController::class, 'showEncryptedUrl'])->name('register.encrypted');
 
         // for event switching
         Route::get('/vapp/admin/events/{id}/switch',  'switch')->name('ypi.admin.booking.switch');
@@ -251,13 +253,16 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
     Route::get('/auth/ms-signup', [YpiAuthAdminController::class, 'msSignUp'])->name('auth.ms.signup');
     Route::post('/signup/ms/store', [UserController::class, 'msStore'])->name('admin.signup.ms.store');
 
-    Route::controller(AdminUserController::class)->group(function () {
-        Route::get('/vapp/admin/users/profile', 'profile')->name('vapp.admin.users.profile');
-        Route::post('/vapp/admin/users/profile/update', 'update')->name('vapp.admin.users.profile.update');
-        Route::post('/vapp/admin/users/profile/password/update', 'updatePassword')->name('vapp.admin.users.profile.password.update');
-        Route::get('/ypi/admin/users/invite-user', 'showForm')->name('vapp.admin.users.invite.form');
-        Route::post('/ypi/invite-user', 'sendInvite')->name('ypi.admin.users.invite.send');
-    });
+    // Route::controller(AdminUserController::class)->group(function () {
+    //     Route::get('/vapp/admin/users/profile', 'profile')->name('vapp.admin.users.profile');
+    //     Route::post('/vapp/admin/users/profile/update', 'update')->name('vapp.admin.users.profile.update');
+    //     Route::post('/vapp/admin/users/profile/password/update', 'updatePassword')->name('vapp.admin.users.profile.password.update');
+    //     Route::get('/ypi/admin/users/invite-user', 'showForm')->name('ypi.admin.users.invite.form');
+    //     Route::get('/register', function () {
+    //         return view('/ypi/admin/users/invite-link')->name('ypi.admin.users.invite.link');
+    //     });
+    //     Route::post('/ypi/invite-user', 'sendInvite')->name('ypi.admin.users.invite.send');
+    // });
 
     //Applicaiton Setting
     Route::controller(AppSettingController::class)->group(function () {
@@ -293,6 +298,10 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         Route::post('/vapp/admin/users/profile/password/update', 'updatePassword')->name('admin.users.profile.password.update');
         Route::get('/ypi/admin/users/invite-user', 'showForm')->name('admin.users.invite.form');
         Route::post('/vapp/invite-user', 'sendInvite')->name('admin.users.invite.send');
+        // invite link
+        Route::get('/invite-link', function () {
+            return view('/ypi/admin/users/invite-link');
+        })->name('admin.users.invite.link');
     });
 });
 
@@ -308,19 +317,19 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
     //     ->name('participant.docs.view');
 
     Route::middleware('auth')->get('/participant/docs/view/{id}', function ($id) {
-    $doc = ParticipantDocument::findOrFail($id);
+        $doc = ParticipantDocument::findOrFail($id);
 
-    abort_unless(Storage::disk($doc->disk)->exists($doc->path), 404);
+        abort_unless(Storage::disk($doc->disk)->exists($doc->path), 404);
 
-    return response(
-        Storage::disk($doc->disk)->get($doc->path),
-        200,
-        [
-            'Content-Type' => Storage::disk($doc->disk)->mimeType($doc->path),
-            'Content-Disposition' => 'inline; filename="'.basename($doc->path).'"',
-        ]
-    );
-})->name('participant.docs.view');
+        return response(
+            Storage::disk($doc->disk)->get($doc->path),
+            200,
+            [
+                'Content-Type' => Storage::disk($doc->disk)->mimeType($doc->path),
+                'Content-Disposition' => 'inline; filename="' . basename($doc->path) . '"',
+            ]
+        );
+    })->name('participant.docs.view');
 
     Route::delete('/participant/docs/{document}', [ParticipantDocumentController::class, 'destroy'])
         ->name('participant.docs.destroy');

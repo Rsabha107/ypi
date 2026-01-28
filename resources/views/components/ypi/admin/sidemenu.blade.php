@@ -212,8 +212,7 @@
                         <hr class="navbar-vertical-line" />
                         <!-- parent pages-->
                         <div class="nav-item-wrapper"><a class="nav-link dropdown-indicator label-1" href="#nv-list"
-                                role="button" data-bs-toggle="collapse" aria-expanded="false"
-                                aria-controls="nv-list">
+                                role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="nv-list">
                                 <div class="d-flex align-items-center">
                                     <div class="dropdown-indicator-icon-wrapper"><span
                                             class="fas fa-caret-right dropdown-indicator-icon"></span></div><span
@@ -339,6 +338,17 @@
                                             data-feather="life-buoy"></span></span><span
                                         class="nav-link-text-wrapper"><span class="nav-link-text">Invite
                                             Users</span></span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="nav-item-wrapper"><a
+                                class="nav-link label-1 {{ Request::is('/register/enc') }}"
+                                href="{{ route('admin.users.invite.link') }}" role="button" data-bs-toggle=""
+                                aria-expanded="false">
+                                <div class="d-flex align-items-center"><span class="nav-link-icon"><span
+                                            data-feather="life-buoy"></span></span><span
+                                        class="nav-link-text-wrapper"><span class="nav-link-text">Generate Invite
+                                            Link</span></span>
                                 </div>
                             </a>
                         </div>
