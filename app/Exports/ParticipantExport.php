@@ -41,7 +41,7 @@ class ParticipantExport implements FromCollection, WithHeadings
     }
     public function collection()
     {
-        $participants = Participant::all();
+        $participants = Participant::where('event_id', session()->get('EVENT_ID'))->get();
         $participants->transform(function ($participant) {
             return [
                 'participant_status' => $participant->status?->title,
@@ -56,10 +56,10 @@ class ParticipantExport implements FromCollection, WithHeadings
                 'date_of_birth' => $participant->date_of_birth,
                 'gender' => $participant->gender?->title,
                 'nationality' => $participant->nationality?->title,
-                'pants_size' => $participant->pants_size,
-                'jersey_size' => $participant->jersey_size,
-                'jacket_size' => $participant->jacket_size,
-                'shoe_size' => $participant->shoe_size,
+                'pants_size' => $participant->pantSize?->label,
+                'jersey_size' => $participant->jerseySize?->label,
+                'jacket_size' => $participant->jacketSize?->label,
+                'shoe_size' => $participant->shoeSize?->label,
                 'food_allergy' => $participant->food_allergy,
                 'food_allergy_details' => $participant->food_allergy_details,
                 'health_issues' => $participant->health_issues,
