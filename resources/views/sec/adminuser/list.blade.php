@@ -55,7 +55,7 @@
                                                 <th class="sort ps-3 pe-1 align-middle white-space-nowrap" data-sort="orderId" style="min-width: 4.5rem;">Email</th>
                                                 <!-- <th class="sort ps-3 pe-1 align-middle white-space-nowrap" data-sort="orderId" style="min-width: 4.5rem;">User Type</th> -->
                                                 <th class="sort ps-3 pe-1 align-middle white-space-nowrap" data-sort="orderId" style="min-width: 4.5rem;">Event</th>
-                                                <th class="sort ps-3 pe-1 align-middle white-space-nowrap" data-sort="orderId" style="min-width: 4.5rem;">FA</th>
+                                                {{-- <th class="sort ps-3 pe-1 align-middle white-space-nowrap" data-sort="orderId" style="min-width: 4.5rem;">FA</th> --}}
                                                 <th class="sort ps-3 pe-1 align-middle white-space-nowrap" data-sort="orderId" style="min-width: 4.5rem;">Phone</th>
                                                 <th class="sort ps-3 pe-1 align-middle white-space-nowrap" data-sort="orderId" style="min-width: 4.5rem;">Role</th>
                                                 <th class="no-sort" style="text-align:right"></th>
@@ -76,11 +76,11 @@
                                                     @endforeach
                                                 </td>
                                                 <!-- <td class="ps-3">{{ $item->dept_name}}</td> -->
-                                                <td class="ps-3">
+                                                {{-- <td class="ps-3">
                                                     @foreach ($item->fa as $fa_item)
                                                     <span class='badge badge-pill bg-body-tertiary'>{{ $fa_item->title }}</span>
                                                     @endforeach
-                                                </td>
+                                                </td> --}}
                                                 <td class="ps-3">{{ $item->phone }}</td>
                                                 <td class="ps-3">
                                                     @foreach ($item->roles as $role)

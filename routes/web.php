@@ -36,7 +36,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Ypi\Setting\VenueController;
 use App\Http\Controllers\UtilController;
 use App\Http\Controllers\Vapp\Admin\BookingController;
-use App\Http\Controllers\Ypi\Auth\AdminController as GmsAuthAdminController;
+use App\Http\Controllers\Ypi\Auth\AdminController as YpiAuthAdminController;
 use App\Http\Controllers\Ypi\Customer\GuardianController;
 use App\Http\Controllers\Ypi\Customer\GuestController as CustomerGuestController;
 use App\Http\Controllers\Ypi\Setting\SizeController;
@@ -205,28 +205,6 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
     });
 
-    // Route::controller(ClientGroupController::class)->group(function () {
-    //     Route::get('/ypi/setting/client_group', 'index')->name('ypi.setting.client_group');
-    //     Route::get('/ypi/setting/client_group/list', 'list')->name('ypi.setting.client_group.list');
-    //     Route::get('/ypi/setting/client_group/get/{id}', 'get')->name('ypi.setting.client_group.get');
-    //     Route::post('ypi/setting/client_group/update', 'update')->name('ypi.setting.client_group.update');
-    //     Route::delete('/ypi/setting/client_group/delete/{id}', 'delete')->name('ypi.setting.client_group.delete');
-    //     Route::post('/ypi/setting/client_group/store', 'store')->name('ypi.setting.client_group.store');
-    //     Route::get('/ypi/setting/client_group/mv/get/{id}', 'getEventView')->name('ypi.setting.client_group.get.mv');
-    //     // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
-    // });
-
-    // Route::controller(DesignationController::class)->group(function () {
-    //     Route::get('/ypi/setting/designation', 'index')->name('ypi.setting.designation');
-    //     Route::get('/ypi/setting/designation/list', 'list')->name('ypi.setting.designation.list');
-    //     Route::get('/ypi/setting/designation/get/{id}', 'get')->name('ypi.setting.designation.get');
-    //     Route::post('ypi/setting/designation/update', 'update')->name('ypi.setting.designation.update');
-    //     Route::delete('/ypi/setting/designation/delete/{id}', 'delete')->name('ypi.setting.designation.delete');
-    //     Route::post('/ypi/setting/designation/store', 'store')->name('ypi.setting.designation.store');
-    //     Route::get('/ypi/setting/designation/mv/get/{id}', 'getEventView')->name('ypi.setting.designation.get.mv');
-    //     // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
-    // });
-
     Route::controller(NationalityController::class)->group(function () {
         Route::get('/ypi/setting/nationality', 'index')->name('ypi.setting.nationality');
         Route::get('/ypi/setting/nationality/list', 'list')->name('ypi.setting.nationality.list');
@@ -249,86 +227,6 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
     });
 
-    // Route::controller(HostedByController::class)->group(function () {
-    //     Route::get('/ypi/setting/hosted_by', 'index')->name('ypi.setting.hosted_by');
-    //     Route::get('/ypi/setting/hosted_by/list', 'list')->name('ypi.setting.hosted_by.list');
-    //     Route::get('/ypi/setting/hosted_by/get/{id}', 'get')->name('ypi.setting.hosted_by.get');
-    //     Route::post('ypi/setting/hosted_by/update', 'update')->name('ypi.setting.hosted_by.update');
-    //     Route::delete('/ypi/setting/hosted_by/delete/{id}', 'delete')->name('ypi.setting.hosted_by.delete');
-    //     Route::post('/ypi/setting/hosted_by/store', 'store')->name('ypi.setting.hosted_by.store');
-    //     Route::get('/ypi/setting/hosted_by/mv/get/{id}', 'getEventView')->name('ypi.setting.hosted_by.get.mv');
-    //     // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
-    // });
-
-    // // Flight
-    // Route::controller(FlightController::class)->group(function () {
-    //     Route::get('/ypi/admin/flight', 'index')->name('ypi.admin.flight');
-    //     Route::get('/ypi/admin/flight/list', 'list')->name('ypi.admin.flight.list');
-    //     Route::post('/ypi/admin/flight/store', 'store')->name('ypi.admin.flight.store');
-    //     Route::get('/ypi/admin/flight/detail/{id}', 'detail')->name('ypi.admin.flight.detail');
-    // });
-
-    // Route::controller(FlightStatusController::class)->group(function () {
-    //     Route::get('/ypi/setting/flight_status', 'index')->name('ypi.setting.flight_status');
-    //     Route::get('/ypi/setting/flight_status/list', 'list')->name('ypi.setting.flight_status.list');
-    //     Route::get('/ypi/setting/flight_status/get/{id}', 'get')->name('ypi.setting.flight_status.get');
-    //     Route::post('ypi/setting/flight_status/update', 'update')->name('ypi.setting.flight_status.update');
-    //     Route::delete('/ypi/setting/flight_status/delete/{id}', 'delete')->name('ypi.setting.flight_status.delete');
-    //     Route::post('/ypi/setting/flight_status/store', 'store')->name('ypi.setting.flight_status.store');
-    //     Route::get('/ypi/setting/flight_status/mv/get/{id}', 'getEventView')->name('ypi.setting.flight_status.get.mv');
-    //     // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
-    // });
-
-    // Route::controller(AirlineController::class)->group(function () {
-    //     Route::get('/ypi/setting/airline', 'index')->name('ypi.setting.airline');
-    //     Route::get('/ypi/setting/airline/list', 'list')->name('ypi.setting.airline.list');
-    //     Route::get('/ypi/setting/airline/get/{id}', 'get')->name('ypi.setting.airline.get');
-    //     Route::post('ypi/setting/airline/update', 'update')->name('ypi.setting.airline.update');
-    //     Route::delete('/ypi/setting/airline/delete/{id}', 'delete')->name('ypi.setting.airline.delete');
-    //     Route::post('/ypi/setting/airline/store', 'store')->name('ypi.setting.airline.store');
-    //     Route::get('/ypi/setting/airline/mv/get/{id}', 'getEventView')->name('ypi.setting.airline.get.mv');
-    //     // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
-    // });
-
-    // Route::controller(CabinTypeController::class)->group(function () {
-    //     Route::get('/ypi/setting/cabin_type', 'index')->name('ypi.setting.cabin_type');
-    //     Route::get('/ypi/setting/cabin_type/list', 'list')->name('ypi.setting.cabin_type.list');
-    //     Route::get('/ypi/setting/cabin_type/get/{id}', 'get')->name('ypi.setting.cabin_type.get');
-    //     Route::post('ypi/setting/cabin_type/update', 'update')->name('ypi.setting.cabin_type.update');
-    //     Route::delete('/ypi/setting/cabin_type/delete/{id}', 'delete')->name('ypi.setting.cabin_type.delete');
-    //     Route::post('/ypi/setting/cabin_type/store', 'store')->name('ypi.setting.cabin_type.store');
-    //     Route::get('/ypi/setting/cabin_type/mv/get/{id}', 'getEventView')->name('ypi.setting.cabin_type.get.mv');
-    //     // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
-    // });
-
-    // Route::controller(FlightTypeController::class)->group(function () {
-    //     Route::get('/ypi/setting/flight_type', 'index')->name('ypi.setting.flight_type');
-    //     Route::get('/ypi/setting/flight_type/list', 'list')->name('ypi.setting.flight_type.list');
-    //     Route::get('/ypi/setting/flight_type/get/{id}', 'get')->name('ypi.setting.flight_type.get');
-    //     Route::post('ypi/setting/flight_type/update', 'update')->name('ypi.setting.flight_type.update');
-    //     Route::delete('/ypi/setting/flight_type/delete/{id}', 'delete')->name('ypi.setting.flight_type.delete');
-    //     Route::post('/ypi/setting/flight_type/store', 'store')->name('ypi.setting.flight_type.store');
-    //     Route::get('/ypi/setting/flight_type/mv/get/{id}', 'getEventView')->name('ypi.setting.flight_type.get.mv');
-    //     // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
-    // });
-
-    // Route::controller(AirportController::class)->group(function () {
-    //     Route::get('/ypi/setting/airport', 'index')->name('ypi.setting.airport');
-    //     Route::get('/ypi/setting/airport/list', 'list')->name('ypi.setting.airport.list');
-    //     Route::get('/ypi/setting/airport/get/{id}', 'get')->name('ypi.setting.airport.get');
-    //     Route::post('ypi/setting/airport/update', 'update')->name('ypi.setting.airport.update');
-    //     Route::delete('/ypi/setting/airport/delete/{id}', 'delete')->name('ypi.setting.airport.delete');
-    //     Route::post('/ypi/setting/airport/store', 'store')->name('ypi.setting.airport.store');
-    //     Route::get('/ypi/setting/airport/mv/get/{id}', 'getEventView')->name('ypi.setting.airport.get.mv');
-    //     // Route::get('/mds/setting/event/file/{file}', 'getPrivateFile')->name('mds.setting.event.file');
-    // });
-
-    // // Accomodation
-    // Route::controller(AccommodationController::class)->group(function () {
-    //     Route::get('/ypi/admin/accomm', 'index')->name('ypi.admin.accomm');
-    //     Route::get('/ypi/admin/accomm/list', 'list')->name('ypi.admin.accomm.list');
-    //     Route::post('/ypi/admin/accomm/store', 'store')->name('ypi.admin.accomm.store');
-    // });
 
     //     // Venue
     Route::controller(VenueController::class)->group(function () {
@@ -340,16 +238,6 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         Route::post('/ypi/setting/venue/store', 'store')->name('ypi.setting.venue.store');
     });
 
-    // // Functional Area
-    // Route::controller(FunctionalAreaController::class)->group(function () {
-    //     Route::get('/ypi/setting/funcareas', 'index')->name('ypi.setting.funcareas');
-    //     Route::get('/ypi/setting/funcareas/list', 'list')->name('ypi.setting.funcareas.list');
-    //     Route::get('/ypi/setting/funcareas/get/{id}', 'get')->name('ypi.setting.funcareas.get');
-    //     Route::post('ypi/setting/funcareas/update', 'update')->name('ypi.setting.funcareas.update');
-    //     Route::delete('/ypi/setting/funcareas/delete/{id}', 'delete')->name('ypi.setting.funcareas.delete');
-    //     Route::post('/ypi/setting/funcareas/store', 'store')->name('ypi.setting.funcareas.store');
-    // });
-
     //Event
     Route::controller(EventController::class)->group(function () {
         Route::get('/ypi/setting/event', 'index')->name('ypi.setting.event');
@@ -360,7 +248,7 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         Route::post('/ypi/setting/event/store', 'store')->name('ypi.setting.event.store');
     });
 
-    Route::get('/auth/ms-signup', [GmsAuthAdminController::class, 'msSignUp'])->name('auth.ms.signup');
+    Route::get('/auth/ms-signup', [YpiAuthAdminController::class, 'msSignUp'])->name('auth.ms.signup');
     Route::post('/signup/ms/store', [UserController::class, 'msStore'])->name('admin.signup.ms.store');
 
     Route::controller(AdminUserController::class)->group(function () {
@@ -476,7 +364,7 @@ Route::get('/ypi/customer/guardian/pick', function () {
 })->name('ypi.customer.guardian.pick')->middleware('role:Customer');
 Route::post('/ypi/customer/events/switch', [GuardianController::class, 'pickEvent'])->name('ypi.customer.guardian.event.switch')->middleware('role:Customer');
 
-Route::get('/ypi/logout', [GmsAuthAdminController::class, 'logout'])->name('ypi.logout');
+Route::get('/ypi/logout', [YpiAuthAdminController::class, 'logout'])->name('ypi.logout');
 
 
 Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', 'role:Customer',  'prevent-back-history', 'auth.session'])->group(function () {
@@ -498,40 +386,23 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
         // Route::get('/vapp/customer/dashboard', 'dashboard')->name('vapp.customer.dashboard');
     });
 });
-// Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', 'role:Operator',  'prevent-back-history', 'auth.session'])->group(function () {
-
-//     Route::controller(OperatorBookingController::class)->group(function () {
-//         Route::get('/vapp/operator', 'index')->name('vapp.operator');
-//         Route::get('/vapp/operator/booking', 'index')->name('vapp.operator.booking');
-//         Route::get('/vapp/operator/booking/list', 'list')->name('vapp.operator.booking.list');
-//         Route::post('/vapp/operator/rfc/status', 'updateStatus')->name('vapp.operator.rfc.status');
-//         Route::post('/generate-pdf', 'generate')->name('vapp.pdf.receipt');
-//         Route::post('/mark-as-collected', 'markAsCollected')->name('vapp.mark.collected');
-
-//         // for event switching
-//         Route::get('/vapp/operator/events/{id}/switch',  'switch')->name('vapp.operator.booking.switch');
-//         // Route::get('/vapp/operator/dashboard', 'dashboard')->name('vapp.operator.dashboard');
-//     });
-// });
-// });
-
 
 // ****************** ADMIN *********************
 Route::group(['middleware' => 'prevent-back-history'], function () {
 
     // Add User
-    Route::get('/ypi/auth/signup', [GmsAuthAdminController::class, 'signUp'])->name('auth.signup')->middleware('signed');
+    Route::get('/ypi/auth/signup', [YpiAuthAdminController::class, 'signUp'])->name('auth.signup')->middleware('signed');
     Route::post('/signup/store', [UserController::class, 'store'])->name('admin.signup.store');
 
     // Add User
-    Route::get('/register/{event_id}', [GmsAuthAdminController::class, 'register'])->name('auth.register');
-    Route::post('/register/store', [GmsAuthAdminController::class, 'storeRegister'])->name('admin.register.store');
+    Route::get('/register/{event_id}', [YpiAuthAdminController::class, 'register'])->name('auth.register');
+    Route::post('/register/store', [YpiAuthAdminController::class, 'storeRegister'])->name('admin.register.store');
 
     Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
-        Route::get('auth/otp', [GmsAuthAdminController::class, 'showOtp'])->name('otp.get');
-        Route::post('verify-otp', [GmsAuthAdminController::class, 'verifyOtpAndLogin'])->name('auth.otp.post');
-        Route::get('auth/resend', [GmsAuthAdminController::class, 'resendOTP'])->name('otp.resend.get');
+        Route::get('auth/otp', [YpiAuthAdminController::class, 'showOtp'])->name('otp.get');
+        Route::post('verify-otp', [YpiAuthAdminController::class, 'verifyOtpAndLogin'])->name('auth.otp.post');
+        Route::get('auth/resend', [YpiAuthAdminController::class, 'resendOTP'])->name('otp.resend.get');
 
         //used to show images in private folder
         Route::get('/doc/{file}', [UtilController::class, 'showImage'])->name('a');
@@ -563,7 +434,7 @@ Route::group(['middleware' => 'prevent-back-history'], function () {
         Route::post('/vapp/operator/events/switch', [OperatorBookingController::class, 'pickEvent'])->name('vapp.operator.booking.event.switch')->middleware('role:Operator');
 
 
-        Route::get('/vapp/logout', [GmsAuthAdminController::class, 'logout'])->name('vapp.logout');
+        Route::get('/vapp/logout', [YpiAuthAdminController::class, 'logout'])->name('vapp.logout');
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
     });
 

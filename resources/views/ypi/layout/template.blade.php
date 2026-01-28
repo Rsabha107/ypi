@@ -40,7 +40,7 @@
     <link href="{{asset('fnx/assets/css/user-rtl.min.css')}}" type="text/css" rel="stylesheet" id="user-style-rtl">
     <link href="{{asset('fnx/assets/css/user.min.css')}}" type="text/css" rel="stylesheet" id="user-style-default">
     <link href="{{ asset('assets/css/branding.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/js/spinner/spinner.css') }}" rel="stylesheet">
+        <link href="{{ asset('assets/css/spinner.css') }}" rel="stylesheet">
 
     <script>
         var phoenixIsRTL = window.config.config.phoenixIsRTL;
@@ -110,7 +110,8 @@
     <script src="{{ asset('assets/vendors/dayjs/dayjs.min.js') }}"></script>
     <script src="{{ asset('fnx/assets/js/phoenix.js') }}"></script>
     <script src="{{ asset('assets/js/pace.min.js') }}"></script>
-    <script src="{{ asset('assets/js/spinner/spin.js') }}"></script>
+        <script src="{{ asset('assets/js/pages/spinner/spin.js') }}"></script>
+
 
     <script>
         // showing the offcanvas for the task creation

@@ -522,7 +522,7 @@ class AdminController extends Controller
 
     public function storeRegister(Request $request)
     {
-        appLog('UserController@store - Request: ' . json_encode($request->all()));
+        appLog('AdminController@store - Request: ' . json_encode($request->all()));
 
         $rules = [
             'name' => 'required|max:255',
@@ -595,7 +595,7 @@ class AdminController extends Controller
             foreach ($qidFiles as $tempId) {
 
                 Log::info("Processing QID file temp ID: {$tempId} for guardian ID: {$guardian->id}");
-                $temp = TempUpload::find((int)$tempId);
+                $temp = TempUpload::where('path', $tempId)->first();
 
                 if (!$temp) {
                     throw new \Exception("Invalid uploaded file reference: {$tempId}");
@@ -727,7 +727,7 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            appLog('Validation error in UserController@store: ' . $e->getMessage());
+            appLog('Validation error in AdminController@store: ' . $e->getMessage());
             return redirect()->back()->withErrors($e->getMessage())->withInput();
         }
 

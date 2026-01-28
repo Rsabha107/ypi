@@ -1,4 +1,4 @@
-@extends('vapp.layout.template')
+@extends('ypi.layout.template')
 @section('main')
 <div class="container">
     <form method="POST" action="{{ route('login') }}" class="forms-sample" id="spinner-form">

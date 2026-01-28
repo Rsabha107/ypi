@@ -78,11 +78,6 @@ class User extends Authenticatable
         return $this->belongsToMany(Event::class, 'user_event', 'user_id', 'event_id');
     }
 
-    public function fa()
-    {
-        return $this->belongsToMany(FunctionalArea::class, 'user_fa', 'user_id', 'fa_id');
-    }
-
     public function file_attach()
     {
         return $this->hasOne(GlobalAttachment::class, 'model_id'); //->where('model_name', 'users');

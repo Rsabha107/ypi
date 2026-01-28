@@ -32,7 +32,6 @@
     {{-- <div class="container"> --}}
 
 
-
     <div class="card shadow-none border my-4 col-md-8" style="margin:0 auto;" data-component-card="data-component-card">
         <div class="card-header p-4 border-bottom bg-body">
             <div class="row g-3 justify-content-between align-items-center">
@@ -132,13 +131,22 @@
                         <div class=" gy-3">
                             <hr />
                         </div>
-                        <div class="text-center mb-3">
+                        <div class="col mb-3">
+                            <label class="form-label" for="qid_files">Upload Participant QID <span
+                                    class='text-danger'></label>
+                            <input class="form-control" id="qid_files" name="qid_files[]" type="file" multiple
+                                required />
+                            <small class="form-text text-muted">Max size: 2MB. Accepted formats: JPG, PNG,
+                                GIF, PNG</small>
+                        </div>
+                        {{-- <div class="text-center mb-3">
                             <div class="mb-3 text-start">
-                                <label class="form-label">Upload Participant QID <span class='text-danger'>(Extensions: jpg,jpeg,png,pdf Max 2MB)</span></label>
+                                <label class="form-label">Upload Participant QID <span class='text-danger'>(Extensions:
+                                        jpg,jpeg,png,pdf Max 2MB)</span></label>
                                 <input type="file" required name="qid_file" class="dropify" data-height="100"
                                     data-allowed-file-extensions="jpg jpeg png pdf" data-max-file-size="2M" />
                             </div>
-                        </div>
+                        </div> --}}
                         <div class=" gy-3">
                             <hr />
                         </div>
@@ -240,7 +248,8 @@
                         <div class="col-12 gy-6">
                             <div class="row g-3 justify-content-end">
                                 <div class="col-auto">
-                                    <button class="btn btn-phoenix-primary px-5" onclick="window.location='{{ route('home') }}'" type="button">Cancel</button>
+                                    <button class="btn btn-phoenix-primary px-5"
+                                        onclick="window.location='{{ route('home') }}'" type="button">Cancel</button>
                                 </div>
                                 <div class="col-auto">
                                     <button class="btn btn-primary px-5 px-sm-15" type="submit">Save Participant</button>

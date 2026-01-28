@@ -71,7 +71,7 @@ class GuardianController extends Controller
 
             Storage::disk($temp->disk)->move($temp->path, $newPath);
 
-            
+
             ParticipantDocument::create([
                 'participant_id' => $model_id,
                 'disk' => $temp->disk,
@@ -343,7 +343,7 @@ class GuardianController extends Controller
             'jersey_size_id' => 'required',
             'jacket_size_id' => 'required',
             'shoe_size_id' => 'required',
-            'qid_file' => 'required|file|max:2048|mimes:jpg,jpeg,png,pdf',
+            // 'qid_file' => 'required|file|max:2048|mimes:jpg,jpeg,png,pdf',
             // 'food_allergy' => 'required',
             // 'health_issues' => 'required',
             // FilePond temp ids
@@ -355,10 +355,17 @@ class GuardianController extends Controller
         if ($validator->fails()) {
             Log::info($validator->errors());
             $error = true;
-            $type = 'success';
+            $type = 'error';
             // $message = 'Guest could not be created';
-            $message = implode($validator->errors()->all('<div>:message</div>'));
-            return response()->json(['error' => $error, 'message' => $message]);
+            $message = implode($validator->errors()->all(':message'));
+            $toastr_message = [
+                'alert-type' => $type,
+                'message' => $message,
+            ];
+
+            return redirect()->back()->with($toastr_message)->withInput();
+
+            // return response()->json(['error' => $error, 'message' => $message]);
         }
 
         $user_id = Auth::user()->id;
@@ -397,62 +404,106 @@ class GuardianController extends Controller
 
             $op->save();
 
-            if ($request->hasFile('qid_file')) {
 
-                $file = $request->file('qid_file');
-                // $fileNameWithExt = $file->getClientOriginalName();
-                // // get file name
-                // $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-                // // get extension
-                // $extension = $request->file('qid_file')->getClientOriginalExtension();
+            $qidFiles = $request->input('qid_files', []);
 
-                // $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-
-                // Log::info($fileNameWithExt);
-                // Log::info($filename);
-                // Log::info($extension);
-                // Log::info($fileNameToStore);
-
-                // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
-                // $path = $file->move('upload/profile_images/', $fileNameToStore);
-                // Log::info($path);
-
-                // $dir = "reports/{$report->id}";
-                $dir = "uploads/participants/{$op->id}";
-                // $filename = uniqid() . '.jpg'; // normalize to jpg
-
-                // // 🔥 Resize image
-                // // $image = Image::read($photo);
-                // $manager = new ImageManager(new Driver());
-
-                // // ✅ Read image
-                // $image = $manager->read($photo)
-                //     ->orient() // replaces orientate()
-                //     ->resize(1600, null, function ($constraint) {
-                //         $constraint->aspectRatio();
-                //         $constraint->upsize();
-                //     })
-                //     ->toJpeg(85); // encode
-
-
-                // // 🔥 Store in PRIVATE disk
-                // $path = Storage::disk('private')->put(
-                //     "{$dir}/{$filename}",
-                //     $image
-                // );
-                $path = $file->store($dir, 'private');
-
-                ParticipantDocument::create([
-                    'participant_id' => $op->id,
-                    'disk' => 'private',
-                    'path' => $path,
-                    'original_name' => $file->getClientOriginalName(),
-                    'mime' => $file->getClientMimeType(),
-                    'size' => $file->getSize(),
-                    'created_by' => auth()->id(),
-                ]);
+            // If somehow a single value comes, normalize to array
+            if (!is_array($qidFiles) && $qidFiles) {
+                $qidFiles = [$qidFiles];
             }
 
+            foreach ($qidFiles as $tempId) {
+
+                Log::info("Processing QID file temp ID: {$tempId} for participant ID: {$op->id}");
+                $temp = TempUpload::where('path', $tempId)
+                    ->where('user_id', auth()->id())
+                    ->first();
+
+                if (!$temp) {
+                    throw new \Exception("Invalid uploaded file reference: {$tempId}");
+                }
+
+                $ext = pathinfo($temp->path, PATHINFO_EXTENSION) ?: 'jpg';
+                $fileName = time() . '_' . uniqid() . '.' . $ext;
+
+                $finalDir  = "uploads/participants/{$op->id}/";
+                $finalPath = $finalDir . $fileName;
+
+                // move from temp disk -> private disk
+                $contents = Storage::disk($temp->disk)->get($temp->path);
+                Storage::disk('private')->put($finalPath, $contents);
+
+                // create document row
+                $doc = new ParticipantDocument();
+                $doc->participant_id = $op->id;
+                $doc->disk = 'private';
+                $doc->path = $finalPath; // full file path
+                $doc->original_name = $temp->original_name ?? $fileName;
+                $doc->mime = $temp->mime ?? 'image/' . $ext;
+                $doc->size = $temp->size ?? strlen($contents);
+                $doc->created_by = $user_id;
+                $doc->save();
+
+                // cleanup temp
+                Storage::disk($temp->disk)->delete($temp->path);
+                $temp->delete();
+            }
+
+            // if ($request->hasFile('qid_file')) {
+
+            //     $file = $request->file('qid_file');
+            //     // $fileNameWithExt = $file->getClientOriginalName();
+            //     // // get file name
+            //     // $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            //     // // get extension
+            //     // $extension = $request->file('qid_file')->getClientOriginalExtension();
+
+            //     // $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+
+            //     // Log::info($fileNameWithExt);
+            //     // Log::info($filename);
+            //     // Log::info($extension);
+            //     // Log::info($fileNameToStore);
+
+            //     // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
+            //     // $path = $file->move('upload/profile_images/', $fileNameToStore);
+            //     // Log::info($path);
+
+            //     // $dir = "reports/{$report->id}";
+            //     $dir = "uploads/participants/{$op->id}";
+            //     // $filename = uniqid() . '.jpg'; // normalize to jpg
+
+            //     // // 🔥 Resize image
+            //     // // $image = Image::read($photo);
+            //     // $manager = new ImageManager(new Driver());
+
+            //     // // ✅ Read image
+            //     // $image = $manager->read($photo)
+            //     //     ->orient() // replaces orientate()
+            //     //     ->resize(1600, null, function ($constraint) {
+            //     //         $constraint->aspectRatio();
+            //     //         $constraint->upsize();
+            //     //     })
+            //     //     ->toJpeg(85); // encode
+
+
+            //     // // 🔥 Store in PRIVATE disk
+            //     // $path = Storage::disk('private')->put(
+            //     //     "{$dir}/{$filename}",
+            //     //     $image
+            //     // );
+            //     $path = $file->store($dir, 'private');
+
+            //     ParticipantDocument::create([
+            //         'participant_id' => $op->id,
+            //         'disk' => 'private',
+            //         'path' => $path,
+            //         'original_name' => $file->getClientOriginalName(),
+            //         'mime' => $file->getClientMimeType(),
+            //         'size' => $file->getSize(),
+            //         'created_by' => auth()->id(),
+            //     ]);
+            // }
 
             DB::commit();
 
@@ -462,7 +513,7 @@ class GuardianController extends Controller
 
             // return response()->json(['error' => $error, 'message' => $message]);
             $toastr_message = [
-                'alert-type' => 'success',
+                'type' => 'success',
                 'message' => 'Report submitted successfully!',
             ];
 
@@ -474,10 +525,17 @@ class GuardianController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'error'   => true,
-                'message' => 'Failed to create participant. ' . $e->getMessage(),
-            ], 500);
+                        $toastr_message = [
+                'alert-type' => 'error',
+                'message' => $e->getMessage(),
+            ];
+
+            return redirect()->back()->with($toastr_message)->withInput();
+
+            // return response()->json([
+            //     'error'   => true,
+            //     'message' => 'Failed to create participant. ' . $e->getMessage(),
+            // ], 500);
         }
     }
 

@@ -1,4 +1,4 @@
-@extends('vapp.layout.template')
+@extends('ypi.layout.template')
 @section('main')
     <div class="px-3">
         <div class="row min-vh-100 flex-center p-5">

@@ -179,6 +179,6 @@
         });
     </script>
 
-    @include('ypi.partials.event-js')
+    {{-- @include('ypi.partials.event-js') --}}
 
     @endpush
