@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Ypi\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ApprovedRequestMail;
+use App\Mail\RejectedRequestMail;
 use App\Models\Ypi\Event;
 use App\Models\Ypi\AirlineCarriers;
 use App\Models\Ypi\Airport;
@@ -19,6 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -79,10 +82,10 @@ class GuestController extends Controller
                 ->orWhere('date_of_birth', 'like', '%' . $search . '%')
                 ->orWhere('school_name', 'like', '%' . $search . '%')
                 ->orWhereHas('guardian', function ($query) use ($search) {
-                $query->where('full_name', 'like', '%' . $search . '%')
-                    ->orWhere('email', 'like', '%' . $search . '%')
-                    ->orWhere('phone_main', 'like', '%' . $search . '%');
-            })
+                    $query->where('full_name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%')
+                        ->orWhere('phone_main', 'like', '%' . $search . '%');
+                })
                 ->orWhereHas(
                     'status',
                     function ($query) use ($search) {
@@ -166,18 +169,18 @@ class GuestController extends Controller
                 $op->id .
                 '" data-table="guest_table" data-bs-toggle="tooltip" data-bs-placement="right" title="Update">' .
                 '<i class="fa-solid fa-pen-to-square text-primary"></i></a>';
-            $delete_actions = 
+            $delete_actions =
                 '<a href="javascript:void(0)" class="btn btn-sm" data-table="guest_table" data-id="' .
                 $op->id .
                 '" id="deleteGuest" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">' .
                 '<i class="bx bx-trash text-danger"></i></a>';
-            $upload_img_actions = 
+            $upload_img_actions =
                 '<a href="javascript:void(0)" class="btn btn-sm" data-table="guest_table" data-id="' .
                 $op->id .
                 '" id="uploadImagesGuest" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">' .
                 '<i class="bx bx-arrow-to-top text-success"></i></a>';
 
-            $actions .=  $actions . (($op->status?->title == 'Approved')? $upload_img_actions: '') . $delete_actions;
+            $actions .=  $actions . (($op->status?->title == 'Approved') ? $upload_img_actions : '') . $delete_actions;
             $actions .= '</div>';
 
             $order_status =  '<span class="badge badge-phoenix fs--2 ms-2 badge-phoenix-' . $op->status?->color . ' "><span class="badge-label" id="change_participant_status" style="cursor:pointer" data-id="' . $op->id . '"data-status_id="' . $op->status?->id . '" data-table="participant_table">' . $op->status?->title . '</span><span class="ms-1" data-feather="x" style="height:12.8px;width:12.8px;cursor:pointer"></span></span>';
@@ -423,7 +426,6 @@ class GuestController extends Controller
         ]);
     }
 
-
     public function destroy($id)
     {
         // LOG::info('inside delete');
@@ -483,6 +485,7 @@ class GuestController extends Controller
             ]);
         }
         $op = Participant::findOrFail($request->participant_id);
+        $guardian = $op->guardian;
         $user_id = Auth::user()->id;
 
         $error = false;
@@ -493,41 +496,33 @@ class GuestController extends Controller
 
         $op->save();
 
+        if (config('settings.send_notifications')) {
+
+            $details = [
+                'email' => config('settings.admin_email'),
+                'guardian_name' => $guardian->full_name,
+                'participant_name' => $op->full_name,
+                'reference_number' => $op->reference_number,
+                'event' => $op->event?->name,
+                'participant_type' => $op->participantType?->title,
+            ];
+            // SendNewRequestEmailJob::dispatch($details);
+            $filePath = null; // Adjust if you generate a QR code file
+
+            if ($op->status?->title == 'Approved') {
+                $user = $guardian->user;
+                Mail::to($user->email)->send(new ApprovedRequestMail($details, $filePath));
+            } elseif ($op->status?->title == 'Declined') {
+                $user = $guardian->user;
+                Mail::to($user->email)->send(new RejectedRequestMail($details, $filePath));
+            }
+        }
 
         return response()->json([
             'error' => $error,
             'message' => $message,
         ]);
     }
-
-    public function detail(Request $request, $id)
-    {
-
-        $guest = Guest::find($id);
-        $events = Event::all();
-        $airlines = AirlineCarriers::all();
-        $cabins = FlightCabin::all();
-        $flight_types = FlightType::all();
-        $airports = Airport::all();
-        $flight_statuses = FlightStatus::all();
-        $client_group = $guest->client_group;
-
-        // dd($guest);
-
-        // dd($taskData);
-        $count = $guest->count();
-        return view('ypi.admin.participant.detail', [
-            'count' => $count,
-            'events' => $events,
-            'airlines' => $airlines,
-            'cabins' => $cabins,
-            'flightTypes' => $flight_types,
-            'airports' => $airports,
-            'flightStatuses' => $flight_statuses,
-            'guestData' => $guest,
-            'client_group' => $client_group,
-        ]);
-    }  // end detail
 
     public function switch($id)
     {

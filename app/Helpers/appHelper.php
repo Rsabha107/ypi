@@ -18,6 +18,51 @@ use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\Permission\Models\Role;
 
+if (! function_exists('get_current_event_id')) {
+    /**
+     * Get the current event ID from session or default
+     *
+     * @return int|null
+     */
+    function get_current_event_id()
+    {
+        // Assuming event ID is stored in session
+        return session('EVENT_ID', null);
+    }
+}
+
+if (! function_exists('nextSequence')) {
+    /**
+     * Get the next value in a named sequence
+     *
+     * @param string $key
+     * @return int
+     * @throws \Exception
+     */
+
+    function nextSequence(string $key): int
+    {
+        return DB::transaction(function () use ($key) {
+            $row = DB::table('sequences')
+                ->where('key', $key)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$row) {
+                throw new Exception("Sequence '{$key}' not found");
+            }
+
+            $next = $row->value + 1;
+
+            DB::table('sequences')
+                ->where('key', $key)
+                ->update(['value' => $next]);
+
+            return $next;
+        });
+    }
+}
+
 if (!function_exists('registerUrl')) {
     function registerUrl(int $id): string
     {

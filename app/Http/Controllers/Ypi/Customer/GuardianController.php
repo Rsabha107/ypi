@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Ypi\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NewRequestMail;
 use App\Models\Ypi\ClientGroup;
 use App\Models\Ypi\Event;
 use App\Models\Ypi\Gender;
@@ -20,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\Guard;
@@ -325,10 +327,6 @@ class GuardianController extends Controller
 
     public function store(Request $request)
     {
-        //
-        // dd($request);
-
-        // $timeslots = DeliverySchedulePeriod::findOrFail($request->schedule_period_id);
 
         $rules = [
             'participant_type_id' => 'required',
@@ -368,19 +366,22 @@ class GuardianController extends Controller
             // return response()->json(['error' => $error, 'message' => $message]);
         }
 
-        $user_id = Auth::user()->id;
+        // $user_id = Auth::user()->id;
         $serverIds = json_decode($request->input('qid_server_ids', '[]'), true) ?: [];
 
         DB::beginTransaction();
         try {
+            $user = Auth::user();
             $op = new Participant();
 
-            $userId = auth()->id();
+            $user_id = $user->id;
 
-            $guardian = Guardian::where('user_id', $userId)->firstOrFail();
+            $guardian = Guardian::where('user_id', $user_id)->firstOrFail();
 
             $submitted_id = getStatusIdByLabel('Submitted');
+            $seq = nextSequence('ypi');
 
+            $op->reference_number = 'YPI-' . date('Y') . '-' . get_current_event_id() . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
             $op->participant_type_id = $request->participant_type_id;
             $op->status_id = $submitted_id;
             $op->event_id = session()->get('EVENT_ID');
@@ -507,6 +508,22 @@ class GuardianController extends Controller
 
             DB::commit();
 
+            if (config('settings.send_notifications')) {
+                
+                $details = [
+                    'email' => config('settings.admin_email'),
+                    'guardian_name' => $guardian->full_name,
+                    'participant_name' => $op->full_name,
+                    'reference_number' => $op->reference_number,
+                    'event' => $op->event?->name,
+                    'participant_type' => $op->participantType?->title,
+                ];
+                // SendNewRequestEmailJob::dispatch($details);
+                $filePath = null; // Adjust if you generate a QR code file
+                Mail::to($user->email)->send(new NewRequestMail($details, $filePath));
+            }
+
+
             $error = false;
             // $type = 'success';
             $message = 'Participant created succesfully.';
@@ -525,7 +542,7 @@ class GuardianController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-                        $toastr_message = [
+            $toastr_message = [
                 'alert-type' => 'error',
                 'message' => $e->getMessage(),
             ];
@@ -539,180 +556,8 @@ class GuardianController extends Controller
         }
     }
 
-    // public function update(Request $request)
-    // {
-    //     Log::info('inside GuardianController update');
-    //     Log::info('request data: ' . json_encode($request->all()));
-    //     //
-    //     // dd($request);
-
-    //     // $timeslots = DeliverySchedulePeriod::findOrFail($request->schedule_period_id);
-
-    //     $rules = [
-    //         'participant_type_id' => 'required',
-    //         'gender_id' => 'required',
-    //         'full_name' => 'required',
-    //         'qid' => 'required',
-    //         'date_of_birth' => ['required', 'date_format:d/m/Y'],
-    //         'nationality_id' => 'required',
-    //         'school_name' => 'required',
-    //         // 'guardian_id' => 'required',
-    //         'pants_size_id' => 'required',
-    //         'jersey_size_id' => 'required',
-    //         'jacket_size_id' => 'required',
-    //         'shoe_size_id' => 'required',
-    //         // 'food_allergy' => 'required',
-    //         // 'health_issues' => 'required',
-    //         // FilePond temp ids
-    //         'qid_server_ids' => 'nullable|string',
-    //     ];
-
-    //     $validator = Validator::make($request->all(), $rules);
-
-    //     if ($validator->fails()) {
-    //         Log::info($validator->errors());
-    //         $error = true;
-    //         $type = 'success';
-    //         // $message = 'Guest could not be created';
-    //         $message = implode($validator->errors()->all('<div>:message</div>'));
-    //         return response()->json(['error' => $error, 'message' => $message]);
-    //     }
-
-    //     $user_id = Auth::user()->id;
-    //     $serverIds = json_decode($request->input('qid_server_ids', '[]'), true) ?: [];
-    //     $deleteIds = json_decode($request->input('delete_doc_ids', '[]'), true) ?: [];
-
-    //     DB::beginTransaction();
-    //     try {
-    //         $op = Participant::findOrFail($request->participant_id);
-
-    //         // if ($request->hasFile('file_name')) {
-
-    //         //     $file = $request->file('file_name');
-    //         //     $fileNameWithExt = $file->getClientOriginalName();
-    //         //     // get file name
-    //         //     $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-    //         //     // get extension
-    //         //     $extension = $request->file('file_name')->getClientOriginalExtension();
-
-    //         //     $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-
-    //         //     Log::info($fileNameWithExt);
-    //         //     Log::info($filename);
-    //         //     Log::info($extension);
-    //         //     Log::info($fileNameToStore);
-
-    //         //     // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
-    //         //     // $path = $file->move('upload/profile_images/', $fileNameToStore);
-    //         //     // Log::info($path);
-
-    //         //     $op->photo = $fileNameToStore;
-    //         // }
-
-    //         $userId = auth()->id();
-
-    //         $guardian = Guardian::where('user_id', $userId)->firstOrFail();
-
-    //         $op->participant_type_id = $request->participant_type_id;
-    //         $op->event_id = session()->get('EVENT_ID');
-    //         $op->date_of_birth = $request->date_of_birth ? Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->toDateString() : null;
-    //         $op->full_name = $request->full_name;
-    //         $op->qid = $request->qid;
-    //         $op->school_name = $request->school_name;
-    //         $op->gender_id = intval($request->gender_id);
-    //         // $op->guardian_id = $guardian->id;
-    //         $op->nationality_id = intval($request->nationality_id);
-    //         $op->pants_size_id = intval($request->pants_size_id);
-    //         $op->jersey_size_id = intval($request->jersey_size_id);
-    //         $op->jacket_size_id = intval($request->jacket_size_id);
-    //         $op->shoe_size_id = intval($request->shoe_size_id);
-    //         $op->food_allergy = $request->food_allergy;
-    //         $op->health_issues = $request->health_issues;
-    //         $op->food_allergy_details = $request->food_allergy_details;
-    //         $op->health_issues_details = $request->health_issues_details;
-    //         // $op->created_by = $user_id;
-    //         $op->updated_by = $user_id;
-
-    //         $op->save();
-    //         // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
-    //         // =========================
-    //         // Commit FilePond uploads
-    //         // =========================
-    //         if (!empty($serverIds)) {
-    //             $this->commitFilepondUploads($serverIds, $op->id, 'qid');
-    //         }
-
-    //         // =========================
-    //         // 4) Delete docs ONLY ON SAVE (staged deletes)
-    //         // =========================
-    //         // Ensure the table has: id, event_id, disk, path (or equivalents)
-    //         // if (!empty($deleteIds)) {
-    //         //     $docs = ParticipantDocument::where('participant_id', $op->id)
-    //         //         ->whereIn('id', $deleteIds)
-    //         //         ->get();
-
-    //         //     foreach ($docs as $doc) {
-    //         //         Storage::disk($doc->disk ?? 'private')->delete($doc->path);
-    //         //         $doc->delete();
-    //         //     }
-    //         // }
-
-    //         if ($request->hasFile('qid_file')) {
-
-    //             // delete old file (optional but recommended)
-    //             if ($op->qidDocument) {
-    //                 Storage::disk($op->qidDocument->disk)
-    //                     ->delete($op->qidDocument->path);
-    //                 $op->qidDocument->delete();
-    //             }
-
-    //             $file = $request->file('qid_file');
-    //             $path = $file->store('participants/qid', 'private');
-
-    //             ParticipantDocument::create([
-    //                 'participant_id' => $op->id,
-    //                 'disk'           => 'private',
-    //                 'path'           => $path,
-    //                 'original_name'  => $file->getClientOriginalName(),
-    //                 'mime'           => $file->getClientMimeType(),
-    //                 'size'           => $file->getSize(),
-    //             ]);
-    //         }
-
-    //         DB::commit();
-
-    //         $toastr_message = [
-    //             'alert-type' => 'success',
-    //             'message' => 'Report submitted successfully!',
-    //         ];
-
-    //         return redirect()->route('home')->with($toastr_message);
-
-    //         // $error = false;
-    //         // // $type = 'success';
-    //         // $message = 'Participant updated successfully.';
-
-    //         // return response()->json(['error' => $error, 'message' => $message]);
-    //     } catch (\Throwable $e) {
-    //         DB::rollBack();
-
-    //         Log::error('GuardianController::store failed', [
-    //             'error' => $e->getMessage(),
-    //         ]);
-
-    //         return response()->json([
-    //             'error'   => true,
-    //             'message' => 'Failed to update participant. ' . $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
     public function update(Request $request)
     {
-        //
-        // dd($request);
-
-        // $timeslots = DeliverySchedulePeriod::findOrFail($request->schedule_period_id);
 
         Log::info('inside GuardianController update');
         Log::info('request data: ' . json_encode($request->all()));

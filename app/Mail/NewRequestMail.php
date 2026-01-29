@@ -19,13 +19,13 @@ class NewRequestMail extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-    public array $vappRequest;
+    public array $detail;
     public $qrBase64;
     public $qrUrl;
 
-    public function __construct($vappRequest, public $qrFilePath)
+    public function __construct($detail, public $qrFilePath)
     {
-        $this->vappRequest = $vappRequest;
+        $this->detail = $detail;
 
         // $this->qrBase64 = base64_encode(QrCode::format('png')->size(200)->generate($qrUrl));
     }
@@ -33,7 +33,7 @@ class NewRequestMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('VAPP Confirmation for a New Request ('.$this->vappRequest['event'].', ' . $this->vappRequest['request_ref_number'] .', '.$this->vappRequest['request_status'].')')
+        return $this->subject('Youth Program - Expression of Interest Received ('.$this->detail['event'].', ' . $this->detail['reference_number'].')')
                     ->view('emails.new_request');
                     // ->attach(
                     //     $this->qrFilePath,
