@@ -15,8 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use App\Imports\PermissionImport;
-use App\Models\Vapp\Event;
-use App\Models\Vapp\FunctionalArea;
+use App\Models\Ypi\Event;
 // use App\Models\Mds\CmsEvent;
 use App\Notifications\NewUserNotification;
 use Illuminate\Validation\Rules\Password;
@@ -441,10 +440,9 @@ class RoleController extends Controller
     {
         $roles = Role::all();
         $events = Event::all();
-        $functional_areas = FunctionalArea::all();
         // $workspace = Workspace::all();
         // $departments = Department::all();
-        return view('sec.adminuser.add', compact('roles', 'events', 'functional_areas'));
+        return view('sec.adminuser.add', compact('roles', 'events'));
     }  // addAdminUser
 
     public function createAdminUser(Request $request)
@@ -520,10 +518,9 @@ class RoleController extends Controller
     {
         $user = User::findOrFail($id);
         $roles = Role::all();
-        $functional_areas = FunctionalArea::all();
         $events = Event::all();
 
-        return view('sec.adminuser.edit', compact('user', 'roles', 'events', 'functional_areas'));
+        return view('sec.adminuser.edit', compact('user', 'roles', 'events'));
     }
 
     public function updateAdminUser(Request $request)
@@ -567,12 +564,12 @@ class RoleController extends Controller
             }
         }
 
-        $user->fa()->detach();
-        if ($request->fa_id) {
-            foreach ($request->fa_id as $key => $data) {
-                $user->fa()->attach($request->fa_id[$key]);
-            }
-        }
+        // $user->fa()->detach();
+        // if ($request->fa_id) {
+        //     foreach ($request->fa_id as $key => $data) {
+        //         $user->fa()->attach($request->fa_id[$key]);
+        //     }
+        // }
 
         $notification = array(
             'message'       => 'User updated successfully',

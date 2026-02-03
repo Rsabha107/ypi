@@ -72,7 +72,8 @@ class UploadController extends Controller
         // Better: validate using the file you found:
         // (Laravel doesn't validate dynamic keys nicely, so do manual checks)
         $mime = $file->getClientMimeType();
-        $allowed = ['image/jpeg', 'image/png', 'image/gif'];
+        $allowed = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', "image/jpg", "image/webp"];
+
         if (!in_array($mime, $allowed)) {
             return response('Invalid file type', 422);
         }

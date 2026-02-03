@@ -103,7 +103,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-12 gy-3 mb-3">
+                                {{-- <div class="col-12 gy-3 mb-3">
                                     <label class="form-label" for="inputAddress2">Functional Area
                                         (multiple)</label>
                                     <select class="form-select js-select-fa-assign-multiple"
@@ -117,7 +117,7 @@
                                         </option>
                                         @endforeach
                                     </select>
-                                </div>
+                                </div> --}}
                                 {{-- <div class="row g-3 mb-3">
                                     <div class="col-xl-6">
                                         <label class="form-label" for="password">Password</label>

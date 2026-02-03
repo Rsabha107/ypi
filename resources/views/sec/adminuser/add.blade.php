@@ -84,11 +84,11 @@
                                             <div class="btn-group btn-group d-flex justify-content-center" role="group"
                                                 aria-label="Basic radio toggle button group">
                                                 <input type="radio" class="btn-check" id="user_active" name="status"
-                                                    value="1">
+                                                    value="1" checked>
                                                 <label class="btn btn-outline-primary"
                                                     for="user_active"><?= get_label('active', 'Active') ?></label>
                                                 <input type="radio" class="btn-check" id="user_deactive" name="status"
-                                                    value="0" checked>
+                                                    value="0" >
                                                 <label class="btn btn-outline-primary"
                                                     for="user_deactive"><?= get_label('deactive', 'Deactive') ?></label>
 
@@ -104,7 +104,7 @@
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" id="adminUser" type="radio"
-                                                name="usertype" value="admin" required />
+                                                name="usertype" value="admin" required checked/>
                                             <label class="form-check-label" for="inlineRadio2">Admin</label>
                                         </div>
                                     </div>
@@ -122,7 +122,7 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-12 gy-3 mb-3">
+                                    {{-- <div class="col-12 gy-3 mb-3">
                                         <label class="form-label" for="inputAddress2">Functional Area
                                             (multiple)</label>
                                         <select class="form-select js-select-fa-assign-multiple" id="add_fa_assigned_to"
@@ -135,7 +135,7 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <div class="row g-3 mb-3">
                                         <div class="col-xl-6">
                                             <label class="form-label" for="password">Password</label>

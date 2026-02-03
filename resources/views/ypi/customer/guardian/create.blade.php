@@ -137,7 +137,7 @@
                             <input class="form-control" id="qid_files" name="qid_files[]" type="file" multiple
                                 required />
                             <small class="form-text text-muted">Max size: 2MB. Accepted formats: JPG, PNG,
-                                GIF, PNG</small>
+                                GIF, PNG, PDF</small>
                         </div>
                         {{-- <div class="text-center mb-3">
                             <div class="mb-3 text-start">
@@ -241,7 +241,7 @@
                                 Please specify health issues
                             </label>
                             <input type="text" class="form-control" id="health_issues_details"
-                                name="health_issues_details" placeholder="e.g. nuts, dairy, shellfish">
+                                name="health_issues_details" placeholder="e.g. asthma, diabetes, epilepsy">
                         </div>
 
 
@@ -275,65 +275,65 @@
             $('.dropify').dropify();
         });
 
-        const input = document.getElementById('photoUpload');
-        const preview = document.getElementById('photoPreview');
+        // const input = document.getElementById('photoUpload');
+        // const preview = document.getElementById('photoPreview');
 
-        let selectedFiles = [];
+        // let selectedFiles = [];
 
-        input.addEventListener('change', () => {
-            const newFiles = Array.from(input.files);
+        // input.addEventListener('change', () => {
+        //     const newFiles = Array.from(input.files);
 
-            // ✅ Append new files, avoid duplicates (same name+size+lastModified)
-            newFiles.forEach(f => {
-                const exists = selectedFiles.some(x =>
-                    x.name === f.name &&
-                    x.size === f.size &&
-                    x.lastModified === f.lastModified
-                );
-                if (!exists) selectedFiles.push(f);
-            });
+        //     // ✅ Append new files, avoid duplicates (same name+size+lastModified)
+        //     newFiles.forEach(f => {
+        //         const exists = selectedFiles.some(x =>
+        //             x.name === f.name &&
+        //             x.size === f.size &&
+        //             x.lastModified === f.lastModified
+        //         );
+        //         if (!exists) selectedFiles.push(f);
+        //     });
 
-            syncInputFiles();
-            renderPreviews();
-        });
+        //     syncInputFiles();
+        //     renderPreviews();
+        // });
 
-        function syncInputFiles() {
-            const dt = new DataTransfer();
-            selectedFiles.forEach(file => dt.items.add(file));
-            input.files = dt.files;
-        }
+        // function syncInputFiles() {
+        //     const dt = new DataTransfer();
+        //     selectedFiles.forEach(file => dt.items.add(file));
+        //     input.files = dt.files;
+        // }
 
-        function renderPreviews() {
-            preview.innerHTML = '';
+        // function renderPreviews() {
+        //     preview.innerHTML = '';
 
-            selectedFiles.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'preview-item';
+        //     selectedFiles.forEach((file, index) => {
+        //         const reader = new FileReader();
+        //         reader.onload = e => {
+        //             const wrapper = document.createElement('div');
+        //             wrapper.className = 'preview-item';
 
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'preview-img';
+        //             const img = document.createElement('img');
+        //             img.src = e.target.result;
+        //             img.className = 'preview-img';
 
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'photo-remove';
-                    btn.innerHTML = '&times;';
-                    btn.onclick = () => removeFile(index);
+        //             const btn = document.createElement('button');
+        //             btn.type = 'button';
+        //             btn.className = 'photo-remove';
+        //             btn.innerHTML = '&times;';
+        //             btn.onclick = () => removeFile(index);
 
-                    wrapper.appendChild(img);
-                    wrapper.appendChild(btn);
-                    preview.appendChild(wrapper);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
+        //             wrapper.appendChild(img);
+        //             wrapper.appendChild(btn);
+        //             preview.appendChild(wrapper);
+        //         };
+        //         reader.readAsDataURL(file);
+        //     });
+        // }
 
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            syncInputFiles();
-            renderPreviews();
-        }
+        // function removeFile(index) {
+        //     selectedFiles.splice(index, 1);
+        //     syncInputFiles();
+        //     renderPreviews();
+        // }
     </script>
 @endpush

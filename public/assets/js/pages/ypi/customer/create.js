@@ -24,10 +24,57 @@ $(document).ready(function () {
     fpAdd.config.onChange.push(function (selectedDates) {
         if (!selectedDates.length) return;
 
+        valid = true;
+
         console.log("selectedDates", selectedDates);
-        const age = calculateAge(selectedDates[0]);
+        const dob = selectedDates[0];
+        const age = calculateAge(dob);
+        const participant_type = $("#participant_type_id").val();
+        const participant_label = $("#participant_type_id option:selected")
+            .text()
+            .trim();
         console.log("age", age);
+
         $("#participant_age").val(age);
+
+        if (participant_label === "Player Escort kid (Ages 6-11)") {
+            if (age < 6 || age > 11) {
+                valid = false;
+                errorMsg =
+                    "Player Escort Kid age must be between 6 and 11 years.";
+            }
+        }
+
+        if (participant_label === "Flag Bearer (Ages 11-16)") {
+            if (age < 11 || age > 16) {
+                valid = false;
+                errorMsg = "Flag Bearer age must be between 11 and 16 years.";
+            }
+        }
+
+        if (participant_label === "Ball Crew (Ages 12-16)") {
+            if (age < 12 || age > 16) {
+                valid = false;
+                errorMsg = "Ball Crew age must be between 12 and 16 years.";
+            }
+        }
+
+        if (!valid) {
+            console.log("errorMsg", errorMsg);
+            toastr.error(errorMsg);
+
+            // reset DOB + age
+            fpAdd.clear();
+            $("#participant_age").val("");
+
+            $("#participant_type_id").on("change", function () {
+                if (fpAdd.selectedDates.length) {
+                    fpAdd.config.onChange[0](fpAdd.selectedDates);
+                }
+            });
+
+            return;
+        }
     });
 
     document
@@ -154,6 +201,27 @@ $(document).ready(function () {
                 headers: { "X-CSRF-TOKEN": csrf },
             },
         },
+    });
+
+    // On form submit -> validate
+    const form = document.querySelector("#spinner-form"); // your form id
+
+    form.addEventListener("submit", function (e) {
+        // optional: count only files that are actually in the pond
+        const count = pond.getFiles().length;
+
+        if (count === 0) {
+            e.preventDefault();
+
+            toastr.error("Please upload participant QID File before submitting.");
+
+            // nice UX: highlight + scroll
+            input
+                .closest(".filepond--wrapper")
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            return false;
+        }
     });
 
     const anyUploading = () =>

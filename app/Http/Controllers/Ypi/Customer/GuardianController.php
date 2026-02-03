@@ -701,7 +701,7 @@ class GuardianController extends Controller
     public function destroy($id)
     {
         // LOG::info('inside delete');
-        $op = Guest::find($id);
+        $op = Participant::find($id);
         Log::info($op);
         if (!$op) {
             $error = true;

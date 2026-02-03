@@ -192,7 +192,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 // console.log('inside confirmed')
                 $.ajax({
-                    url: "/ypi/customer/participant/delete/" + id,
+                    url: "/ypi/customer/guardian/delete/" + id,
                     type: "DELETE",
                     headers: {
                         // "X-CSRF-TOKEN": $('input[name="_token"]').attr("value"),

@@ -361,7 +361,7 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
         Route::get('/ypi/customer/guardian/create', 'create')->name('ypi.customer.guardian.create');
         Route::get('/ypi/customer/guardian/get/{id}', 'get')->name('ypi.customer.guardian.get');
         Route::post('/ypi/customer/guardian/update', 'update')->name('ypi.customer.guardian.update');
-        Route::delete('/ypi/customer/guardian/delete/{id}', 'delete')->name('ypi.customer.guardian.delete');
+        Route::delete('/ypi/customer/guardian/delete/{id}', 'destroy')->name('ypi.customer.guardian.delete');
         Route::post('/ypi/customer/guardian/store', 'store')->name('ypi.customer.guardian.store');
         Route::get('/ypi/customer/participant/create', 'create')->name('ypi.customer.participant.create');
         Route::get('/ypi/customer/participant/edit/{id}', 'edit')->name('ypi.customer.participant.edit');
