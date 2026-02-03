@@ -168,7 +168,6 @@ class UserController extends Controller
                 'email' => 'required|email|unique:users,email',
                 'phone' => 'required|max:15',
 
-                'fa_id' => 'required',
                 'event_id' => 'required',
                 'roles' => 'required|array|min:1',
             ];
@@ -226,11 +225,11 @@ class UserController extends Controller
                 }
             }
 
-            if ($request->fa_id) {
-                foreach ($request->fa_id as $key => $data) {
-                    $user->fa()->attach($request->fa_id[$key]);
-                }
-            }
+            // if ($request->fa_id) {
+            //     foreach ($request->fa_id as $key => $data) {
+            //         $user->fa()->attach($request->fa_id[$key]);
+            //     }
+            // }
 
             appLog('Assigning roles: ' . json_encode($intRoles));
 

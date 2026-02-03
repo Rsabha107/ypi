@@ -196,6 +196,32 @@ if (!function_exists('time_range_segment')) {
     }
 }
 
+if (!function_exists('generateSecurePassword')) {
+    function generateSecurePassword($length = 12)
+    {
+        $lowercase    = 'abcdefghijklmnopqrstuvwxyz';
+        $uppercase    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $numbers      = '0123456789';
+        $specialChars = '!@#$%^&*()-_=+<>?';
+
+        // Ensure at least one of each
+        $password = '';
+        $password .= $lowercase[random_int(0, strlen($lowercase) - 1)];
+        $password .= $uppercase[random_int(0, strlen($uppercase) - 1)];
+        $password .= $numbers[random_int(0, strlen($numbers) - 1)];
+        $password .= $specialChars[random_int(0, strlen($specialChars) - 1)];
+
+        // Fill the rest
+        $all = $lowercase . $uppercase . $numbers . $specialChars;
+        for ($i = strlen($password); $i < $length; $i++) {
+            $password .= $all[random_int(0, strlen($all) - 1)];
+        }
+
+        // Shuffle to randomize order
+        return str_shuffle($password);
+    }
+}
+
 /**
  * Generate initials from a name
  *

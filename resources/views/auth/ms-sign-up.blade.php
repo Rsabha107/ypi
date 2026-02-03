@@ -51,7 +51,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-12 gy-3 mb-3">
+                        {{-- <div class="col-12 gy-3 mb-3">
                             <label class="form-label" for="inputAddress2">Functional Area
                                 (multiple)</label>
                             <select class="form-select js-select-fa-assign-multiple" id="add_fa_assigned_to" name="fa_id[]"
@@ -63,7 +63,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-6 col-md-9 mb-3">
                             @foreach ($roles as $key => $item)
