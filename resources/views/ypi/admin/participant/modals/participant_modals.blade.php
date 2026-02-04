@@ -82,3 +82,36 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="ypiUploadCertModal" tabindex="-1" aria-labelledby="ypiUploadCertModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="ypiUploadCertModalLabel">Upload Certificate</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-2 small text-muted">
+          Upload a single certificate file (PDF/JPG/PNG). Max 5MB.
+        </div>
+
+        <input type="file" class="form-control" id="certFile" accept="application/pdf,image/jpeg,image/png">
+
+        <div class="small mt-2" id="certMsg"></div>
+
+        {{-- store returned path (or id) --}}
+        <input type="hidden" id="certPath" name="cert_path" value="">
+        <input type="hidden" id="participantIdForCert" name="participant_id" value="">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="certCloseBtn">Close</button>
+        <button type="button" class="btn btn-primary" id="certUploadBtn" disabled>Upload</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+

@@ -6,24 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Mail\ApprovedRequestMail;
 use App\Mail\RejectedRequestMail;
 use App\Models\Ypi\Event;
-use App\Models\Ypi\AirlineCarriers;
-use App\Models\Ypi\Airport;
-use App\Models\Ypi\FlightCabin;
-use App\Models\Ypi\FlightStatus;
-use App\Models\Ypi\FlightType;
 use App\Models\Ypi\Gender;
 use App\Models\Ypi\Nationality;
 use App\Models\Ypi\Participant;
+use App\Models\Ypi\ParticipantDocument;
 use App\Models\Ypi\ParticipantStatus;
 use App\Models\Ypi\ParticipantType;
 use App\Models\Ypi\SizeLookup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class GuestController extends Controller
 {
@@ -60,10 +58,10 @@ class GuestController extends Controller
     public function list(Request $request)
     {
 
-        Log::info('inside guest list');
-        Log::info('request data: ');
-        Log::info($request);
-        Log::info($request->all());
+        // Log::info('inside guest list');
+        // Log::info('request data: ');
+        // Log::info($request);
+        // Log::info($request->all());
 
         $search = request('search');
         $filter = request('filter');
@@ -138,7 +136,9 @@ class GuestController extends Controller
         }
 
         $total = $ops->count();
-        $ops = $ops->paginate(request("limit"))->through(function ($op) {
+        $limit = request("limit");
+        $limit = max(1, min($limit, 100)); // min=1, max=100
+        $ops = $ops->paginate($limit)->through(function ($op) {
 
             // $location = Location::find($guests->location_id);
             $full_name = $op->first_name . ' ' . $op->last_name;
@@ -167,17 +167,17 @@ class GuestController extends Controller
             $actions = '<div class="font-sans-serif btn-reveal-trigger position-static">';
             $edit_actions = '<a href="javascript:void(0)" class="btn btn-sm" id="edit_guest_offcanv" data-id="' .
                 $op->id .
-                '" data-table="guest_table" data-bs-toggle="tooltip" data-bs-placement="right" title="Update">' .
+                '" data-table="participant_table" data-bs-toggle="tooltip" data-bs-placement="right" title="Update">' .
                 '<i class="fa-solid fa-pen-to-square text-primary"></i></a>';
             $delete_actions =
-                '<a href="javascript:void(0)" class="btn btn-sm" data-table="guest_table" data-id="' .
+                '<a href="javascript:void(0)" class="btn btn-sm" data-table="participant_table" data-id="' .
                 $op->id .
                 '" id="deleteGuest" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">' .
                 '<i class="bx bx-trash text-danger"></i></a>';
             $upload_img_actions =
-                '<a href="javascript:void(0)" class="btn btn-sm" data-table="guest_table" data-id="' .
+                '<a href="javascript:void(0)" class="btn btn-sm" data-table="participant_table" data-id="' .
                 $op->id .
-                '" id="uploadImagesGuest" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">' .
+                '" id="ypiUploadCertificate" data-bs-toggle="tooltip" data-bs-placement="right" title="Upload Certificate">' .
                 '<i class="bx bx-arrow-to-top text-success"></i></a>';
 
             $actions .=  $actions . (($op->status?->title == 'Approved') ? $upload_img_actions : '') . $delete_actions;
@@ -187,6 +187,25 @@ class GuestController extends Controller
             $qid_image_route = $op->qidDocument
                 ? '<a href="' . route('participant.docs.download', $op->qidDocument) . '" target="_blank" ><span><i class="fa-solid fa-eye me-2"></i>' . $op->qid . '</span></a>'
                 : $op->qid;
+
+            $cert_image_route = $op->certDocument
+                ? '<div class="d-flex align-items-center gap-2">'
+                . '<a href="' . route('participant.docs.download', $op->certDocument) . '" target="_blank" class="text-warning">'
+                . '<i class="fa-solid fa-eye"></i>'
+                . '</a>'
+                . '<a href="javascript:void(0)"'
+                . ' class="text-danger js-remove-cert"'
+                . ' data-doc-id="' . $op->certDocument->id . '"'
+                . ' data-table="participant_table"'
+                . ' title="Remove certificate">'
+                . '<i class="fa-solid fa-trash"></i>'
+                . '</a>'
+                . '<span class="ms-1 text-truncate" style="max-width:180px"'
+                . ' title="' . e($op->certDocument->originalName) . '">'
+                . e($op->certDocument->originalName)
+                . '</span>'
+                . '</div>'
+                : null;
 
             $gardian_qid_image_route = $op->guardian->qidDocument
                 ? '<a href="' . route('guardian.docs.download', $op->guardian->qidDocument) . '" target="_blank" ><span><i class="fa-solid fa-eye me-2"></i>' . $op->guardian->qid . '</span></a>'
@@ -200,6 +219,7 @@ class GuestController extends Controller
                 'guest_type' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->guest_type?->title . '</div>',
                 'guardian_name' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->guardian->full_name . '</div>',
                 'guardian_qid' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $gardian_qid_image_route . '</div>',
+                'participant_cert' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $cert_image_route . '</div>',
                 'participant_name' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->full_name . '</div>',
                 'guardian_email' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->guardian->email . '</div>',
                 'guardian_phone' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->guardian->phone_main . '</div>',
@@ -544,6 +564,104 @@ class GuestController extends Controller
             session()->forget('EVENT_ID');
             // return redirect()->route('tracki.project.show.card')->with('message', 'Workspace switched successfully. now showing all workspace data');
             return back()->withInput();
+        }
+    }
+
+    public function uploadCertificate(Request $request)
+    {
+        Log::info('inside uploadCertificate');
+        Log::info('request data: ');
+        Log::info($request);
+        Log::info($request->all());
+
+        $rules = [
+            'certificate' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // max 5MB
+            'participant_id' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            Log::info($validator->errors());
+            $error = true;
+            $message = implode($validator->errors()->all('<div>:message</div>'));
+            return response()->json(['error' => $error, 'message' => $message], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+
+            $disk = 'private'; // or 'public'
+            $dir  = 'certificates';
+
+            $file = $request->file('certificate');
+            $name = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+            $path = $file->storeAs($dir, $name, $disk);
+
+            ParticipantDocument::create([
+                'participant_id' => $request->input('participant_id'),
+                'category' => 'certificate',
+                'disk' => $disk,
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'mime' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'created_by' => auth()->id(),
+            ]);
+
+            DB::commit();
+
+            return response()->json(['error' => false, 'message' => 'Certificate uploaded successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error uploading certificate: ' . $e->getMessage());
+            return response()->json(['error' => true, 'message' => 'Failed to upload certificate.'], 500);
+        }
+
+
+        // $file = $request->file('certificate');
+
+        // if (!$file) {
+        //     return response('No file uploaded', 422);
+        // }
+
+        // $request->validate([
+        //     'certificate' => 'required|file|mimes:jpeg,png,webp,pdf|max:5120', // max 5MB
+        // ]);
+
+        // $participant_id = $request->input('participant_id');
+        // $participant = Participant::find($participant_id);
+
+        // if (!$participant) {
+        //     return response()->json(['error' => true, 'message' => 'Participant not found.'], 404);
+        // }
+
+        // $fileNameWithExt = $file->getClientOriginalName();
+        // $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        // $extension = $file->getClientOriginalExtension();
+        // $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+
+        // $path = $file->move('storage/upload/certificates/', $fileNameToStore);
+
+        // $participant->certificate = $fileNameToStore;
+
+
+        // $participant->save();
+
+    }
+
+    public function deleteCertificate($documentId)
+    {
+        try {
+            $doc = ParticipantDocument::findOrFail($documentId);
+
+            Storage::disk($doc->disk ?? 'private')->delete($doc->path);
+            $doc->delete();
+
+            return response()->json(['error' => false, 'message' => 'Certificate removed successfully.']);
+        } catch (\Exception $e) {
+            Log::error('Error deleting certificate: ' . $e->getMessage());
+            return response()->json(['error' => true, 'message' => 'Failed to remove certificate.'], 500);
         }
     }
 }

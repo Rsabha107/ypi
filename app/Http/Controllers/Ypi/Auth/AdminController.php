@@ -483,9 +483,8 @@ class AdminController extends Controller
     public function msSignUp()
     {
         $events = Event::all();
-        $clients = FunctionalArea::all();
         $roles = Role::all();
-        return view('auth.ms-sign-up', compact('events', 'clients', 'roles'));
+        return view('auth.ms-sign-up', compact('events', 'roles'));
     }
 
     public function forgotPassword()

@@ -32,28 +32,10 @@
                     data-mobile-responsive="true" data-buttons-class="secondary" data-query-params="guestQueryParams">
 
                     <thead>
-                        {{-- <tr> --}}
-                        {{-- <th rowspan="2"></th> --}}
-
-                        {{-- <th colspan="2" class="text-center bg-light fw-semibold">
-
-                            </th>
-
-                            <th colspan="3" class="text-center bg-light-green fw-semibold">
-                                Guardian Details
-                            </th>
-
-                            <th colspan="11" class="text-center bg-light fw-semibold">
-                                Participant Details
-                            </th> --}}
-
-                        {{-- <th rowspan="1" class="text-end">
-                                Action
-                            </th> --}}
-                        {{-- </tr> --}}
                         <tr>
                             {{-- <th data-field="image"></th> --}}
                             <th data-field="participant_status">Participant Status</th>
+                            <th data-field="participant_cert">Certificate</th>
                             <th data-field="participant_type">Participant Type</th>
                             <th data-field="participant_name">Participant Name</th>
                             <th data-field="event_id">Event</th>

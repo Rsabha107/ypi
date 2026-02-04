@@ -110,10 +110,10 @@ class GuardianController extends Controller
     public function list(Request $request)
     {
 
-        Log::info('inside guest list');
-        Log::info('request data: ');
-        Log::info($request);
-        Log::info($request->all());
+        // Log::info('inside guest list');
+        // Log::info('request data: ');
+        // Log::info($request);
+        // Log::info($request->all());
 
         $search = request('search');
         $filter = request('filter');
@@ -129,66 +129,10 @@ class GuardianController extends Controller
 
         $ops = $ops->participants()->orderBy($sort, $order);
 
-        // $ops = Participant::orderBy($sort, $order);
-
-
-        if ($search) {
-            $ops = $ops->whereHas('client', function ($query) use ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
-            })
-                ->orWhereHas(
-                    'schedule_period',
-                    function ($query) use ($search) {
-                        $query->where('period', 'like', '%' . $search . '%');
-                    }
-                )
-                ->orWhereHas(
-                    'cargo',
-                    function ($query) use ($search) {
-                        $query->where('title', 'like', '%' . $search . '%');
-                    }
-                )
-                ->orWhereHas(
-                    'zone',
-                    function ($query) use ($search) {
-                        $query->where('title', 'like', '%' . $search . '%');
-                    }
-                )
-                ->orWhereHas(
-                    'status',
-                    function ($query) use ($search) {
-                        $query->where('title', 'like', '%' . $search . '%');
-                    }
-                )
-                ->orWhereHas(
-                    'driver',
-                    function ($query) use ($search) {
-                        $query->where('first_name', 'like', '%' . $search . '%');
-                    }
-                )
-                ->orWhereHas(
-                    'driver',
-                    function ($query) use ($search) {
-                        $query->where('last_name', 'like', '%' . $search . '%');
-                    }
-                );
-        }
-
-
-        if ($mds_schedule_event_filter) {
-            $ops = $ops->where('event_id', $mds_schedule_event_filter);
-        }
-
-        if ($mds_schedule_venue_filter) {
-            $ops = $ops->where('venue_id', $mds_schedule_venue_filter);
-        }
-
-        if ($mds_schedule_rsp_filter) {
-            $ops = $ops->where('rsp_id', $mds_schedule_rsp_filter);
-        }
-
         $total = $ops->count();
-        $ops = $ops->paginate(request("limit"))->through(function ($op) {
+        $limit = request("limit");
+        $limit = max(1, min($limit, 100)); // min=1, max=100
+        $ops = $ops->paginate($limit)->through(function ($op) {
 
 
             if ($op->is_admin == 'X') {
@@ -240,6 +184,13 @@ class GuardianController extends Controller
 
             $details_url = route('ypi.admin.participant.detail', $op->id);
             $order_status =  '<span class="badge badge-phoenix fs--2 ms-2 badge-phoenix-' . $op->status?->color . ' "><span class="badge-label" id="editprojectStatus" data-id="' . $op->id . '" data-table="project_table">' . $op->status->title . '</span><span class="ms-1" data-feather="x" style="height:12.8px;width:12.8px;"></span></span>';
+            $cert_image_route = $op->certDocument
+                ? '<div class="d-flex align-items-center gap-2">'
+                . '<a href="' . route('participant.docs.download', $op->certDocument) . '" target="_blank" class="text-warning">'
+                . '<i class="fa-solid fa-eye"></i>'
+                . '</a>'
+                . '</div>'
+                : null;
 
             return  [
                 'id' => $op->id,
@@ -248,6 +199,7 @@ class GuardianController extends Controller
                 // 'id' => '<div class="align-middle white-space-wrap fw-bold fs-8 ps-2">' .$op->id. '</div>',
                 'ref_number' => '<div class="align-middle white-space-wrap fw-bold fs-9 ms-2">
                         <a href="' . $details_url . '" >' . $op->ref_number . '</a></div>',
+                'participant_cert' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $cert_image_route . '</div>',
                 'event_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->event?->name . '</div>',
                 'participant_type' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->participantType?->title . '</div>',
                 'full_name' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->full_name . '</div>',
@@ -509,7 +461,7 @@ class GuardianController extends Controller
             DB::commit();
 
             if (config('settings.send_notifications')) {
-                
+
                 $details = [
                     'email' => config('settings.admin_email'),
                     'guardian_name' => $guardian->full_name,

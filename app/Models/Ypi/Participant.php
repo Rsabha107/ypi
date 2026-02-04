@@ -23,9 +23,9 @@ class Participant extends Model
 
     public function getDateOfBirthDmyAttribute()
     {
-    return $this->date_of_birth
-        ? Carbon::parse($this->date_of_birth)->format('d/m/Y')
-        : null;
+        return $this->date_of_birth
+            ? Carbon::parse($this->date_of_birth)->format('d/m/Y')
+            : null;
     }
 
 
@@ -68,6 +68,12 @@ class Participant extends Model
     {
         return $this->hasOne(ParticipantDocument::class, 'participant_id', 'id')
             ->where('category', 'qid');
+    }
+
+    public function certDocument()
+    {
+        return $this->hasOne(ParticipantDocument::class, 'participant_id', 'id')
+            ->where('category', 'certificate');
     }
 
     public function participantType()

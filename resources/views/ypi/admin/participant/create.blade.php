@@ -1,4 +1,4 @@
-@extends('mds.admin.layout.admin_template')
+@extends('ypi.layout.admin_template')
 @section('main')
 
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>

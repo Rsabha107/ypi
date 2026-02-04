@@ -20,14 +20,14 @@
                 <table id="participant_table" data-toggle="table"
                     data-classes="table table-hover  fs-9 mb-0 border-top border-translucent"
                     data-loading-template="loadingTemplate" data-url="{{ route('ypi.customer.guardian.list') }}"
-                    data-icons-prefix="bx" data-icons="icons"
-                    data-show-columns-toggle-all="true" data-show-refresh="true" data-show-toggle="true"
-                    data-total-field="total" data-trim-on-search="false" data-data-field="rows"
-                    data-page-list="[5, 10, 20, 50, 100, 200]" data-search="true" data-searchable="true"
-                    data-strict-search="true" data-side-pagination="server" data-show-columns="true"
-                    data-pagination="true" data-filter-control="true" data-filter-control-visible="true"
-                    data-show-search-clear-button="true" data-sort-name="id" data-sort-order="desc"
-                    data-mobile-responsive="true" data-buttons-class="secondary" data-query-params="guestQueryParams">
+                    data-icons-prefix="bx" data-icons="icons" data-show-columns-toggle-all="true"
+                    data-show-refresh="true" data-show-toggle="true" data-total-field="total"
+                    data-trim-on-search="false" data-data-field="rows" data-page-list="[5, 10, 20, 50, 100, 200]"
+                    data-search="true" data-searchable="true" data-strict-search="true" data-side-pagination="server"
+                    data-show-columns="true" data-pagination="true" data-filter-control="true"
+                    data-filter-control-visible="true" data-show-search-clear-button="true" data-sort-name="id"
+                    data-sort-order="desc" data-mobile-responsive="true" data-buttons-class="secondary"
+                    data-query-params="guestQueryParams">
 
                     <thead>
                         {{-- <tr>
@@ -52,6 +52,7 @@
                         {{-- <tr> --}}
                         <th data-field="image"></th>
                         <th data-field="participant_status">Participant Status</th>
+                        <th data-field="participant_cert">Certificate</th>
                         <th data-field="full_name">Participant Name</th>
                         <th data-field="participant_type">Participant Type</th>
                         <th data-field="qid">QID</th>

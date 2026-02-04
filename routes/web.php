@@ -192,6 +192,9 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         Route::delete('/ypi/admin/participant/delete/{id}', 'destroy')->name('ypi.admin.participant.delete');
         Route::get('/ypi/admin/participant/get/{id}', 'get')->name('ypi.admin.participant.get');
         Route::get('/ypi/admin/participant/mv/get/{id}', 'getView')->name('ypi.admin.participant.get.mv');
+        // upload certificate
+        Route::post('/ypi/admin/participant/certificate/upload', 'uploadCertificate')->name('ypi.admin.participant.certificate.upload');
+        Route::delete('/ypi/admin/participant/certificate/delete/{id}', 'deleteCertificate')->name('ypi.admin.participant.certificate.delete');
 
 
         //Booking note

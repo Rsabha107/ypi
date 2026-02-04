@@ -10,6 +10,84 @@ $(document).ready(function () {
         $("#cover-spin").hide();
     });
 
+    $("body").on("click", "#ypiUploadCertificate", function () {
+        console.log("inside #ypiUploadCertificate");
+        $("#cover-spin").show();
+        var $participantId = $(this).data("id");
+        var tableID = $(this).data("table");
+        console.log("participant id for cert upload: ", $participantId);
+        $("#participantIdForCert").val($participantId);
+        $("#ypiUploadCertModal").data("table", tableID);
+        $("#ypiUploadCertModal").modal("show");
+        $("#cover-spin").hide();
+    });
+
+    $(document).on("click", ".js-remove-cert", function () {
+        console.log("inside .js-remove-cert");
+        var docId = $(this).data("doc-id");
+        var tableID = $(this).data("table");
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Delete This Data?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // console.log('inside confirmed')
+                $.ajax({
+                    url: "/ypi/admin/participant/certificate/delete/" + docId,
+                    type: "DELETE",
+                    headers: {
+                        // "X-CSRF-TOKEN": $('input[name="_token"]').attr("value"),
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content",
+                        ),
+                    },
+                    dataType: "json",
+                    success: function (result) {
+                        // alert(result)
+                        if (!result["error"]) {
+                            toastr.success(result["message"]);
+                            $("#" + tableID).bootstrapTable("refresh");
+                            // Swal.fire(
+                            //     'Deleted!',
+                            //     'Your file has been deleted.',
+                            //     'success'
+                            //   )
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr.status);
+                        console.log(thrownError);
+                    },
+                });
+            }
+        });
+
+        // if (!confirm("Remove certificate?")) return;
+
+        // $.ajax({
+        //     url: "/ypi/admin/participant/certificate/delete/" + docId, // adjust if route differs
+        //     type: "DELETE",
+        //     headers: {
+        //         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        //     },
+        //     success: function () {
+        //         toastr.success("Certificate removed");
+        //         location.reload(); // or redraw your table
+        //     },
+        //     error: function (xhr) {
+        //         toastr.error(
+        //             xhr.responseJSON?.message || "Failed to remove certificate",
+        //         );
+        //     },
+        // });
+    });
+
     $("body").on("click", "#change_participant_status", function () {
         console.log("inside #change_participant_status");
         $("#cover-spin").show();
@@ -57,7 +135,7 @@ $(document).ready(function () {
                 }
 
                 $("#edit_participant_type").val(
-                    response.op.participant_type_id
+                    response.op.participant_type_id,
                 );
                 $("#edit_gender").val(response.op.gender_id);
                 $("#edit_participant_id").val(response.op.id);
@@ -75,20 +153,20 @@ $(document).ready(function () {
                 $("#edit_has_food_allergy").prop("checked", hasFoodAllergy);
                 $("#edit_food_allergy_details_wrap").toggleClass(
                     "d-none",
-                    !hasFoodAllergy
+                    !hasFoodAllergy,
                 );
                 $("#edit_food_allergy_details").val(
-                    response.op.food_allergy_details
+                    response.op.food_allergy_details,
                 );
 
                 $("#edit_has_health_issues").val(response.op.health_issues);
                 $("#edit_has_health_issues").prop("checked", hasHealthIssues);
                 $("#edit_health_issues_details").val(
-                    response.op.health_issues_details
+                    response.op.health_issues_details,
                 );
                 $("#edit_health_issues_details_wrap").toggleClass(
                     "d-none",
-                    !hasHealthIssues
+                    !hasHealthIssues,
                 );
 
                 $("#edit_participant_table").val(table);
@@ -98,7 +176,7 @@ $(document).ready(function () {
                 if (window.EventPondEdit) {
                     console.log(
                         "Preloading docs into EventPondEdit:",
-                        response.event_docs
+                        response.event_docs,
                     );
                     window.EventPondEdit.preload(response.event_docs);
                 }
@@ -171,7 +249,7 @@ $(document).ready(function () {
                     headers: {
                         // "X-CSRF-TOKEN": $('input[name="_token"]').attr("value"),
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                            "content"
+                            "content",
                         ),
                     },
                     dataType: "json",

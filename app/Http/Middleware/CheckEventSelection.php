@@ -16,9 +16,9 @@ class CheckEventSelection
      */
     public function handle(Request $request, Closure $next): Response
     {
-        appLog('CheckEventSelection');
+        // appLog('CheckEventSelection');
         if (config('mds.check_event_selection')) {
-            appLog('CheckEventSelection: Checking event selection: '. session()->has('EVENT_ID'));
+            // appLog('CheckEventSelection: Checking event selection: '. session()->has('EVENT_ID'));
             if (!session()->has('EVENT_ID') && auth()->check()) {
                 if (auth()->user()->hasRole('SuperAdmin')) {
                     session()->put('EVENT_ID', 11);
@@ -26,7 +26,7 @@ class CheckEventSelection
                 } elseif (auth()->user()->hasRole('Customer')) {
                     return redirect()->route('ypi.customer.guardian.pick');
                 } else {
-                    appLog('CheckEventSelection: Redirecting to pick event');
+                    // appLog('CheckEventSelection: Redirecting to pick event');
                     return redirect()->route('login');
                 }
             }
