@@ -20,7 +20,7 @@ class CheckFirstLoginMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        appLog('CheckFirstLoginMiddleware');
+        // appLog('CheckFirstLoginMiddleware');
 
                 if (auth()->user()->first_login_flag) {
                     // dd ('first_login_flag');

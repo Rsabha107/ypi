@@ -3,7 +3,7 @@
     $current_event_id = session()->get('EVENT_ID');
     $event = App\Models\Ypi\Event::find($current_event_id);
 
-    appLog('Current Event:', ['event' => $event]);
+    // appLog('Current Event:', ['event' => $event]);
 
     $user = Auth::user();
     $profileData = App\Models\User::find($user->id);

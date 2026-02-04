@@ -402,62 +402,6 @@ class GuardianController extends Controller
                 $temp->delete();
             }
 
-            // if ($request->hasFile('qid_file')) {
-
-            //     $file = $request->file('qid_file');
-            //     // $fileNameWithExt = $file->getClientOriginalName();
-            //     // // get file name
-            //     // $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            //     // // get extension
-            //     // $extension = $request->file('qid_file')->getClientOriginalExtension();
-
-            //     // $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-
-            //     // Log::info($fileNameWithExt);
-            //     // Log::info($filename);
-            //     // Log::info($extension);
-            //     // Log::info($fileNameToStore);
-
-            //     // $path = $request->file('file_name')->storeAs('public/upload/profile_images', $fileNameToStore);
-            //     // $path = $file->move('upload/profile_images/', $fileNameToStore);
-            //     // Log::info($path);
-
-            //     // $dir = "reports/{$report->id}";
-            //     $dir = "uploads/participants/{$op->id}";
-            //     // $filename = uniqid() . '.jpg'; // normalize to jpg
-
-            //     // // 🔥 Resize image
-            //     // // $image = Image::read($photo);
-            //     // $manager = new ImageManager(new Driver());
-
-            //     // // ✅ Read image
-            //     // $image = $manager->read($photo)
-            //     //     ->orient() // replaces orientate()
-            //     //     ->resize(1600, null, function ($constraint) {
-            //     //         $constraint->aspectRatio();
-            //     //         $constraint->upsize();
-            //     //     })
-            //     //     ->toJpeg(85); // encode
-
-
-            //     // // 🔥 Store in PRIVATE disk
-            //     // $path = Storage::disk('private')->put(
-            //     //     "{$dir}/{$filename}",
-            //     //     $image
-            //     // );
-            //     $path = $file->store($dir, 'private');
-
-            //     ParticipantDocument::create([
-            //         'participant_id' => $op->id,
-            //         'disk' => 'private',
-            //         'path' => $path,
-            //         'original_name' => $file->getClientOriginalName(),
-            //         'mime' => $file->getClientMimeType(),
-            //         'size' => $file->getSize(),
-            //         'created_by' => auth()->id(),
-            //     ]);
-            // }
-
             DB::commit();
 
             if (config('settings.send_notifications')) {
@@ -657,25 +601,28 @@ class GuardianController extends Controller
         Log::info($op);
         if (!$op) {
             $error = true;
-            $message = 'Guest not found.';
+            $message = 'Participant not found.';
             $notification = array(
-                'message'       => 'Guest not found',
+                'message'       => 'Participant not found',
                 'alert-type'    => 'error'
             );
             return response()->json(['error' => $error, 'message' => $message]);
         }
 
-        if ($op->photo) {
-            Storage::delete('public/upload/profile_images/' . $op->photo);
+        if ($op->documents) {
+            foreach ($op->documents as $doc) {
+                Storage::disk($doc->disk)->delete($doc->path);
+                $doc->delete();
+            }
         }
 
         $op->delete();
 
         $error = false;
-        $message = 'Guest deleted succesfully.';
+        $message = 'Participant deleted successfully.';
 
         $notification = array(
-            'message'       => 'Guest deleted successfully',
+            'message'       => 'Participant deleted successfully',
             'alert-type'    => 'success'
         );
 
