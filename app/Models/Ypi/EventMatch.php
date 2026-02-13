@@ -5,14 +5,13 @@ namespace App\Models\Ypi;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Venue extends Model
+class EventMatch extends Model
 {
+    //
     use HasFactory;
     protected $guarded = [];
-    protected $table = 'venues';
-
-    public function matches()
-    {
-        return $this->hasMany(EventMatch::class, 'venue_id');
-    }
+    protected $table = 'matches';
+    protected $casts = [
+        'match_date' => 'datetime',
+    ];
 }

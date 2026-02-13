@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\ApprovedRequestMail;
 use App\Mail\RejectedRequestMail;
 use App\Models\Ypi\Event;
+use App\Models\Ypi\EventMatch;
 use App\Models\Ypi\Gender;
 use App\Models\Ypi\Nationality;
 use App\Models\Ypi\Participant;
@@ -13,6 +14,7 @@ use App\Models\Ypi\ParticipantDocument;
 use App\Models\Ypi\ParticipantStatus;
 use App\Models\Ypi\ParticipantType;
 use App\Models\Ypi\SizeLookup;
+use App\Models\Ypi\Venue;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,8 +30,11 @@ class GuestController extends Controller
     //
     public function index()
     {
+        Log::info('inside GuestController participant index');
+
         $participants = Participant::all();
-        $events = Event::all();
+       // $events = Event::all();
+       $event = Event::find(session()->get('EVENT_ID'));
         $participant_types = ParticipantType::all();
         $genders = Gender::all();
         $nationalities = Nationality::all();
@@ -38,12 +43,14 @@ class GuestController extends Controller
         $shoe_sizes   = SizeLookup::type('shoe')->get();
         $jacket_sizes = SizeLookup::type('jacket')->get();
         $statuses = ParticipantStatus::all();
+        $matches = EventMatch::all();
 
         // $guests = Guest::with('client', 'schedule_period', 'cargo', 'zone', 'status', 'driver')->get();
 
         return view('ypi.admin.participant.list', compact(
             'participants',
-            'events',
+           // 'events',
+            'event',
             'participant_types',
             'genders',
             'nationalities',
@@ -51,7 +58,8 @@ class GuestController extends Controller
             'jersey_sizes',
             'jacket_sizes',
             'shoe_sizes',
-            'statuses'
+            'statuses',
+            'matches'
         ));
     }
 
@@ -215,6 +223,8 @@ class GuestController extends Controller
                 'image' => '<div class="align-middle white-space-wrap fs-9 px-3">' . $image,
                 'participant_status' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $order_status . '</div>',
                 'participant_type' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->participantType?->title . '</div>',
+                'assigned_venue_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->venue?->title . '</div>',
+                'assigned_match_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->match?->match_code . '</div>',
                 'event_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->event?->name . '</div>',
                 'guest_type' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->guest_type?->title . '</div>',
                 'guardian_name' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->guardian->full_name . '</div>',
@@ -490,9 +500,16 @@ class GuestController extends Controller
         $rules = [
             'status_id' => 'required',
             'participant_id' => 'required',
+            'venue_id' => 'required_if:status_id,2', // required if status is Approved
+            'match_id' => 'required_if:status_id,2', // required if status is Approved
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $messages = [
+            'venue_id.required_if' => 'Venue is required when status is Approved.',
+            'match_id.required_if' => 'Match is required when status is Approved.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             // Log::info($validator->errors());
@@ -512,6 +529,8 @@ class GuestController extends Controller
         $message = 'Status successfully updated';
 
         $op->status_id = intval($request->status_id);
+        $op->assigned_venue_id = intval($request->venue_id);
+        $op->assigned_match_id = intval($request->match_id);
         $op->updated_by = $user_id;
 
         $op->save();
@@ -663,5 +682,20 @@ class GuestController extends Controller
             Log::error('Error deleting certificate: ' . $e->getMessage());
             return response()->json(['error' => true, 'message' => 'Failed to remove certificate.'], 500);
         }
+    }
+
+    public function getMatchesByVenue($venue_id)
+    {
+        $venue = Venue::findOrFail($venue_id);
+        $matches = $venue->matches()   // assumes Venue has matches() relationship
+            ->orderBy('match_date', 'asc')
+            ->where('event_id', session()->get('EVENT_ID'))
+            ->get()
+            ->map(fn ($m) => [
+                'id'   => $m->id,
+                'text' => ($m->pma1.' vs '.$m->pma2.' - '.$m->match_date?->format('d M Y')),
+            ]);
+
+        return response()->json($matches);
     }
 }

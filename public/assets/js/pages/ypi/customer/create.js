@@ -2,6 +2,28 @@ $(document).ready(function () {
     console.log("customer create.js loaded");
 
     // ************************************************** task venues
+    function toggleSpecifyField() {
+        let selectedText = $("#food_allergy_id option:selected")
+            .text()
+            .trim()
+            .replace(/\s+/g, " ");
+        console.log("selected", selectedText);
+
+        if (selectedText === "Others") {
+            console.log("show specify field");
+            $("#food_allergy_other_wrap").slideDown(200);
+        } else {
+            $("#food_allergy_other_wrap").slideUp(200);
+            $('input[name="specify_food_allergy"]').val("");
+        }
+    }
+
+    // On change
+    $("#food_allergy_id").on("change", function () {
+        toggleSpecifyField();
+    });
+
+    toggleSpecifyField(); // on page load
 
     function calculateAge(dob) {
         if (!dob) return null;
@@ -56,6 +78,20 @@ $(document).ready(function () {
             if (age < 12 || age > 16) {
                 valid = false;
                 errorMsg = "Ball Crew age must be between 12 and 16 years.";
+            }
+        }
+
+        if (participant_label === "Official Match Ball Carrier (Ages 8-16)") {
+            if (age < 8 || age > 16) {
+                valid = false;
+                errorMsg = "Official Match Ball Carrier age must be between 8 and 16 years.";
+            }
+        }
+
+        if (participant_label === "Referee walk out escort child (Ages 6-11)") {
+            if (age < 6 || age > 11) {
+                valid = false;
+                errorMsg = "Referee walk out escort child age must be between 6 and 11 years.";
             }
         }
 
@@ -188,7 +224,7 @@ $(document).ready(function () {
             "application/pdf",
         ],
         labelIdle:
-            'Drag & Drop QID Image or <span class="filepond--label-action">Browse</span>',
+            'Drag & Drop QID/Passport Image or <span class="filepond--label-action">Browse</span>',
         server: {
             process: {
                 url: "/uploads/process",
@@ -213,7 +249,9 @@ $(document).ready(function () {
         if (count === 0) {
             e.preventDefault();
 
-            toastr.error("Please upload participant QID File before submitting.");
+            toastr.error(
+                "Please upload participant QID File before submitting.",
+            );
 
             // nice UX: highlight + scroll
             input

@@ -35,6 +35,8 @@
                         <tr>
                             {{-- <th data-field="image"></th> --}}
                             <th data-field="participant_status">Participant Status</th>
+                            <th data-field="assigned_venue_id">Assigned Venue</th>
+                            <th data-field="assigned_match_id">Assigned Match</th>
                             <th data-field="participant_cert">Certificate</th>
                             <th data-field="participant_type">Participant Type</th>
                             <th data-field="participant_name">Participant Name</th>

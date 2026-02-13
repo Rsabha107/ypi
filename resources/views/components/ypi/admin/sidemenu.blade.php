@@ -3,7 +3,7 @@
         <!-- scrollbar removed-->
         <div class="navbar-vertical-content">
             <ul class="navbar-nav flex-column" id="navbarVerticalNav">
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <!-- parent pages-->
                     <div class="nav-item-wrapper"><a class="nav-link dropdown-indicator label-1" href="#nv-home"
                             role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="nv-home">
@@ -28,7 +28,7 @@
                             </ul>
                         </div>
                     </div>
-                </li>
+                </li> --}}
                 <li class="nav-item">
                     <!-- label-->
                     <p class="navbar-vertical-label">Apps</p>

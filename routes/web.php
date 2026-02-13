@@ -12,20 +12,11 @@ use App\Http\Controllers\GeneralSettings\EventDocumentController;
 use App\Http\Controllers\GeneralSettings\ParticipantDocumentController;
 use App\Http\Controllers\GeneralSettings\GuardianDocumentController;
 use App\Http\Controllers\GeneralSettings\UploadController;
-use App\Http\Controllers\Ypi\Admin\AccommodationController;
-use App\Http\Controllers\Ypi\Admin\FlightController;
+
 use App\Http\Controllers\Ypi\Admin\GuestController;
-use App\Http\Controllers\Ypi\Setting\AirlineController;
-use App\Http\Controllers\Ypi\Setting\AirportController;
-use App\Http\Controllers\Ypi\Setting\CabinTypeController;
-use App\Http\Controllers\Ypi\Setting\ClientGroupController;
-use App\Http\Controllers\Ypi\Setting\DesignationController;
-use App\Http\Controllers\Ypi\Setting\FlightStatusController;
-use App\Http\Controllers\Ypi\Setting\FlightTypeController;
+
 use App\Http\Controllers\Ypi\Setting\ParticipantTypeController;
-use App\Http\Controllers\Ypi\Setting\HostedByController;
 use App\Http\Controllers\Ypi\Setting\NationalityController;
-use App\Http\Controllers\Vapp\Setting\FunctionalAreaController;
 
 // use App\Http\Controllers\Mds\Admin\DashboardController;
 use App\Http\Controllers\Security\ActivityAuditController;
@@ -205,6 +196,9 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         //Booking file upload
         Route::post('mds/admin/booking/file/store', 'fileStore')->name('mds.admin.booking.file.store');
         Route::delete('mds/admin/booking/file/{id}/delete', 'fileDelete')->name('mds.admin.booking.file.delete');
+
+        // get match by venue
+        Route::get('/venues/{venue_id}/matches', 'getMatchesByVenue')->name('ypi.admin.matches.by.venue');
     });
 
     Route::controller(ParticipantTypeController::class)->group(function () {
@@ -385,25 +379,25 @@ Route::post('/ypi/customer/events/switch', [GuardianController::class, 'pickEven
 Route::get('/ypi/logout', [YpiAuthAdminController::class, 'logout'])->name('ypi.logout');
 
 
-Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', 'role:Customer',  'prevent-back-history', 'auth.session'])->group(function () {
+// Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', 'role:Customer',  'prevent-back-history', 'auth.session'])->group(function () {
 
-    // Route::controller(DashboardController::class)->group(function () {
-    //     Route::get('/cms/admin/dashboard', 'dashboard')->name('cms.admin.dashboard');
-    // });
+//     // Route::controller(DashboardController::class)->group(function () {
+//     //     Route::get('/cms/admin/dashboard', 'dashboard')->name('cms.admin.dashboard');
+//     // });
 
-    Route::controller(CustomerBookingController::class)->group(function () {
-        Route::get('/vapp/customer', 'index')->name('vapp.customer');
-        Route::get('/vapp/customer/booking', 'index')->name('vapp.customer.booking');
-        Route::get('/vapp/customer/booking/list', 'list')->name('vapp.customer.booking.list');
-        Route::get('/vapp/customer/booking/create', 'create')->name('vapp.customer.booking.create');
-        Route::delete('/vapp/customer/booking/delete/{id}', 'delete')->name('vapp.customer.booking.delete');
-        Route::post('/vapp/customer/request/store', 'store')->name('vapp.customer.request.store');
+//     Route::controller(CustomerBookingController::class)->group(function () {
+//         Route::get('/vapp/customer', 'index')->name('vapp.customer');
+//         Route::get('/vapp/customer/booking', 'index')->name('vapp.customer.booking');
+//         Route::get('/vapp/customer/booking/list', 'list')->name('vapp.customer.booking.list');
+//         Route::get('/vapp/customer/booking/create', 'create')->name('vapp.customer.booking.create');
+//         Route::delete('/vapp/customer/booking/delete/{id}', 'delete')->name('vapp.customer.booking.delete');
+//         Route::post('/vapp/customer/request/store', 'store')->name('vapp.customer.request.store');
 
-        // for event switching
-        Route::get('/vapp/customer/events/{id}/switch',  'switch')->name('vapp.customer.booking.switch');
-        // Route::get('/vapp/customer/dashboard', 'dashboard')->name('vapp.customer.dashboard');
-    });
-});
+//         // for event switching
+//         Route::get('/vapp/customer/events/{id}/switch',  'switch')->name('vapp.customer.booking.switch');
+//         // Route::get('/vapp/customer/dashboard', 'dashboard')->name('vapp.customer.dashboard');
+//     });
+// });
 
 // ****************** ADMIN *********************
 Route::group(['middleware' => 'prevent-back-history'], function () {
@@ -423,33 +417,33 @@ Route::group(['middleware' => 'prevent-back-history'], function () {
         Route::get('auth/resend', [YpiAuthAdminController::class, 'resendOTP'])->name('otp.resend.get');
 
         //used to show images in private folder
-        Route::get('/doc/{file}', [UtilController::class, 'showImage'])->name('a');
+        // Route::get('/doc/{file}', [UtilController::class, 'showImage'])->name('a');
 
         /*************************************** Play ground */
         // Route::get('/a/{GlobalAttachment}', [UtilController::class, 'serve'])->name('a');
-        Route::get('/doc/{file}', [UtilController::class, 'showImage'])->name('a');
-        Route::get('/a', function () {
-            return response()->file(storage_path('app/private/users/502828276250308124600avatar-2.png'));
-        })->name('b');
+        // Route::get('/doc/{file}', [UtilController::class, 'showImage'])->name('a');
+        // Route::get('/a', function () {
+        //     return response()->file(storage_path('app/private/users/502828276250308124600avatar-2.png'));
+        // })->name('b');
         /*************************************** End Play ground */
 
-        // Admin Booking Pick an event
-        Route::get('/vapp/admin/booking/pick', function () {
-            return view('/vapp/admin/booking/pick');
-        })->name('vapp.admin.booking.pick')->middleware('role:SuperAdmin');
-        Route::post('/vapp/admin/events/switch', [BookingController::class, 'pickEvent'])->name('vapp.admin.booking.event.switch')->middleware('role:SuperAdmin');
+        // // Admin Booking Pick an event
+        // Route::get('/vapp/admin/booking/pick', function () {
+        //     return view('/vapp/admin/booking/pick');
+        // })->name('vapp.admin.booking.pick')->middleware('role:SuperAdmin');
+        // Route::post('/vapp/admin/events/switch', [BookingController::class, 'pickEvent'])->name('vapp.admin.booking.event.switch')->middleware('role:SuperAdmin');
 
-        // Customer Booking Pick an event
-        Route::get('/vapp/customer/booking/pick', function () {
-            return view('/vapp/customer/booking/pick');
-        })->name('vapp.customer.booking.pick')->middleware('role:Customer');
-        Route::post('/vapp/customer/events/switch', [CustomerBookingController::class, 'pickEvent'])->name('vapp.customer.booking.event.switch')->middleware('role:Customer');
+        // // Customer Booking Pick an event
+        // Route::get('/vapp/customer/booking/pick', function () {
+        //     return view('/vapp/customer/booking/pick');
+        // })->name('vapp.customer.booking.pick')->middleware('role:Customer');
+        // Route::post('/vapp/customer/events/switch', [CustomerBookingController::class, 'pickEvent'])->name('vapp.customer.booking.event.switch')->middleware('role:Customer');
 
-        // Operator Booking Pick an event
-        Route::get('/vapp/operator/booking/pick', function () {
-            return view('/vapp/operator/booking/pick');
-        })->name('vapp.operator.booking.pick')->middleware('role:Operator');
-        Route::post('/vapp/operator/events/switch', [OperatorBookingController::class, 'pickEvent'])->name('vapp.operator.booking.event.switch')->middleware('role:Operator');
+        // // Operator Booking Pick an event
+        // Route::get('/vapp/operator/booking/pick', function () {
+        //     return view('/vapp/operator/booking/pick');
+        // })->name('vapp.operator.booking.pick')->middleware('role:Operator');
+        // Route::post('/vapp/operator/events/switch', [OperatorBookingController::class, 'pickEvent'])->name('vapp.operator.booking.event.switch')->middleware('role:Operator');
 
 
         Route::get('/vapp/logout', [YpiAuthAdminController::class, 'logout'])->name('vapp.logout');

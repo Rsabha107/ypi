@@ -211,7 +211,7 @@
                             $hasAllergy = (int) old('has_food_allergy', $participant->food_allergy) === 1;
                             $hasHealthIssues = (int) old('has_health_issues', $participant->health_issues) === 1;
 
-                            Log::info('participant->has_food_allergy: ' . $participant->ood_allergy);
+                            Log::info('participant->has_food_allergy: ' . $participant->food_allergy);
                             Log::info('participant->has_health_issues: ' . $participant->health_issues);
                             Log::info('hasAllergy: ' . ($hasAllergy ? 'true' : 'false'));
                             Log::info('hasHealthIssues: ' . ($hasHealthIssues ? 'true' : 'false'));
@@ -220,7 +220,8 @@
                         <div class="mb-0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="has_food_allergy"
-                                    name="food_allergy" value="1" {{ $hasAllergy ? 'checked' : '' }}>
+                                    name="food_allergy" value="1" required {{ $hasAllergy ? 'checked' : '' }}>
+
                                 <label class="form-check-label fw-semibold" for="has_food_allergy">
                                     Any food allergies?
                                 </label>
@@ -228,12 +229,29 @@
                         </div>
 
                         <div class="mb-1 {{ $hasAllergy ? '' : 'd-none' }}" id="food_allergy_details_wrap">
-                            <label class="form-label">
-                                Please specify food allergies
-                            </label>
-                            <input type="text" class="form-control" name="food_allergy_details"
-                                id="food_allergy_details" placeholder="e.g. nuts, dairy, shellfish"
-                                value="{{ $participant->food_allergy_details }}">
+                            <div class="row g-3">
+                                <div class="col-sm-6 col-md-4">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="food_allergy_id" name="food_allergy_id" required>
+                                            <option selected="selected" value="">Select food allergy</option>
+                                            @foreach ($allergens as $food_allergen)
+                                                <option value="{{ $food_allergen->id }}"
+                                                    {{ $participant->food_allergy_id == $food_allergen->id ? 'selected' : '' }}>
+                                                    {{ $food_allergen->title }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="food_allergy_id">Food Allergy</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 {{ $hasAllergy ? '' : 'd-none' }}" id="food_allergy_other_wrap">
+                                    <div class="form-floating">
+                                        <input class="form-control" id="food_allergy_others" type="text"
+                                            placeholder="specify food allergies" name="food_allergy_others"
+                                            value="{{ $participant->food_allergy_others }}" />
+                                        <label for="food_allergy_others">specify food allergies</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-1">
                             <div class="form-check form-switch">

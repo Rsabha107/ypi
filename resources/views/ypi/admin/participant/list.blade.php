@@ -17,8 +17,8 @@
             </nav>
         </div>
         <div>
-            <x-button_insert_js title='Add participant' selectionId="offcanvas-add-participant" dataId="{{ session()->get('EVENT_ID') }}"
-                table="participant_table" />
+            {{-- <x-button_insert_js title='Add participant' selectionId="offcanvas-add-participant" dataId="{{ session()->get('EVENT_ID') }}"
+                table="participant_table" /> --}}
             <button class="btn px-3 btn-phoenix-secondary" type="button" data-bs-toggle="offcanvas"
                 data-bs-target="#bookingFilterOffcanvas" aria-haspopup="true" aria-expanded="false"
                 data-bs-reference="parent"><svg class="svg-inline--fa fa-filter text-primary" data-fa-transform="down-3"

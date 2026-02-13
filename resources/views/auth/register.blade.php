@@ -41,6 +41,7 @@
     <link href="{{ asset('assets/css/pace.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/branding.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendors/select2/css/select2.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/toastr.min.css') }}" rel="stylesheet">
     <link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet">
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css"
         rel="stylesheet">
@@ -72,7 +73,7 @@
     <!-- ===============================================-->
     <main class="main" id="top">
         <div class="container">
-            <form method="POST" action="{{ route('admin.register.store') }}" class="forms-sample needs-validation"
+            <form method="POST" action="{{ route('admin.register.store') }}" class="forms-sample needs-validation" id="spinner-form"
                 enctype="multipart/form-data" novalidate>
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
@@ -231,6 +232,8 @@
     <script src="{{ asset('assets/vendors/feather-icons/feather.min.js') }}"></script>
     <script src="{{ asset('assets/vendors/dayjs/dayjs.min.js') }}"></script>
     <script src="{{ asset('fnx/assets/js/phoenix.js') }}"></script>
+    <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
+
     <script src="{{ asset('assets/js/pace.min.js') }}"></script>
     {{-- <script src="{{ asset('assets/vendors/select2/select2.min.js') }}"></script> --}}
     <script src="{{ asset('assets/vendors/select2/js/select2.full.js') }}"></script>

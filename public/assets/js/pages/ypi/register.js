@@ -72,4 +72,25 @@ document.addEventListener("DOMContentLoaded", () => {
     pond.on("removefile", () => {
         if (!anyUploading()) setButtonDisabled(false);
     });
+
+        // On form submit -> validate
+    const form = document.querySelector("#spinner-form"); // your form id
+
+    form.addEventListener("submit", function (e) {
+        // optional: count only files that are actually in the pond
+        const count = pond.getFiles().length;
+
+        if (count === 0) {
+            e.preventDefault();
+
+            toastr.error("Please upload participant QID File before submitting.");
+
+            // nice UX: highlight + scroll
+            input
+                .closest(".filepond--wrapper")
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            return false;
+        }
+    });
 });

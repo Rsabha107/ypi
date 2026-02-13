@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ypi\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Mail\NewRequestMail;
+use App\Models\Ypi\Allergen;
 use App\Models\Ypi\ClientGroup;
 use App\Models\Ypi\Event;
 use App\Models\Ypi\Gender;
@@ -236,6 +237,7 @@ class GuardianController extends Controller
         $jersey_sizes = SizeLookup::type('jersey')->get();
         $shoe_sizes   = SizeLookup::type('shoe')->get();
         $jacket_sizes = SizeLookup::type('jacket')->get();
+        $allergens = Allergen::all();
 
         return view('ypi.customer.guardian.create', compact(
             'event',
@@ -246,6 +248,7 @@ class GuardianController extends Controller
             'jersey_sizes',
             'shoe_sizes',
             'jacket_sizes',
+            'allergens',
         ));
     }
 
@@ -260,6 +263,7 @@ class GuardianController extends Controller
         $jersey_sizes = SizeLookup::type('jersey')->get();
         $shoe_sizes   = SizeLookup::type('shoe')->get();
         $jacket_sizes = SizeLookup::type('jacket')->get();
+        $allergens = Allergen::all();
 
         $age = age_from_dob($participant->date_of_birth, 'Y-m-d');
 
@@ -273,6 +277,7 @@ class GuardianController extends Controller
             'jersey_sizes',
             'shoe_sizes',
             'jacket_sizes',
+            'allergens',
             'age'
         ));
     }
@@ -293,6 +298,7 @@ class GuardianController extends Controller
             'jersey_size_id' => 'required',
             'jacket_size_id' => 'required',
             'shoe_size_id' => 'required',
+            'food_allergy' => 'required|boolean',
             // 'qid_file' => 'required|file|max:2048|mimes:jpg,jpeg,png,pdf',
             // 'food_allergy' => 'required',
             // 'health_issues' => 'required',
@@ -350,8 +356,9 @@ class GuardianController extends Controller
             $op->shoe_size_id = intval($request->shoe_size_id);
             $op->food_allergy = $request->boolean('food_allergy');
             $op->health_issues = $request->boolean('health_issues');
-            $op->food_allergy_details = $request->food_allergy_details;
-            $op->food_allergy_details = $request->food_allergy_details;
+            $op->food_allergy_id = $request->food_allergy_id;
+            $op->food_allergy_others = ($request->food_allergy_id == getIdByName('allergens','Others', 'title')) ? $request->food_allergy_others : null;
+            $op->health_issues_details = ($request->health_issues ? $request->health_issues_details : null);
             $op->created_by = $user_id;
             $op->updated_by = $user_id;
 
@@ -471,7 +478,7 @@ class GuardianController extends Controller
             'jersey_size_id' => 'required',
             'jacket_size_id' => 'required',
             'shoe_size_id' => 'required',
-            // 'food_allergy' => 'required',
+             'food_allergy' => 'required',
             // 'health_issues' => 'required',
             // FilePond temp ids
             'qid_server_ids' => 'nullable|string',
@@ -536,10 +543,11 @@ class GuardianController extends Controller
             $op->jersey_size_id = intval($request->jersey_size_id);
             $op->jacket_size_id = intval($request->jacket_size_id);
             $op->shoe_size_id = intval($request->shoe_size_id);
-            $op->food_allergy = $request->food_allergy;
+            $op->food_allergy_id = $request->food_allergy_id;
             $op->health_issues = $request->health_issues;
-            $op->food_allergy_details = $request->food_allergy_details;
-            $op->health_issues_details = $request->health_issues_details;
+            $op->food_allergy_id = $request->food_allergy_id;
+            $op->food_allergy_others = ($request->food_allergy_id == getIdByName('allergens','Others', 'title')) ? $request->food_allergy_others : null;
+            $op->health_issues_details = ($request->health_issues ? $request->health_issues_details : null);
             // $op->created_by = $user_id;
             $op->updated_by = $user_id;
 

@@ -22,7 +22,7 @@
     </div>
 </div>
 
-<div class="offcanvas offcanvas-end offcanvas-global-modal custom-offcanvas in65" id="offcanvas-add-participant-modal"
+{{-- <div class="offcanvas offcanvas-end offcanvas-global-modal custom-offcanvas in65" id="offcanvas-add-participant-modal"
     tabindex="-1" aria-labelledby="offcanvasWithBackdropLabel" data-bs-backdrop="static">
     <a class="close-task-detail in" id="close-task-detail" style="display: block;" data-bs-dismiss="offcanvas">
         <span>
@@ -36,9 +36,9 @@
         </span>
     </a>
     <x-ypi.admin.participant-drawer id="" formAction="{{ route('ypi.admin.participant.store') }}"
-        formId="add_participant_slot_form" :events="$events" :participantTypes="$participant_types" :genders="$genders" :nationalities="$nationalities" :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes" :jacketSizes="$jacket_sizes"
-        :shoeSizes="$shoe_sizes" />
-</div>
+        formId="add_participant_slot_form" :participantTypes="$participant_types" :genders="$genders" :nationalities="$nationalities"
+        :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes" :jacketSizes="$jacket_sizes" :shoeSizes="$shoe_sizes" />
+</div> --}}
 
 <div class="modal fade" id="change-participant-status-modal" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -60,13 +60,32 @@
                                 <input type="hidden" id="table" name="table" value="participant_table">
                                 <div class="mb-4">
                                     <label class="text-1000 fw-bold mb-2">Status</label>
-                                    <select name="status_id" class="form-select" id="editStatusSelection" required>
+                                    <select name="status_id" class="form-select" id="status_id" required>
                                         <option selected="selected" value="">Select</option>
                                         @foreach ($statuses as $key => $item)
                                             <option value="{{ $item->id }}">
                                                 {{ $item->title }}
                                             </option>
                                         @endforeach
+                                    </select>
+                                    <!-- <input class="form-control" type="number" max="100" min="0" name="prorgress_number" id="editPoregessNumber" required /> -->
+                                </div>
+                                <div class="mb-4">
+                                    <label class="text-1000 fw-bold mb-2">Venue</label>
+                                    <select name="venue_id" class="form-select" id="venue_id">
+                                        <option selected="selected" value="">Select</option>
+                                        @foreach ($event->venues as $key => $item)
+                                            <option value="{{ $item->id }}">
+                                                {{ $item->title }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <!-- <input class="form-control" type="number" max="100" min="0" name="prorgress_number" id="editPoregessNumber" required /> -->
+                                </div>
+                                <div class="mb-4">
+                                    <label class="text-1000 fw-bold mb-2">Match</label>
+                                    <select id="match_id" class="form-select" name="match_id" disabled>
+                                        <option value="">Select</option>
                                     </select>
                                     <!-- <input class="form-control" type="number" max="100" min="0" name="prorgress_number" id="editPoregessNumber" required /> -->
                                 </div>
@@ -83,35 +102,37 @@
     </div>
 </div>
 
-<div class="modal fade" id="ypiUploadCertModal" tabindex="-1" aria-labelledby="ypiUploadCertModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
+<div class="modal fade" id="ypiUploadCertModal" tabindex="-1" aria-labelledby="ypiUploadCertModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class="modal-title" id="ypiUploadCertModalLabel">Upload Certificate</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
+            <div class="modal-header">
+                <h5 class="modal-title" id="ypiUploadCertModalLabel">Upload Certificate</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
 
-      <div class="modal-body">
-        <div class="mb-2 small text-muted">
-          Upload a single certificate file (PDF/JPG/PNG). Max 5MB.
+            <div class="modal-body">
+                <div class="mb-2 small text-muted">
+                    Upload a single certificate file (PDF/JPG/PNG). Max 5MB.
+                </div>
+
+                <input type="file" class="form-control" id="certFile"
+                    accept="application/pdf,image/jpeg,image/png">
+
+                <div class="small mt-2" id="certMsg"></div>
+
+                {{-- store returned path (or id) --}}
+                <input type="hidden" id="certPath" name="cert_path" value="">
+                <input type="hidden" id="participantIdForCert" name="participant_id" value="">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                    id="certCloseBtn">Close</button>
+                <button type="button" class="btn btn-primary" id="certUploadBtn" disabled>Upload</button>
+            </div>
+
         </div>
-
-        <input type="file" class="form-control" id="certFile" accept="application/pdf,image/jpeg,image/png">
-
-        <div class="small mt-2" id="certMsg"></div>
-
-        {{-- store returned path (or id) --}}
-        <input type="hidden" id="certPath" name="cert_path" value="">
-        <input type="hidden" id="participantIdForCert" name="participant_id" value="">
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="certCloseBtn">Close</button>
-        <button type="button" class="btn btn-primary" id="certUploadBtn" disabled>Upload</button>
-      </div>
-
     </div>
-  </div>
 </div>
-

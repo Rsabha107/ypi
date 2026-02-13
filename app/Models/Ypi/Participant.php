@@ -95,4 +95,19 @@ class Participant extends Model
     {
         return $this->belongsTo(ParticipantStatus::class, 'status_id');
     }
+
+    public function allergen()
+    {
+        return $this->belongsTo(Allergen::class, 'food_allergy_id');
+    }
+
+    public function venue()
+    {
+        return $this->belongsTo(Venue::class, 'assigned_venue_id');
+    }
+
+    public function match()
+    {
+        return $this->belongsTo(EventMatch::class, 'assigned_match_id');
+    }
 }
