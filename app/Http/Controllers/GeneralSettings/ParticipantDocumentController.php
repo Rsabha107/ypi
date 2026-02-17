@@ -21,6 +21,8 @@ class ParticipantDocumentController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        $this->authorize('view', $document);
+
         Log::info('Downloading participant document: ' . $document->id);
 
         abort_unless(Storage::disk($document->disk)->exists($document->path), 404);
@@ -67,6 +69,9 @@ class ParticipantDocumentController extends Controller
         if (!Auth::check()) {
             abort(403, 'Unauthorized');
         }
+
+        $this->authorize('delete', $document);
+
         Storage::disk($document->disk)->delete($document->path);
         $document->delete();
 

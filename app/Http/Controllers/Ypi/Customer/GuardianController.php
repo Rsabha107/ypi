@@ -255,6 +255,7 @@ class GuardianController extends Controller
     public function edit($id)
     {
         $participant = Participant::findOrFail($id);
+        $this->authorize('update', $participant);
         $event = Event::findOrFail(session()->get('EVENT_ID'));
         $participant_types = ParticipantType::all();
         $genders = Gender::all();
@@ -606,6 +607,7 @@ class GuardianController extends Controller
     {
         // LOG::info('inside delete');
         $op = Participant::find($id);
+        $this->authorize('delete', $op);
         Log::info($op);
         if (!$op) {
             $error = true;

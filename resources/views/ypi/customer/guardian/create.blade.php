@@ -238,7 +238,7 @@
                                     <div class="form-floating">
                                         <input class="form-control" id="food_allergy_others" type="text"
                                             placeholder="specify food allergies" name="food_allergy_others"
-                                            value="{{ old('food_allergy_others') }}" required />
+                                            value="{{ old('food_allergy_others') }}"  />
                                         <label for="food_allergy_others">specify food allergies</label>
                                     </div>
                                 </div>
