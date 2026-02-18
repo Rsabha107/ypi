@@ -38,30 +38,45 @@ class ParticipantDocumentController extends Controller
             $document->original_name ?? basename($document->path)
         );
     }
-
     public function view($id)
     {
-        Log::info('Request to view participant document: ' . $id);
-        $doc = ParticipantDocument::find($id);
-
+        $doc = ParticipantDocument::findOrFail($id);
+        $this->authorize('view', $doc);
         abort_unless(Storage::disk($doc->disk)->exists($doc->path), 404);
 
-        $mime = Storage::disk($doc->disk)->mimeType($doc->path) ?? 'image/png';
-        $content = Storage::disk($doc->disk)->get($doc->path);
-        // $file = Storage::disk($doc->disk)->get($doc->path);
-        // // read file contents and return inline
-        // Log::info('Viewing participant document: ' . $id . ' with mime type: ' . $mime);
-        // Log::info('File size: ' . Str::limit(strlen($file), 100) . ' bytes');
-        // Log::info('File preview: ' . Str::limit($file, 100));
-        // return response()->file(storage_path($doc->path));
-        return response($content, 200, [
-            'Content-Type' => $mime,
-            'Content-Disposition' => 'inline; filename="' . basename($doc->path) . '"',
-            'Cache-Control' => 'public, max-age=86400',
-        ]);
-
-        // return Storage::disk($doc->disk)->response($doc->path);
+        return response(
+            Storage::disk($doc->disk)->get($doc->path),
+            200,
+            [
+                'Content-Type' => Storage::disk($doc->disk)->mimeType($doc->path),
+                'Content-Disposition' => 'inline; filename="' . basename($doc->path) . '"',
+            ]
+        );
     }
+
+    // public function view($id)
+    // {
+    //     Log::info('Request to view participant document: ' . $id);
+    //     $doc = ParticipantDocument::find($id);
+
+    //     abort_unless(Storage::disk($doc->disk)->exists($doc->path), 404);
+
+    //     $mime = Storage::disk($doc->disk)->mimeType($doc->path) ?? 'image/png';
+    //     $content = Storage::disk($doc->disk)->get($doc->path);
+    //     // $file = Storage::disk($doc->disk)->get($doc->path);
+    //     // // read file contents and return inline
+    //     // Log::info('Viewing participant document: ' . $id . ' with mime type: ' . $mime);
+    //     // Log::info('File size: ' . Str::limit(strlen($file), 100) . ' bytes');
+    //     // Log::info('File preview: ' . Str::limit($file, 100));
+    //     // return response()->file(storage_path($doc->path));
+    //     return response($content, 200, [
+    //         'Content-Type' => $mime,
+    //         'Content-Disposition' => 'inline; filename="' . basename($doc->path) . '"',
+    //         'Cache-Control' => 'public, max-age=86400',
+    //     ]);
+
+    //     // return Storage::disk($doc->disk)->response($doc->path);
+    // }
 
     public function destroy(ParticipantDocument $document)
     {

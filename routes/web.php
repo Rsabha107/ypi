@@ -319,20 +319,23 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
     // Route::get('/participant/docs/{id}/view', [ParticipantDocumentController::class, 'view'])
     //     ->name('participant.docs.view');
 
-    Route::middleware('auth')->get('/participant/docs/view/{id}', function ($id) {
-        $doc = ParticipantDocument::findOrFail($id);
+    Route::get('/participant/docs/view/{id}', [ParticipantDocumentController::class, 'view'])
+        ->name('participant.docs.view');
+        
+    // Route::middleware('auth')->get('/participant/docs/view/{id}', function ($id) {
+    //     $doc = ParticipantDocument::findOrFail($id);
+    //     // $this->authorize('view', $doc);
+    //     abort_unless(Storage::disk($doc->disk)->exists($doc->path), 404);
 
-        abort_unless(Storage::disk($doc->disk)->exists($doc->path), 404);
-
-        return response(
-            Storage::disk($doc->disk)->get($doc->path),
-            200,
-            [
-                'Content-Type' => Storage::disk($doc->disk)->mimeType($doc->path),
-                'Content-Disposition' => 'inline; filename="' . basename($doc->path) . '"',
-            ]
-        );
-    })->name('participant.docs.view');
+    //     return response(
+    //         Storage::disk($doc->disk)->get($doc->path),
+    //         200,
+    //         [
+    //             'Content-Type' => Storage::disk($doc->disk)->mimeType($doc->path),
+    //             'Content-Disposition' => 'inline; filename="' . basename($doc->path) . '"',
+    //         ]
+    //     );
+    // })->name('participant.docs.view');
 
     Route::delete('/participant/docs/{document}', [ParticipantDocumentController::class, 'destroy'])
         ->name('participant.docs.destroy');

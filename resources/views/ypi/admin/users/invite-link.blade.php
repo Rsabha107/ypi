@@ -22,7 +22,7 @@
 
         <div class="card shadow-none border my-4 col-md-8" style="margin:0 auto;" data-component-card="data-component-card">
             @php
-                $link = registerUrl(17);
+                $link = registerUrl(session()->get('EVENT_ID'));
             @endphp
 
             <div class="input-group">
