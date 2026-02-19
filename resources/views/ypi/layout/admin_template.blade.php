@@ -195,7 +195,7 @@
 
     <!-- <script src="{{ asset('fnx/vendors/dhtmlx-gantt/dhtmlxgantt.js') }}"></script> -->
     <script src="{{ asset('fnx/vendors/glightbox/glightbox.min.js') }}"></script>
-    <script src="{{ asset('fnx/vendors/tinymce/tinymce.min.js') }}"></script>
+    {{-- <script src="{{ asset('fnx/vendors/tinymce/tinymce.min.js') }}"></script> --}}
     {{-- <script src="{{ asset('fnx/vendors/dropzone/dropzone-min.js') }}"></script> --}}
     {{-- <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script> --}}
     <script src="{{ asset('assets/vendors/dropify/src/js/dropify.js') }}"></script>
