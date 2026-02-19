@@ -22,6 +22,7 @@ class GuardianDocumentController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        $this->authorize('view', $document);
         Log::info('Downloading guardian document: ' . $document->id);
 
         abort_unless(Storage::disk($document->disk)->exists($document->path), 404);
@@ -44,6 +45,9 @@ class GuardianDocumentController extends Controller
         if (!Auth::check()) {
             abort(403, 'Unauthorized');
         }
+
+        $this->authorize('delete', $document);
+
         Storage::disk($document->disk)->delete($document->path);
         $document->delete();
 
