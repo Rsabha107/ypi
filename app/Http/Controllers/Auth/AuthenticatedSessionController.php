@@ -118,10 +118,10 @@ class AuthenticatedSessionController extends Controller
         // appLog($request->user()->role);
         $url = '';
         if ($request->user()->is_admin) {
-            $url = 'vapp/admin';
+            $url = 'ypi/admin/participant';
             return redirect()->intended($url);
         } else {
-            $url = 'vapp/customer';
+            $url = 'ypi/customer';
             return redirect()->intended($url);
         }
 

@@ -35,7 +35,7 @@ class MicrosoftController extends Controller
                 // $tenantId = config('services.microsoft.tenant_id'); // from .env
                 // $redirectUri = urlencode(route('home')); // or any route you want after logout
                 $microsoftLogoutUrl = Socialite::driver('microsoft')->getLogoutUrl(route('login')); // Replace 'azure' with your Microsoft Socialite driver name if different, and 'login' with your desired redirect URI after Microsoft logout.
-                return redirect($microsoftLogoutUrl)->with('error', 'Your Microsoft account is not authorized to access VAPP. Please contact the administrator for assistance.');
+                return redirect($microsoftLogoutUrl)->with('error', 'Your Microsoft account is not authorized to access YPI. Please contact the administrator for assistance.');
                 // return redirect('login')->with('error', 'Your Microsoft account is not authorized to access VAPP. Please contact the administrator for assistance.');
                 // return redirect()->intended('/');
             }
