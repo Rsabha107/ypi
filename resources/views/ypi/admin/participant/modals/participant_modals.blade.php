@@ -36,7 +36,7 @@
         </span>
     </a>
     <x-ypi.admin.participant-drawer id="" formAction="{{ route('ypi.admin.participant.store') }}"
-        formId="add_participant_slot_form" :participantTypes="$participant_types" :genders="$genders" :nationalities="$nationalities"
+        formId="add_participant_slot_form" :events="$events" :participantTypes="$participant_types" :genders="$genders" :nationalities="$nationalities"
         :pantSizes="$pant_sizes" :jerseySizes="$jersey_sizes" :jacketSizes="$jacket_sizes" :shoeSizes="$shoe_sizes" />
 </div> --}}
 
@@ -74,7 +74,7 @@
                                     <label class="text-1000 fw-bold mb-2">Venue</label>
                                     <select name="venue_id" class="form-select" id="venue_id">
                                         <option selected="selected" value="">Select</option>
-                                        @foreach ($event->venues as $key => $item)
+                                        @foreach ($venues as $key => $item)
                                             <option value="{{ $item->id }}">
                                                 {{ $item->title }}
                                             </option>
@@ -98,6 +98,21 @@
                     <button class="btn btn-primary" type="submit" id="submit_btn">Save</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="qidImageModal" tabindex="-1" aria-labelledby="qidImageModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qidImageModalLabel">QID Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="qidImagePreview" src="" alt="QID Document" class="img-fluid" style="max-height: 70vh;">
+            </div>
         </div>
     </div>
 </div>

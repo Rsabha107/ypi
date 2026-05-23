@@ -3,6 +3,19 @@ $(document).ready(function () {
 
     // ************************************************** task venues
 
+    // QID Image Modal Handler
+    $("body").on("click", ".qid-image-link", function (e) {
+        e.preventDefault();
+        console.log("QID image link clicked");
+        var imageUrl = $(this).data("image-url");
+        var qid = $(this).data("qid");
+        console.log("Image URL:", imageUrl);
+        
+        $("#qidImagePreview").attr("src", imageUrl);
+        $("#qidImageModalLabel").text("QID Document - " + qid);
+        $("#qidImageModal").modal("show");
+    });
+
     $("body").on("click", "#offcanvas-add-participant", function () {
         console.log("inside #offcanvas-add-participant");
         $("#cover-spin").show();
@@ -93,11 +106,20 @@ $(document).ready(function () {
         $("#cover-spin").show();
         var id = $(this).data("id");
         var status_id = $(this).data("status_id");
+        var event_id = $(this).data("event_id");
         var table = $(this).data("table");
         console.log("id", id);
+        console.log("event_id", event_id);
         console.log("table", table);
         $("#participant_id").val(id);
         $("#editStatusSelection").val(status_id);
+        
+        // Store event_id for later use when loading matches
+        $("#venue_id").data("event_id", event_id);
+        
+        // Load venues filtered by event
+        loadVenuesByEvent(event_id);
+        
         $("#change-participant-status-modal").modal("show");
         $("#cover-spin").hide();
     });
@@ -106,10 +128,47 @@ $(document).ready(function () {
     const $venue = $('#venue_id');
     const $match = $('#match_id');
 
+    function resetVenues(placeholder = 'Select') {
+        $venue
+            .html('<option value="">' + placeholder + '</option>');
+        resetMatches('Select');
+    }
+
     function resetMatches(placeholder = 'Select') {
         $match
             .prop('disabled', true)
             .html('<option value="">' + placeholder + '</option>');
+    }
+
+    function loadVenuesByEvent(eventId) {
+        if (!eventId) {
+            resetVenues('Select');
+            return;
+        }
+
+        resetVenues('Loading...');
+
+        const url = "/events/{event_id}/venues".replace('{event_id}', eventId);
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            dataType: 'json',
+            success: function (venues) {
+                console.log('Venues loaded:', venues);
+                let html = '<option value="">Select</option>';
+
+                $.each(venues, function (_, venue) {
+                    html += '<option value="' + venue.id + '">' + venue.title + '</option>';
+                });
+
+                $venue.html(html);
+            },
+            error: function () {
+                resetVenues('Select');
+                if (window.toastr) toastr.error('Failed to load venues for this event.');
+            }
+        });
     }
 
     function loadMatchesByVenue(venueId, preselectId = null) {
@@ -120,15 +179,26 @@ $(document).ready(function () {
 
         resetMatches('Loading...');
 
-        // Build URL from Laravel route string
-        const url = "/venues/{venue_id}/matches".replace('{venue_id}', venueId);
+        // Get event_id from stored data
+        const eventId = $('#venue_id').data('event_id');
+        
+        // Build URL with both venue and event
+        let url;
+        if (eventId) {
+            url = "/venues/{venue_id}/events/{event_id}/matches"
+                .replace('{venue_id}', venueId)
+                .replace('{event_id}', eventId);
+        } else {
+            // Fallback to venue-only if no event (shouldn't happen)
+            url = "/venues/{venue_id}/matches".replace('{venue_id}', venueId);
+        }
 
         $.ajax({
             url: url,
             method: 'GET',
             dataType: 'json',
             success: function (items) {
-                console.log(items);
+                console.log('Matches loaded:', items);
                 let html = '<option value="">Select</option>';
 
                 $.each(items, function (_, it) {
@@ -150,7 +220,7 @@ $(document).ready(function () {
     }
 
     // When venue changes, reload matches
-    // $("body").on("change", "#venue_id", function () {
+    // $("ody").on("change", "#venue_id", function () {
     //     const venueId = $(this).val();
     //     console.log("Selected venue ID:", venueId);
     //     // if you store existing selected match in data-selected
@@ -177,6 +247,35 @@ $(document).ready(function () {
     } else {
         resetMatches('Select');
     }
+
+    // Edit participant handler
+    $("body").on("click", "#edit_guest_offcanv", function () {
+        console.log("inside #edit_guest_offcanv");
+        $("#cover-spin").show();
+        var id = $(this).data("id");
+        var table = $(this).data("table");
+        console.log("id", id);
+        console.log("table", table);
+        $.ajax({
+            url: "/ypi/admin/participant/mv/get/" + id,
+            method: "GET",
+            async: true,
+            success: function (response) {
+                var g_response = response.view;
+                $("#global-edit-participant-content")
+                    .empty("")
+                    .append(g_response);
+                $("#edit_participant_table").val(table);
+                $("#offcanvas-edit-participant-modal").offcanvas("show");
+                $("#cover-spin").hide();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(xhr.status);
+                console.log(thrownError);
+                $("#cover-spin").hide();
+            },
+        });
+    });
 
 
 

@@ -17,15 +17,16 @@
                 </ol>
             </nav>
         </div>
-        <div>
+        <div class="d-flex align-items-center gap-2">
             {{-- <x-button_insert_js title='Add participant' selectionId="offcanvas-add-participant" dataId="{{ session()->get('EVENT_ID') }}"
                 table="participant_table" /> --}}
             
             <x-formy.button url="{{ route('ypi.customer.participant.create') }}" title="Add Participant" icon="fa-solid fa-plus"
                 class="btn btn-subtle-primary px-3 px-sm-5 me-2" />
-            <button class="btn px-3 btn-phoenix-secondary" type="button" data-bs-toggle="offcanvas"
+            <button class="btn px-3 btn-phoenix-secondary position-relative" type="button" data-bs-toggle="offcanvas"
                 data-bs-target="#participantFilterOffcanvas" aria-haspopup="true" aria-expanded="false"
-                data-bs-reference="parent"><svg class="svg-inline--fa fa-filter text-primary" data-fa-transform="down-3"
+                data-bs-reference="parent" id="filterButton">
+                <svg class="svg-inline--fa fa-filter text-primary" data-fa-transform="down-3"
                     aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img"
                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""
                     style="transform-origin: 0.5em 0.6875em;">
@@ -36,7 +37,10 @@
                                 transform="translate(-256 -256)"></path>
                         </g>
                     </g>
-                </svg><!-- <span class="fa-solid fa-filter text-primary" data-fa-transform="down-3"></span> Font Awesome fontawesome.com -->
+                </svg>
+                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" id="filterIndicator" style="display: {{ $selectedEvent ? 'block' : 'none' }};">
+                    <span class="visually-hidden">Filter active</span>
+                </span>
             </button>
             {{-- <button class="btn px-3 btn-phoenix-secondary bg-body-emphasis bg-body-hover action-btn" type="button"
                 data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false"
@@ -84,6 +88,31 @@
     </div>
     <x-ypi.customer.participant-card />
 
+    <!-- Filter Offcanvas -->
+    <div class="offcanvas offcanvas-end" id="participantFilterOffcanvas" tabindex="-1" aria-labelledby="participantFilterOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="participantFilterOffcanvasLabel">Filter Participants</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mb-3">
+                <label for="filter_event_id" class="form-label">Event</label>
+                <select class="form-select" id="filter_event_id" name="event_id">
+                    <option value="">All Events</option>
+                    @foreach($events as $event)
+                        <option value="{{ $event->id }}">{{ $event->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary w-100" id="applyFilter">Apply Filter</button>
+            </div>
+            <div class="mb-3">
+                <button type="button" class="btn btn-secondary w-100" id="clearFilter">Clear Filter</button>
+            </div>
+        </div>
+    </div>
+
     @include('ypi.customer.guardian.modals.guardian_modals')
 
     <script src="{{ asset('assets/js/pages/ypi/participant_upload.js') }}"></script>
@@ -92,10 +121,92 @@
 
 @push('script')
     <script>
+        console.log('Selected event from server:', @json($selectedEvent));
+        console.log('Filter indicator element:', $('#filterIndicator'));
+        console.log('Event name toolbar element:', $('#eventNameToolbar'));
+        
+        // Function to update filter indicator and event name
+        function updateFilterUI(eventId, eventName) {
+            console.log('updateFilterUI called with:', eventId, eventName);
+            if (eventId && eventName) {
+                $('#filterIndicator').css('display', 'block');
+                $('#eventNameToolbar').text(eventName).css('display', 'block');
+            } else {
+                $('#filterIndicator').css('display', 'none');
+                $('#eventNameToolbar').css('display', 'none');
+            }
+        }
+
         // showing the offcanvas for the task creation
         $(document).ready(function() {
             console.log('ready');
             $('.dropify').dropify();
+
+            // Set initial filter value from session and update UI immediately
+            @if($selectedEvent)
+                console.log('Setting filter for event:', {{ $selectedEvent->id }}, {!! json_encode($selectedEvent->name) !!});
+                $('#filter_event_id').val({{ $selectedEvent->id }});
+                updateFilterUI({{ $selectedEvent->id }}, {!! json_encode($selectedEvent->name) !!});
+            @else
+                console.log('No filter set');
+                updateFilterUI(null, null);
+            @endif
+
+            // Handle filter apply
+            $('#applyFilter').on('click', function() {
+                var eventId = $('#filter_event_id').val();
+                var eventName = $('#filter_event_id option:selected').text();
+                
+                // Store in session via AJAX
+                $.ajax({
+                    url: '{{ route('ypi.customer.guardian.setFilter') }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        event_id: eventId
+                    },
+                    success: function(response) {
+                        // Update UI without reload
+                        updateFilterUI(eventId, eventName);
+                        
+                        // Refresh table
+                        $('#participant_table').bootstrapTable('refresh');
+                        
+                        // Close offcanvas
+                        var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('participantFilterOffcanvas'));
+                        if (offcanvas) {
+                            offcanvas.hide();
+                        }
+                    }
+                });
+            });
+
+            // Handle filter clear
+            $('#clearFilter').on('click', function() {
+                $('#filter_event_id').val('');
+                
+                // Clear session via AJAX
+                $.ajax({
+                    url: '{{ route('ypi.customer.guardian.clearFilter') }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        // Update UI without reload
+                        updateFilterUI(null, null);
+                        
+                        // Refresh table
+                        $('#participant_table').bootstrapTable('refresh');
+                        
+                        // Close offcanvas
+                        var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('participantFilterOffcanvas'));
+                        if (offcanvas) {
+                            offcanvas.hide();
+                        }
+                    }
+                });
+            });
 
         });
     </script>

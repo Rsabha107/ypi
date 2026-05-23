@@ -15,4 +15,9 @@ class Venue extends Model
     {
         return $this->hasMany(EventMatch::class, 'venue_id');
     }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'venue_event', 'venue_id', 'event_id');
+    }
 }

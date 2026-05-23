@@ -46,63 +46,6 @@
                     <h6 class="mt-2 text-white">{{ $profileData->name }}</h6>
                 </div>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link" href="#" style="min-width: 2.25rem" role="button" data-bs-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false" data-bs-auto-close="outside"><span
-                        class="d-block text-white" style="height:20px;width:20px;"><span data-feather="layers"
-                            style="height:20px;width:20px;">
-                        </span>
-                    </span>
-                </a>
-
-                <div class="dropdown-menu dropdown-menu-end notification-dropdown-menu py-0 shadow border navbar-dropdown-caret"
-                    id="navbarDropdownNotfication" aria-labelledby="navbarDropdownNotfication">
-                    <div class="card position-relative border-0">
-                        <div class="card-header p-2">
-                            <div class="d-flex justify-content-between">
-                                <h5 class="text-body-emphasis mb-0">Events</h5>
-                                {{-- <button class="btn btn-secondary p-0 fs-9 fw-normal" type="button">Switch to another event</button> --}}
-                            </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="scrollbar-overlay" style="height: 27rem;">
-                                @foreach ($user_events as $event)
-                                    @if (session()->get('EVENT_ID') == $event->id)
-                                        @php
-                                            $avatar_status = 'status-online';
-                                            $read = 'read';
-                                        @endphp
-                                    @else
-                                        @php
-                                            $avatar_status = '';
-                                            $read = 'unread';
-                                        @endphp
-                                    @endif
-                                    <a href="{{ route('ypi.customer.guardian.switch', $event->id) }}"
-                                        class="text-decoration-none text-body-emphasis">
-                                        <div
-                                            class="px-2 px-sm-3 py-3 notification-card position-relative {{ $read }} border-bottom">
-                                            <div
-                                                class="d-flex align-items-center justify-content-between position-relative">
-                                                <div class="d-flex">
-                                                    <div class="avatar avatar-m {{ $avatar_status }} me-3">
-                                                        <img class="rounded-circle"
-                                                            src="{{ route('ypi.setting.event.file', $event->id) }}"
-                                                            alt="" />
-                                                    </div>
-                                                    <div class="flex-1 me-sm-3">
-                                                        <h4 class="fs-9 text-body-emphasis">{{ $event?->name }}</h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
 
             <li class="nav-item dropdown"><a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#!"
                     role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"

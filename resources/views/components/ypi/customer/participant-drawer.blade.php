@@ -15,6 +15,22 @@
                     <div class="card-body">
                         <div class="row mb-3">
                             <x-formy.form_select
+                                class="col-sm-12 col-md-12  mb-3"
+                                name="event_id"
+                                style=""
+                                itemIdForeach="id"
+                                selectedValue="name"
+                                itemTitleForeach="name"
+                                floating='1'
+                                elementId="add_event"
+                                label="Select Event"
+                                required="required"
+                                :forLoopCollection="$events"
+                                addDynamicButton='0'
+                                dynamicModal=null />
+                        </div>
+                        <div class="row mb-3">
+                            <x-formy.form_select
                                 class="col-sm-6 col-md-3  mb-3"
                                 name="participant_type_id"
                                 style=""

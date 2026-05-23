@@ -47,6 +47,19 @@
                         action="{{ route('ypi.customer.guardian.store') }}" method="POST" enctype="multipart/form-data"
                         novalidate>
                         @csrf
+                        <div class="col-sm-12 col-md-12">
+                            <div class="form-floating">
+                                <select class="form-select" id="event_id" name="event_id" required>
+                                    <option selected="selected" value="">Select Event</option>
+                                    @foreach ($events as $event)
+                                        <option value="{{ $event->id }}"
+                                            {{ old('event_id') == $event->id ? 'selected' : '' }}>
+                                            {{ $event->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="event_id">Event</label>
+                            </div>
+                        </div>
                         <div class="col-sm-6 col-md-8">
                             <div class="form-floating">
                                 <input class="form-control" id="full_name" type="text" required

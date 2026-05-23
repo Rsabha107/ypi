@@ -22,7 +22,7 @@
 
         <div class="card shadow-none border my-4 col-md-8" style="margin:0 auto;" data-component-card="data-component-card">
             @php
-                $link = registerUrl(session()->get('EVENT_ID'));
+                $link = URL::signedRoute('auth.register');
             @endphp
 
             <div class="input-group">
@@ -34,7 +34,7 @@
                 </button>
             </div>
 
-            <div class='fw-bold'> Link to register new user for event <span class="text-success">{{ getEventNameById(session()->get('EVENT_ID')) }}</span>
+            <div class='fw-bold'> Link to register new guardian/customer
             </div>
 
             <!-- <br /> -->

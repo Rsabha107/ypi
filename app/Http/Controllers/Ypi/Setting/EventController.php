@@ -86,7 +86,7 @@ class EventController extends Controller
         $search = request('search');
         $sort = (request('sort')) ? request('sort') : "id";
         $order = (request('order')) ? request('order') : "DESC";
-        $ops = Event::orderBy($sort, $order);
+        $ops = Event::with('venues')->orderBy($sort, $order);
 
         if ($search) {
             $ops = $ops->where(function ($query) use ($search) {
@@ -131,10 +131,12 @@ class EventController extends Controller
 
             // $actions = $div_action . $profile_action;
             $venues_display = '';
-            appLog($op);
-            appLog($op->venues);
-            foreach ($op->venues as $venue) {
-                $venues_display .= '<span class="badge badge-pill bg-body-tertiary">' . $venue->short_name . '</span> ';
+            if ($op->venues && $op->venues->count() > 0) {
+                foreach ($op->venues as $venue) {
+                    $venues_display .= '<span class="badge badge-phoenix fs--2 badge-phoenix-secondary me-1 mb-1">' . $venue->short_name . '</span>';
+                }
+            } else {
+                $venues_display = '<span class="text-muted fs-9">No venues assigned</span>';
             }
 
             return  [
@@ -142,8 +144,8 @@ class EventController extends Controller
                 'image' => $image,
                 // 'id' => '<div class="align-middle white-space-wrap fw-bold fs-10 ps-2">' .$op->id. '</div>',
                 'title' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . $op->name . '</div>',
+                'venues' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . $venues_display . '</div>',
                 'status' => '<span class="badge badge-phoenix fs--2 align-middle white-space-wrap ms-3 badge-phoenix-' . $op->active_status->color . ' " style="cursor: pointer;" id="editDriverStatus" data-id="' . $op->id . '" data-table="drivers_table"><span class="badge-label">' . $op->active_status->name . '</span><span class="ms-1 uil-edit-alt" style="height:12.8px;width:12.8px;cursor: pointer;"></span></span>',
-                'venues' => $venues_display,
                 'actions' => $update_action . $delete_action,
                 'created_at' => format_date($op->created_at,  'H:i:s'),
                 'updated_at' => format_date($op->updated_at, 'H:i:s'),

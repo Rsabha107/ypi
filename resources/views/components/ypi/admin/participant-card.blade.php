@@ -17,8 +17,14 @@
         <div class="table-responsive text-nowrap">
             {{ $slot }}
             <input type="hidden" id="data_type" value="booking">
+            <div id="toolbar">
+                <h5 id="eventNameToolbar" class="mb-0 text-primary" style="display: {{ session('participant_filter_event_id') ? 'block' : 'none' }};">
+                    {{ session('participant_filter_event_id') ? optional(\App\Models\Ypi\Event::find(session('participant_filter_event_id')))->name : '' }}
+                </h5>
+            </div>
             <div class="mx-2 mb-2">
                 <table id="participant_table" data-toggle="table"
+                    data-toolbar="#toolbar"
                     data-classes="table table-hover  fs-9 mb-0 border-top border-translucent"
                     data-loading-template="loadingTemplate" data-url="{{ route('ypi.admin.participant.list') }}"
                     data-icons-prefix="bx" data-icons="icons" data-show-export="true"
@@ -77,7 +83,7 @@
             order: p.order,
             offset: p.offset,
             search: p.search,
-            filter: p.filter ? p.filter : '',
+            filter: p.filter ? p.filter : ''
         };
     }
 

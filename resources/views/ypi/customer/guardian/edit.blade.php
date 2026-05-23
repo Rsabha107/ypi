@@ -49,6 +49,19 @@
                         novalidate>
                         @csrf
                         <input type="hidden" name="participant_id" value="{{ $participant->id }}" />
+                        <div class="col-sm-12 col-md-12">
+                            <div class="form-floating">
+                                <select class="form-select" id="event_id" name="event_id" required>
+                                    <option selected="selected" value="">Select event</option>
+                                    @foreach ($events as $evt)
+                                        <option value="{{ $evt->id }}"
+                                            {{ $participant->event_id == $evt->id ? 'selected' : '' }}>
+                                            {{ $evt->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="event_id">Event</label>
+                            </div>
+                        </div>
                         <div class="col-sm-6 col-md-8">
                             <div class="form-floating">
                                 <input class="form-control" id="full_name" type="text" required

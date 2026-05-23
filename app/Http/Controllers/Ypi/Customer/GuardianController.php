@@ -30,11 +30,15 @@ use Laravel\Sanctum\Guard;
 class GuardianController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
         Log::info('inside GuardianController index');
+        Log::info('Session participant_filter_event_id: ' . session('participant_filter_event_id'));
+        
         $participants = Participant::all();
-        $events = Event::all();
+        $events = Event::where('name', 'not like', '%Admin%')
+            ->where('active_flag', 1)
+            ->get();
         $participant_types = ParticipantType::all();
         $genders = Gender::all();
         $nationalities = Nationality::all();
@@ -42,6 +46,15 @@ class GuardianController extends Controller
         $jersey_sizes = SizeLookup::type('jersey')->get();
         $shoe_sizes   = SizeLookup::type('shoe')->get();
         $jacket_sizes = SizeLookup::type('jacket')->get();
+
+        // Get selected event from session
+        $selectedEvent = null;
+        if (session()->has('participant_filter_event_id')) {
+            $selectedEvent = Event::find(session('participant_filter_event_id'));
+            Log::info('Selected event found: ' . ($selectedEvent ? $selectedEvent->name : 'null'));
+        } else {
+            Log::info('No filter in session');
+        }
 
         // $guests = Guest::with('client', 'schedule_period', 'cargo', 'zone', 'status', 'driver')->get();
 
@@ -54,7 +67,8 @@ class GuardianController extends Controller
             'pant_sizes',
             'jersey_sizes',
             'jacket_sizes',
-            'shoe_sizes'
+            'shoe_sizes',
+            'selectedEvent'
         ));
     }
 
@@ -119,6 +133,7 @@ class GuardianController extends Controller
 
         $search = request('search');
         $filter = request('filter');
+        $event_filter = session('participant_filter_event_id'); // Event filter from session
         $sort = (request('sort')) ? request('sort') : "id";
         $order = (request('order')) ? request('order') : "DESC";
         $mds_schedule_event_filter = (request()->mds_schedule_event_filter) ? request()->mds_schedule_event_filter : "";
@@ -130,6 +145,11 @@ class GuardianController extends Controller
             ->firstOrFail();
 
         $ops = $ops->participants()->orderBy($sort, $order);
+
+        // Filter by event if provided
+        if ($event_filter) {
+            $ops = $ops->where('event_id', $event_filter);
+        }
 
         $total = $ops->count();
         $limit = request("limit");
@@ -160,7 +180,7 @@ class GuardianController extends Controller
             }
 
             $qid_image_route = $op->qidDocument
-                ? '<a href="' . route('participant.docs.download', $op->qidDocument) . '" target="_blank" ><span><i class="fa-solid fa-eye me-2"></i>' . $op->qid . '</span></a>'
+                ? '<a href="javascript:void(0)" class="qid-image-link" data-image-url="' . route('participant.docs.download', $op->qidDocument) . '" data-qid="' . $op->qid . '"><span><i class="fa-solid fa-eye me-2"></i>' . $op->qid . '</span></a>'
                 : $op->qid;
 
             // Log::info('QID image route: ' . $qid_image_route);
@@ -203,8 +223,10 @@ class GuardianController extends Controller
                         <a href="' . $details_url . '" >' . $op->ref_number . '</a></div>',
                 'participant_cert' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $cert_image_route . '</div>',
                 'event_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->event?->name . '</div>',
+                'assigned_venue_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->venue?->title . '</div>',
+                'assigned_match_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->match?->match_code . '</div>',
                 'participant_type' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->participantType?->title . '</div>',
-                'full_name' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->full_name . '</div>',
+                'full_name' => '<div class="align-middle white-space-wrap fs-9 ps-2"><a href="javascript:void(0)" class="participant-name-link" data-participant-id="' . $op->id . '">' . $op->full_name . '</a></div>',
                 'date_of_birth' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  format_date($op->date_of_birth, 'd/m/Y') . '</div>',
                 'gender' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->gender?->title . '</div>',
                 'pants_size' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->pantSize?->label . '</div>',
@@ -216,8 +238,8 @@ class GuardianController extends Controller
                 'qid' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $qid_image_route . '</div>',
                 'nationality' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->nationality?->title . '</div>',
                 'action' => $actions,
-                'created_at' => format_date($op->created_at,  'H:i:s'),
-                'updated_at' => format_date($op->updated_at, 'H:i:s'),
+                'created_at' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . format_date($op->created_at, 'd-M-y') . ' ' . format_date($op->created_at, 'H:i:s') . '</div>',
+                'updated_at' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . format_date($op->updated_at, 'd-M-y') . ' ' . format_date($op->updated_at, 'H:i:s') . '</div>',
             ];
         });
 
@@ -230,7 +252,9 @@ class GuardianController extends Controller
     public function create()
     {
         $participants = Participant::all();
-        $event = Event::findOrFail(session()->get('EVENT_ID'));
+        $events = Event::where('name', 'not like', '%Admin%')
+            ->where('active_flag', 1)
+            ->get();
         $participant_types = ParticipantType::all();
         $genders = Gender::all();
         $nationalities = Nationality::all();
@@ -241,7 +265,7 @@ class GuardianController extends Controller
         $allergens = Allergen::all();
 
         return view('ypi.customer.guardian.create', compact(
-            'event',
+            'events',
             'participant_types',
             'genders',
             'nationalities',
@@ -257,7 +281,11 @@ class GuardianController extends Controller
     {
         $participant = Participant::findOrFail($id);
         $this->authorize('update', $participant);
-        $event = Event::findOrFail(session()->get('EVENT_ID'));
+        // Get event from participant instead of session
+        $event = $participant->event;
+        $events = Event::where('name', 'not like', '%Admin%')
+            ->where('active_flag', 1)
+            ->get();
         $participant_types = ParticipantType::all();
         $genders = Gender::all();
         $nationalities = Nationality::all();
@@ -272,6 +300,7 @@ class GuardianController extends Controller
         return view('ypi.customer.guardian.edit', compact(
             'participant',
             'event',
+            'events',
             'participant_types',
             'genders',
             'nationalities',
@@ -288,6 +317,7 @@ class GuardianController extends Controller
     {
 
         $rules = [
+            'event_id' => 'required|exists:events,id',
             'participant_type_id' => 'required',
             'gender_id' => 'required',
             'full_name' => 'required',
@@ -341,10 +371,10 @@ class GuardianController extends Controller
             $submitted_id = getStatusIdByLabel('Submitted');
             $seq = nextSequence('ypi');
 
-            $op->reference_number = 'YPI-' . date('Y') . '-' . get_current_event_id() . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
+            $op->reference_number = 'YPI-' . date('Y') . '-' . $request->event_id . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
             $op->participant_type_id = $request->participant_type_id;
             $op->status_id = $submitted_id;
-            $op->event_id = session()->get('EVENT_ID');
+            $op->event_id = $request->event_id;
             $op->date_of_birth = $request->date_of_birth ? Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->toDateString() : null;
             $op->full_name = $request->full_name;
             $op->qid = $request->qid;
@@ -428,6 +458,8 @@ class GuardianController extends Controller
                 Mail::to($user->email)->send(new NewRequestMail($details, $filePath));
             }
 
+            // Update filter to match the event of the newly created participant
+            session(['participant_filter_event_id' => $request->event_id]);
 
             $error = false;
             // $type = 'success';
@@ -468,6 +500,7 @@ class GuardianController extends Controller
         Log::info('request data: ' . json_encode($request->all()));
 
         $rules = [
+            'event_id' => 'required|exists:events,id',
             'participant_type_id' => 'required',
             'gender_id' => 'required',
             'full_name' => 'required',
@@ -533,7 +566,7 @@ class GuardianController extends Controller
             $guardian = Guardian::where('user_id', $userId)->firstOrFail();
 
             $op->participant_type_id = $request->participant_type_id;
-            $op->event_id = session()->get('EVENT_ID');
+            $op->event_id = $request->event_id;
             $op->date_of_birth = $request->date_of_birth ? Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->toDateString() : null;
             $op->full_name = $request->full_name;
             $op->qid = $request->qid;
@@ -578,6 +611,9 @@ class GuardianController extends Controller
             }
 
             DB::commit();
+
+            // Update filter to match the event of the updated participant
+            session(['participant_filter_event_id' => $request->event_id]);
 
             $toastr_message = [
                 'alert-type' => 'success',
@@ -695,52 +731,61 @@ class GuardianController extends Controller
         ]);
     }  // end detail
 
-    public function switch($id)
+    public function setFilter(Request $request)
     {
-        if ($id) {
-            if (Event::findOrFail($id)) {
-                appLog('Event ID: ' . $id);
-
-                session()->put('EVENT_ID', $id);
-                appLog('Event ID: ' . session()->get('EVENT_ID'));
-                // return redirect()->route('tracki.project.show.card')->with('message', 'Workspace switched successfully.');
-                return redirect()->route('ypi.customer.guardian')->with('message', 'Event Switched.');
-                // return back()->with('message', 'Event Switched.');
-            } else {
-                // return back()->with('error', 'Workspace not found.');
-                // return redirect()->route('tracki.project.show.card')->with('error', 'Workspace not found.');
-                return back()->with('error', 'Event not found.');
-            }
+        Log::info('setFilter called with event_id: ' . $request->event_id);
+        
+        if ($request->has('event_id') && $request->event_id) {
+            session(['participant_filter_event_id' => $request->event_id]);
+            Log::info('Filter set in session: ' . session('participant_filter_event_id'));
         } else {
-            session()->forget('EVENT_ID');
-            // return redirect()->route('tracki.project.show.card')->with('message', 'Workspace switched successfully. now showing all workspace data');
-            return back()->withInput();
+            session()->forget('participant_filter_event_id');
+            Log::info('Filter cleared from session');
         }
+        
+        return response()->json(['success' => true]);
     }
 
-    public function pickEvent(Request $request)
+    public function clearFilter()
     {
-        // $events = Event::all();
-        // $this->switch($request->event_id);
-        // return view('vapp.admin.booking.pick', compact('events'));
-        if ($request->event_id) {
-            appLog('Event ID: ' . $request->event_id);
-            if (Event::findOrFail($request->event_id) && !session()->has('EVENT_ID')) {
-                appLog('Inside if statement Event ID: ' . $request->event_id);
+        session()->forget('participant_filter_event_id');
+        return response()->json(['success' => true]);
+    }
 
-                session()->put('EVENT_ID', $request->event_id);
-                appLog('session EVENT_ID: ' . session()->get('EVENT_ID'));
-                appLog('before redirect');
-                // return redirect()->route('tracki.project.show.card')->with('message', 'Workspace switched successfully.');
-                return redirect()->route('ypi.customer.guardian')->with('message', 'Event Switched.');
-                // return back()->with('message', 'Event Switched.');
-            }
-        }
-        //  else {
-        // return back()->with('error', 'Workspace not found.');
-        // return redirect()->route('tracki.project.show.card')->with('error', 'Workspace not found.');
-        appLog('event_id is null');
-        return redirect()->route('ypi.customer.guardian')->with('error', 'Event not found.');
-        // }
+    public function getParticipantDetails($id)
+    {
+        $participant = Participant::with(['event', 'participantType', 'guardian', 'gender', 'nationality', 'pantSize', 'jerseySize', 'jacketSize', 'shoeSize', 'allergen', 'status', 'venue', 'match'])->findOrFail($id);
+        
+        $this->authorize('view', $participant);
+        
+        return response()->json([
+            'participant' => [
+                'id' => $participant->id,
+                'full_name' => $participant->full_name,
+                'qid' => $participant->qid,
+                'date_of_birth' => format_date($participant->date_of_birth, 'd/m/Y'),
+                'gender' => $participant->gender?->title,
+                'nationality' => $participant->nationality?->title,
+                'school_name' => $participant->school_name,
+                'event' => $participant->event?->name,
+                'participant_type' => $participant->participantType?->title,
+                'status' => $participant->status?->title,
+                'status_color' => $participant->status?->color,
+                'assigned_venue' => $participant->venue?->title,
+                'assigned_match' => $participant->match?->match_code,
+                'pants_size' => $participant->pantSize?->label,
+                'jersey_size' => $participant->jerseySize?->label,
+                'jacket_size' => $participant->jacketSize?->label,
+                'shoe_size' => $participant->shoeSize?->label,
+                'food_allergy' => $participant->food_allergy ? 'Yes' : 'No',
+                'food_allergy_type' => $participant->allergen?->title,
+                'food_allergy_others' => $participant->food_allergy_others,
+                'health_issues' => $participant->health_issues ? 'Yes' : 'No',
+                'health_issues_details' => $participant->health_issues_details,
+                'guardian_name' => $participant->guardian?->full_name,
+                'guardian_email' => $participant->guardian?->email,
+                'guardian_phone' => $participant->guardian?->phone_main,
+            ]
+        ]);
     }
 }

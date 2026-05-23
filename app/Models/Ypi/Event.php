@@ -49,6 +49,6 @@ class Event extends Model
 
     public function venues()
     {
-        return $this->belongsToMany(Venue::class, 'venue_event', 'venue_id', 'event_id');
+        return $this->belongsToMany(Venue::class, 'venue_event', 'event_id', 'venue_id');
     }
 }

@@ -17,7 +17,8 @@ class Guardian extends Model
 
     public function participants()
     {
-        return $this->hasMany(Participant::class, 'guardian_id')->where('event_id', session()->get('EVENT_ID'));
+        // Return all participants for this guardian regardless of event
+        return $this->hasMany(Participant::class, 'guardian_id');
     }
 
     public function user()

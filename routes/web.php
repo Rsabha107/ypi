@@ -113,7 +113,7 @@ Route::group(['middleware' => 'prevent-back-history', 'XssSanitizer'], function 
 
 
     // Email Templates
-    Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmin', 'prevent-back-history', 'auth.session'])
+    Route::middleware(['auth', 'otp', 'XssSanitizer', 'role:SuperAdmin', 'prevent-back-history', 'auth.session'])
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
@@ -142,11 +142,11 @@ Route::group(['middleware' => 'prevent-back-history', 'XssSanitizer'], function 
 
 
 // Booking MANAGEMENT ******************************************************************** Admin All Route
-Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmin', 'prevent-back-history', 'auth.session'])->group(function () {
+Route::middleware(['auth', 'otp', 'XssSanitizer', 'role:SuperAdmin', 'prevent-back-history', 'auth.session'])->group(function () {
 
-    Route::controller(DashboardController::class)->group(function () {
-        Route::get('/mds/admin/dashboard', 'dashboard')->name('mds.admin.dashboard');
-    });
+    // Route::controller(DashboardController::class)->group(function () {
+    //     Route::get('/mds/admin/dashboard', 'dashboard')->name('mds.admin.dashboard');
+    // });
 
 
     //export participant
@@ -167,8 +167,6 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
 
         Route::get('/register/enc/{token}', [YpiAuthAdminController::class, 'showEncryptedUrl'])->name('register.encrypted');
 
-        // for event switching
-        Route::get('/vapp/admin/events/{id}/switch',  'switch')->name('ypi.admin.booking.switch');
         Route::get('/vapp/admin/dashboard', 'dashboard')->name('ypi.admin.dashboard');
 
         // test dynamic email
@@ -186,6 +184,9 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
         // upload certificate
         Route::post('/ypi/admin/participant/certificate/upload', 'uploadCertificate')->name('ypi.admin.participant.certificate.upload');
         Route::delete('/ypi/admin/participant/certificate/delete/{id}', 'deleteCertificate')->name('ypi.admin.participant.certificate.delete');
+        // filter session
+        Route::post('/ypi/admin/participant/filter/set', 'setFilter')->name('ypi.admin.participant.setFilter');
+        Route::post('/ypi/admin/participant/filter/clear', 'clearFilter')->name('ypi.admin.participant.clearFilter');
 
 
         //Booking note
@@ -199,6 +200,8 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'role:SuperAdmi
 
         // get match by venue
         Route::get('/venues/{venue_id}/matches', 'getMatchesByVenue')->name('ypi.admin.matches.by.venue');
+        Route::get('/venues/{venue_id}/events/{event_id}/matches', 'getMatchesByVenueAndEvent')->name('ypi.admin.matches.by.venue.event');
+        Route::get('/events/{event_id}/venues', 'getVenuesByEvent')->name('ypi.admin.venues.by.event');
     });
 
     Route::controller(ParticipantTypeController::class)->group(function () {
@@ -363,21 +366,15 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
         Route::post('/ypi/customer/guardian/update', 'update')->name('ypi.customer.guardian.update');
         Route::delete('/ypi/customer/guardian/delete/{id}', 'destroy')->name('ypi.customer.guardian.delete');
         Route::post('/ypi/customer/guardian/store', 'store')->name('ypi.customer.guardian.store');
+        Route::get('/ypi/customer/guardian/{id}/details', 'getParticipantDetails')->name('ypi.customer.guardian.details');
+        // filter session
+        Route::post('/ypi/customer/guardian/filter/set', 'setFilter')->name('ypi.customer.guardian.setFilter');
+        Route::post('/ypi/customer/guardian/filter/clear', 'clearFilter')->name('ypi.customer.guardian.clearFilter');
         Route::get('/ypi/customer/participant/create', 'create')->name('ypi.customer.participant.create');
         Route::get('/ypi/customer/participant/edit/{id}', 'edit')->name('ypi.customer.participant.edit');
-
-        // for event switching
-        Route::get('/ypi/customer/events/{id}/switch',  'switch')->name('ypi.customer.guardian.switch');
         // Route::get('/ypi/customer/dashboard', 'dashboard')->name('ypi.customer.dashboard');
     });
 });
-
-
-// Customer Pick an event
-Route::get('/ypi/customer/guardian/pick', function () {
-    return view('/ypi/customer/guardian/pick');
-})->name('ypi.customer.guardian.pick')->middleware('role:Customer');
-Route::post('/ypi/customer/events/switch', [GuardianController::class, 'pickEvent'])->name('ypi.customer.guardian.event.switch')->middleware('role:Customer');
 
 Route::get('/ypi/logout', [YpiAuthAdminController::class, 'logout'])->name('ypi.logout');
 
@@ -410,7 +407,8 @@ Route::group(['middleware' => 'prevent-back-history'], function () {
     Route::post('/signup/store', [UserController::class, 'store'])->name('admin.signup.store');
 
     // Add User
-    Route::get('/register/{event_id}', [YpiAuthAdminController::class, 'register'])->name('auth.register');
+    Route::get('/register', [YpiAuthAdminController::class, 'register'])->name('auth.register')->middleware('signed');
+    Route::post('/register/check-email', [YpiAuthAdminController::class, 'checkEmail'])->name('auth.check.email');
     Route::post('/register/store', [YpiAuthAdminController::class, 'storeRegister'])->name('admin.register.store');
 
     Route::middleware(['auth', 'prevent-back-history'])->group(function () {

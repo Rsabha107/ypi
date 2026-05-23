@@ -3,6 +3,88 @@ $(document).ready(function () {
 
     // ************************************************** task venues
 
+    // QID Image Modal Handler
+    $("body").on("click", ".qid-image-link", function (e) {
+        e.preventDefault();
+        console.log("QID image link clicked");
+        var imageUrl = $(this).data("image-url");
+        var qid = $(this).data("qid");
+        console.log("Image URL:", imageUrl);
+        
+        $("#qidImagePreview").attr("src", imageUrl);
+        $("#qidImageModalLabel").text("QID Document - " + qid);
+        $("#qidImageModal").modal("show");
+    });
+
+    // Participant Name Click Handler
+    $("body").on("click", ".participant-name-link", function (e) {
+        e.preventDefault();
+        console.log("Participant name link clicked");
+        var participantId = $(this).data("participant-id");
+        console.log("Participant ID:", participantId);
+        
+        // Show loading state
+        $("#participantDetailsModalLabel").text("Loading...");
+        $("#participantDetailsModal").modal("show");
+        
+        // Fetch participant details
+        $.ajax({
+            url: "/ypi/customer/guardian/" + participantId + "/details",
+            method: "GET",
+            dataType: "json",
+            success: function (response) {
+                console.log("Participant details:", response);
+                var p = response.participant;
+                
+                // Update modal title
+                $("#participantDetailsModalLabel").text("Participant Details - " + p.full_name);
+                
+                // Update status badge
+                $("#detail-status").text(p.status).removeClass().addClass("badge badge-phoenix fs-1 badge-phoenix-" + p.status_color);
+                
+                // Update all fields
+                $("#detail-full-name").text(p.full_name || "-");
+                $("#detail-qid").text(p.qid || "-");
+                $("#detail-dob").text(p.date_of_birth || "-");
+                $("#detail-gender").text(p.gender || "-");
+                $("#detail-nationality").text(p.nationality || "-");
+                $("#detail-school").text(p.school_name || "-");
+                $("#detail-event").text(p.event || "-");
+                $("#detail-type").text(p.participant_type || "-");
+                $("#detail-venue").text(p.assigned_venue || "-");
+                $("#detail-match").text(p.assigned_match || "-");
+                
+                // Sizes
+                $("#detail-pants").text(p.pants_size || "-");
+                $("#detail-jersey").text(p.jersey_size || "-");
+                $("#detail-jacket").text(p.jacket_size || "-");
+                $("#detail-shoe").text(p.shoe_size || "-");
+                
+                // Medical
+                $("#detail-food-allergy").text(p.food_allergy || "-");
+                var allergyType = p.food_allergy_type || "";
+                if (allergyType === "Others" && p.food_allergy_others) {
+                    allergyType += " - " + p.food_allergy_others;
+                }
+                $("#detail-food-allergy-type").text(allergyType);
+                $("#detail-health-issues").text(p.health_issues || "-");
+                $("#detail-health-issues-details").text(p.health_issues_details || "");
+                
+                // Guardian
+                $("#detail-guardian-name").text(p.guardian_name || "-");
+                $("#detail-guardian-email").text(p.guardian_email || "-");
+                $("#detail-guardian-phone").text(p.guardian_phone || "-");
+            },
+            error: function (xhr) {
+                console.error("Error fetching participant details:", xhr);
+                $("#participantDetailsModalLabel").text("Error Loading Details");
+                if (window.toastr) {
+                    toastr.error("Failed to load participant details.");
+                }
+            }
+        });
+    });
+
     function calculateAge(dob) {
         if (!dob) return null;
 

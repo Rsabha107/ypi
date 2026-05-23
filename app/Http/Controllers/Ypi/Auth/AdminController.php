@@ -250,17 +250,32 @@ class AdminController extends Controller
         return view('auth.sign-up', compact('events', 'functional_areas'));
     }
 
-    public function register($event_id)
+    public function register()
     {
+        Log::info("Register page accessed");
+        // No event required - guardians register without event context
+        // They will select events when adding participants
+        return view('auth.register');
+    }
 
-        Log::info("Received encrypted event ID: {$event_id}");
-        // decrypt event id
-        $token = Crypt::decrypt($event_id);
-        Log::info("Decrypted event ID: {$token}");
-        $event = Event::findOrFail($token);
-        // dd($event);
-        // $functional_areas = FunctionalArea::all();
-        return view('auth.register', compact('event'));
+    public function checkEmail(Request $request)
+    {
+        $email = $request->email;
+        
+        // Check if user exists with this email
+        $user = User::where('email', $email)->first();
+        
+        if ($user) {
+            return response()->json([
+                'exists' => true,
+                'message' => 'This email is already registered.',
+                'login_url' => route('login')
+            ]);
+        }
+        
+        return response()->json([
+            'exists' => false
+        ]);
     }
 
     public function storeRegister(Request $request)
@@ -318,13 +333,14 @@ class AdminController extends Controller
 
             $user->save();
 
-            $guardian->event_id = $request->event_id ?? null;
             $guardian->full_name = $request->name;
             $guardian->email = $request->email;
             $guardian->phone_main = $request->phone;
             $guardian->qid = $request->qid;
             $guardian->phone_secondary = $request->phone;
             $guardian->user_id = $user->id;
+            // No event_id - guardians are not tied to specific events
+            // Participants will have their own event_id
             $guardian->save();
 
             // handle multiple QID files upload

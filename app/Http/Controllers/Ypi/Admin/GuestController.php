@@ -28,13 +28,15 @@ use Illuminate\Support\Str;
 class GuestController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
         Log::info('inside GuestController participant index');
+        Log::info('Session participant_filter_event_id: ' . session('participant_filter_event_id'));
 
         $participants = Participant::all();
-       // $events = Event::all();
-       $event = Event::find(session()->get('EVENT_ID'));
+        $events = Event::where('name', 'not like', '%Admin%')
+            ->where('active_flag', 1)
+            ->get();
         $participant_types = ParticipantType::all();
         $genders = Gender::all();
         $nationalities = Nationality::all();
@@ -44,13 +46,22 @@ class GuestController extends Controller
         $jacket_sizes = SizeLookup::type('jacket')->get();
         $statuses = ParticipantStatus::all();
         $matches = EventMatch::all();
+        $venues = Venue::all();
+
+        // Get selected event from session
+        $selectedEvent = null;
+        if (session()->has('participant_filter_event_id')) {
+            $selectedEvent = Event::find(session('participant_filter_event_id'));
+            Log::info('Selected event found: ' . ($selectedEvent ? $selectedEvent->name : 'null'));
+        } else {
+            Log::info('No filter in session');
+        }
 
         // $guests = Guest::with('client', 'schedule_period', 'cargo', 'zone', 'status', 'driver')->get();
 
         return view('ypi.admin.participant.list', compact(
             'participants',
-           // 'events',
-            'event',
+            'events',
             'participant_types',
             'genders',
             'nationalities',
@@ -59,7 +70,9 @@ class GuestController extends Controller
             'jacket_sizes',
             'shoe_sizes',
             'statuses',
-            'matches'
+            'matches',
+            'venues',
+            'selectedEvent'
         ));
     }
 
@@ -73,6 +86,7 @@ class GuestController extends Controller
 
         $search = request('search');
         $filter = request('filter');
+        $event_filter = session('participant_filter_event_id'); // Event filter from session
         $sort = (request('sort')) ? request('sort') : "id";
         $order = (request('order')) ? request('order') : "DESC";
         $mds_schedule_event_filter = (request()->mds_schedule_event_filter) ? request()->mds_schedule_event_filter : "";
@@ -80,7 +94,13 @@ class GuestController extends Controller
         $mds_schedule_rsp_filter = (request()->mds_schedule_rsp_filter) ? request()->mds_schedule_rsp_filter : "";
 
         $ops = Participant::orderBy($sort, $order);
-        $ops = $ops->where('event_id', session()->get('EVENT_ID'));
+        // Optionally filter by event if needed
+        // $ops = $ops->where('event_id', session()->get('EVENT_ID'));
+        
+        // Filter by event if provided
+        if ($event_filter) {
+            $ops = $ops->where('event_id', $event_filter);
+        }
 
         if ($search) {
             $ops = $ops->where('full_name', 'like', '%' . $search . '%')
@@ -188,12 +208,12 @@ class GuestController extends Controller
                 '" id="ypiUploadCertificate" data-bs-toggle="tooltip" data-bs-placement="right" title="Upload Certificate">' .
                 '<i class="bx bx-arrow-to-top text-success"></i></a>';
 
-            $actions .=  $actions . (($op->status?->title == 'Approved') ? $upload_img_actions : '') . $delete_actions;
+            $actions .=  $edit_actions . (($op->status?->title == 'Approved') ? $upload_img_actions : '') . $delete_actions;
             $actions .= '</div>';
 
-            $order_status =  '<span class="badge badge-phoenix fs--2 ms-2 badge-phoenix-' . $op->status?->color . ' "><span class="badge-label" id="change_participant_status" style="cursor:pointer" data-id="' . $op->id . '"data-status_id="' . $op->status?->id . '" data-table="participant_table">' . $op->status?->title . '</span><span class="ms-1" data-feather="x" style="height:12.8px;width:12.8px;cursor:pointer"></span></span>';
+            $order_status =  '<span class="badge badge-phoenix fs--2 ms-2 badge-phoenix-' . $op->status?->color . ' "><span class="badge-label" id="change_participant_status" style="cursor:pointer" data-id="' . $op->id . '" data-status_id="' . $op->status?->id . '" data-event_id="' . $op->event_id . '" data-table="participant_table">' . $op->status?->title . '</span><span class="ms-1" data-feather="x" style="height:12.8px;width:12.8px;cursor:pointer"></span></span>';
             $qid_image_route = $op->qidDocument
-                ? '<a href="' . route('participant.docs.download', $op->qidDocument) . '" target="_blank" ><span><i class="fa-solid fa-eye me-2"></i>' . $op->qid . '</span></a>'
+                ? '<a href="javascript:void(0)" class="qid-image-link" data-image-url="' . route('participant.docs.download', $op->qidDocument) . '" data-qid="' . $op->qid . '"><span><i class="fa-solid fa-eye me-2"></i>' . $op->qid . '</span></a>'
                 : $op->qid;
 
             $cert_image_route = $op->certDocument
@@ -216,7 +236,7 @@ class GuestController extends Controller
                 : null;
 
             $gardian_qid_image_route = $op->guardian->qidDocument
-                ? '<a href="' . route('guardian.docs.download', $op->guardian->qidDocument) . '" target="_blank" ><span><i class="fa-solid fa-eye me-2"></i>' . $op->guardian->qid . '</span></a>'
+                ? '<a href="javascript:void(0)" class="qid-image-link" data-image-url="' . route('guardian.docs.download', $op->guardian->qidDocument) . '" data-qid="' . $op->guardian->qid . '"><span><i class="fa-solid fa-eye me-2"></i>' . $op->guardian->qid . '</span></a>'
                 : $op->guardian->qid;
             return  [
                 'id' => $op->id,
@@ -245,8 +265,8 @@ class GuestController extends Controller
 
                 'health_issues' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  ($op->health_issues ? 'Yes' : 'No') . '</div>',
                 'action' => $actions,
-                'created_at' => format_date($op->created_at,  'H:i:s'),
-                'updated_at' => format_date($op->updated_at, 'H:i:s'),
+                'created_at' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . format_date($op->created_at, 'd-M-y') . ' ' . format_date($op->created_at, 'H:i:s') . '</div>',
+                'updated_at' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . format_date($op->updated_at, 'd-M-y') . ' ' . format_date($op->updated_at, 'H:i:s') . '</div>',
             ];
         });
 
@@ -264,6 +284,7 @@ class GuestController extends Controller
         // $timeslots = DeliverySchedulePeriod::findOrFail($request->schedule_period_id);
 
         $rules = [
+            'event_id' => 'required|exists:events,id',
             'participant_type_id' => 'required',
             'gender_id' => 'required',
             'full_name' => 'required',
@@ -326,7 +347,7 @@ class GuestController extends Controller
             // $guest->user_id =  $user_id;
 
             $participant->participant_type_id = $request->participant_type_id;
-            $participant->event_id = session()->get('EVENT_ID');
+            $participant->event_id = $request->event_id;
             $participant->date_of_birth = Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->toDateString();
             $participant->full_name = $request->full_name;
             $participant->qid = $request->qid;
@@ -370,85 +391,48 @@ class GuestController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'guest_type_id' => 'required',
-            'prefix_id' => 'required',
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'mobile_number' => 'required',
-            'email' => 'required',
-            'client_group_id' => 'required',
-            'hosted_by_id' => 'required',
+            'event_id' => 'required|exists:events,id',
+            'participant_type_id' => 'required',
+            'gender_id' => 'required',
+            'full_name' => 'required',
+            'qid' => 'required',
+            'date_of_birth' => 'required',
+            'nationality_id' => 'required',
+            'school_name' => 'required',
+            'pants_size_id' => 'required',
+            'jersey_size_id' => 'required',
+            'jacket_size_id' => 'required',
+            'shoe_size_id' => 'required',
         ];
 
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            // Log::info($validator->errors());
+            Log::info($validator->errors());
             $error = true;
-            // $message = 'Employee not create.' . $op->id;
             $message = implode($validator->errors()->all('<div>:message</div>'));
         } else {
-            $op = Guest::findOrFail($request->id);
+            $participant = Participant::findOrFail($request->id);
             $user_id = Auth::user()->id;
 
             $error = false;
-            $message = 'Guest successfully updated';
+            $message = 'Participant successfully updated';
 
-            if ($request->hasFile('file_name')) {
+            $participant->event_id = $request->event_id;
+            $participant->participant_type_id = intval($request->participant_type_id);
+            $participant->gender_id = intval($request->gender_id);
+            $participant->full_name = $request->full_name;
+            $participant->qid = $request->qid;
+            $participant->date_of_birth = $request->date_of_birth;
+            $participant->nationality_id = intval($request->nationality_id);
+            $participant->school_name = $request->school_name;
+            $participant->pants_size_id = intval($request->pants_size_id);
+            $participant->jersey_size_id = intval($request->jersey_size_id);
+            $participant->jacket_size_id = intval($request->jacket_size_id);
+            $participant->shoe_size_id = intval($request->shoe_size_id);
+            $participant->updated_by = $user_id;
 
-                $file = $request->file('file_name');
-                $fileNameWithExt = $request->file('file_name')->getClientOriginalName();
-                // get file name
-                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-                // get extension
-                $extension = $request->file('file_name')->getClientOriginalExtension();
-
-                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-                $fileNameToStore = rand() . date('ymdHis') . $file->getClientOriginalName();  // use this
-
-                Log::info($fileNameWithExt);
-                Log::info($filename);
-                Log::info($extension);
-                Log::info($fileNameToStore);
-
-                // upload
-                if ($op->photo != 'default.png') {
-                    Storage::delete('mds/event/logo/' . $op->photo);
-                }
-
-                // $path = $request->file('file_name')->storeAs('private/mds/event/logo', $fileNameToStore);
-                // Storage::disk('private')->putFileAs('mds/event/logo', $file, $fileNameToStore);
-                $path = $file->move('storage/upload/profile_images/', $fileNameToStore);
-
-                // Log::info($path);
-
-
-            } else {
-                $fileNameToStore = 'noimage.jpg';
-            }
-
-            $op->photo = $fileNameToStore;
-
-            $op->guest_type_id = intval($request->guest_type_id);
-            $op->prefix_id = intval($request->prefix_id);
-            // $guest->event_id = session()->get('EVENT_ID');
-            // $guest->booking_date = Carbon::createFromFormat('d/m/Y', $request->booking_date)->toDateString();
-            $op->first_name = $request->first_name;
-            $op->middle_name = $request->middle_name;
-            $op->last_name = $request->last_name;
-            $op->mobile_number = $request->mobile_number;
-            $op->email = $request->email;
-            $op->qid_passport = $request->qid_passport;
-            $op->popular_name = $request->popular_name;
-            $op->client_group_id = intval($request->client_group_id);
-            $op->hosted_by_id = intval($request->hosted_by_id);
-            $op->nationality_id = intval($request->nationality_id);
-            $op->flight_preference = $request->flight_preference;
-            $op->accomodation_preference = $request->accomodation_preference;
-            $op->transportation_preference = $request->transportation_preference;
-            $op->updated_by = $user_id;
-
-            $op->save();
+            $participant->save();
         }
 
         return response()->json([
@@ -564,29 +548,6 @@ class GuestController extends Controller
         ]);
     }
 
-    public function switch($id)
-    {
-        if ($id) {
-            if (Event::findOrFail($id)) {
-                appLog('Event ID: ' . $id);
-
-                session()->put('EVENT_ID', $id);
-                appLog('Event ID: ' . session()->get('EVENT_ID'));
-                // return redirect()->route('tracki.project.show.card')->with('message', 'Workspace switched successfully.');
-                return redirect()->route('ypi.admin.participant')->with('message', 'Event Switched.');
-                // return back()->with('message', 'Event Switched.');
-            } else {
-                // return back()->with('error', 'Workspace not found.');
-                // return redirect()->route('tracki.project.show.card')->with('error', 'Workspace not found.');
-                return back()->with('error', 'Event not found.');
-            }
-        } else {
-            session()->forget('EVENT_ID');
-            // return redirect()->route('tracki.project.show.card')->with('message', 'Workspace switched successfully. now showing all workspace data');
-            return back()->withInput();
-        }
-    }
-
     public function uploadCertificate(Request $request)
     {
         Log::info('inside uploadCertificate');
@@ -690,7 +651,7 @@ class GuestController extends Controller
         $venue = Venue::findOrFail($venue_id);
         $matches = $venue->matches()   // assumes Venue has matches() relationship
             ->orderBy('match_date', 'asc')
-            ->where('event_id', session()->get('EVENT_ID'))
+            // Get all matches for this venue - filter by event on frontend if needed
             ->get()
             ->map(fn ($m) => [
                 'id'   => $m->id,
@@ -698,5 +659,80 @@ class GuestController extends Controller
             ]);
 
         return response()->json($matches);
+    }
+
+    public function getMatchesByVenueAndEvent($venue_id, $event_id)
+    {
+        $matches = EventMatch::where('venue_id', $venue_id)
+            ->where('event_id', $event_id)
+            ->orderBy('match_date', 'asc')
+            ->get()
+            ->map(fn ($m) => [
+                'id'   => $m->id,
+                'text' => ($m->pma1.' vs '.$m->pma2.' - '.$m->match_date?->format('d M Y')),
+            ]);
+
+        return response()->json($matches);
+    }
+
+    public function getVenuesByEvent($event_id)
+    {
+        $venues = Venue::whereHas('events', function ($query) use ($event_id) {
+            $query->where('events.id', $event_id);
+        })
+            ->select('id', 'title')
+            ->get();
+
+        return response()->json($venues);
+    }
+
+    public function setFilter(Request $request)
+    {
+        Log::info('setFilter called with event_id: ' . $request->event_id);
+        
+        if ($request->has('event_id') && $request->event_id) {
+            session(['participant_filter_event_id' => $request->event_id]);
+            Log::info('Filter set in session: ' . session('participant_filter_event_id'));
+        } else {
+            session()->forget('participant_filter_event_id');
+            Log::info('Filter cleared from session');
+        }
+        
+        return response()->json(['success' => true]);
+    }
+
+    public function clearFilter()
+    {
+        session()->forget('participant_filter_event_id');
+        return response()->json(['success' => true]);
+    }
+
+    public function getView($id)
+    {
+        $participant = Participant::with(['guardian', 'status', 'event', 'participantType', 'gender', 'nationality', 'pantSize', 'jerseySize', 'jacketSize', 'shoeSize'])->findOrFail($id);
+        $events = Event::where('name', 'not like', '%Admin%')
+            ->where('active_flag', 1)
+            ->get();
+        $participant_types = ParticipantType::all();
+        $genders = Gender::all();
+        $nationalities = Nationality::all();
+        $pant_sizes   = SizeLookup::type('pant')->get();
+        $jersey_sizes = SizeLookup::type('jersey')->get();
+        $shoe_sizes   = SizeLookup::type('shoe')->get();
+        $jacket_sizes = SizeLookup::type('jacket')->get();
+
+        $view = view('ypi.admin.participant.mv.edit_content', [
+            'participant' => $participant,
+            'events' => $events,
+            'participantTypes' => $participant_types,
+            'genders' => $genders,
+            'nationalities' => $nationalities,
+            'pantSizes' => $pant_sizes,
+            'jerseySizes' => $jersey_sizes,
+            'jacketSizes' => $jacket_sizes,
+            'shoeSizes' => $shoe_sizes,
+        ])->render();
+        
+        return response()->json(['view' => $view]);
     }
 }

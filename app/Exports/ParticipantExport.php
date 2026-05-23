@@ -32,6 +32,8 @@ class ParticipantExport implements FromCollection, WithHeadings
             'JERSEY SIZE',
             'JACKET SIZE',
             'SHOE SIZE',
+            'ASSIGNED VENUE',
+            'ASSIGNED MATCH',
             'FOOD ALLERGY',
             'FOOD ALLERGY TYPE',
             'FOOD ALLERGTY OTHERS',
@@ -42,7 +44,8 @@ class ParticipantExport implements FromCollection, WithHeadings
     }
     public function collection()
     {
-        $participants = Participant::where('event_id', session()->get('EVENT_ID'))->get();
+        // Export all participants - users can filter in Excel if needed
+        $participants = Participant::with(['status', 'event', 'participantType', 'guardian', 'gender', 'nationality', 'venue', 'match'])->get();
         $participants->transform(function ($participant) {
             return [
                 'participant_status' => $participant->status?->title,
@@ -61,11 +64,13 @@ class ParticipantExport implements FromCollection, WithHeadings
                 'jersey_size' => $participant->jerseySize?->label,
                 'jacket_size' => $participant->jacketSize?->label,
                 'shoe_size' => $participant->shoeSize?->label,
+                'assigned_venue' => $participant->venue?->title,
+                'assigned_match' => $participant->match?->match_code,
                 'food_allergy' => ($participant->food_allergy && $participant->food_allergy_id == 22) ? 'No' : 'Yes',
                 'food_allergy_type' => $participant->allergen?->title,
                 'food_allergy_others' => $participant->food_allergy_others,
-                'health_issues' => $participant->health_issues,
-                'health_issue_details' => $participant->health_issue_details,
+                'health_issues' => $participant->health_issues ? 'Yes' : 'No',
+                'health_issue_details' => $participant->health_issues_details,
                 'created_at' => $participant->created_at,
             ];
         });

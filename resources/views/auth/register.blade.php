@@ -14,13 +14,13 @@
     <!-- ===============================================-->
     <!--    Favicons-->
     <!-- ===============================================-->
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/img/favicons/apple-touch-icon.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('fnx/assets/img/favicons/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/img/icons/sc_logo.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/img/icons/sc_logo.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/img/icons/sc_logo.png') }}">
-    <link rel="manifest" href="{{ asset('assets/img/favicons/manifest.json') }}">
-    <meta name="msapplication-TileImage" content="{{ asset('assets/img/favicons/mstile-150x150.png') }}">
-    <meta name="theme-color" content="#fff00">
+    <link rel="manifest" href="{{ asset('fnx/assets/img/favicons/manifest.json') }}">
+    <meta name="msapplication-TileImage" content="{{ asset('fnx/assets/img/favicons/mstile-150x150.png') }}">
+    <meta name="theme-color" content="#ffffff">
     <script src="{{ asset('assets/vendors/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
     <script src="{{ asset('fnx/vendors/simplebar/simplebar.min.js') }}"></script>
     <script src="{{ asset('assets/js/config.js') }}"></script>
@@ -49,6 +49,22 @@
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
+    <style>
+        #registerBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+        }
+        
+        /* Make toastr fully opaque (not transparent) */
+        #toast-container > div {
+            opacity: 1 !important;
+        }
+        
+        .toast-warning {
+            opacity: 1 !important;
+        }
+    </style>
+
     <script>
         var phoenixIsRTL = window.config.config.phoenixIsRTL;
         if (phoenixIsRTL) {
@@ -76,7 +92,6 @@
             <form method="POST" action="{{ route('admin.register.store') }}" class="forms-sample needs-validation" id="spinner-form"
                 enctype="multipart/form-data" novalidate>
                 @csrf
-                <input type="hidden" name="event_id" value="{{ $event->id }}">
                 <div class="row flex-center min-vh-100 py-5">
                     <div class="col-sm-10 col-md-8 col-lg-5 col-xl-5 col-xxl-4">
                         <div class="card shadow-sm">
@@ -84,8 +99,7 @@
                                 <div class="text-center mb-7">
                                     <h3 class="text-body-highlight">{{ config('settings.website_name') }}
                                     </h3>
-                                    <h4 class="mb-2 mt-3">{{ $event->name }}</h4>
-                                    <p class="text-body-tertiary">Register</p>
+                                    <p class="text-body-tertiary">Register as Guardian</p>
                                 </div>
                                 @if (count($errors) > 0)
                                     <div class="alert alert-danger">
@@ -191,7 +205,7 @@
                                             href="{{ route('auth.forgot') }}">Forgot
                                             Password?</a></div>
                                 </div> --}}
-                                <button type="submit" id="registerBtn" class="btn btn-primary w-100 mb-3">Register</button>
+                                <button type="submit" id="registerBtn" class="btn btn-primary w-100 mb-3" disabled>Register</button>
                             </div>
                         </div>
                     </div>
@@ -251,6 +265,9 @@
             console.log('ready');
             // $('.dropify').dropify();
 
+            // Configure toastr to allow HTML (for login link)
+            toastr.options.escapeHtml = false;
+            
             console.log('before toastr');
             @if (Session::has('message'))
                 toastr.options = {
@@ -268,7 +285,8 @@
                     "showEasing": "swing",
                     "hideEasing": "linear",
                     "showMethod": "fadeIn",
-                    "hideMethod": "fadeOut"
+                    "hideMethod": "fadeOut",
+                    "escapeHtml": false
                 }
                 var type = "{{ Session::get('alert-type', 'info') }}"
                 switch (type) {
@@ -292,7 +310,7 @@
         });
     </script>
 
-    <script src="{{ asset('assets/js/pages/ypi/register.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/ypi/register.js') }}?v={{ time() }}"></script>
 </body>
 
 </html>
