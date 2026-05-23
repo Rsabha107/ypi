@@ -270,7 +270,7 @@
                             </label>
                             <input type="text" class="form-control" id="health_issues_details"
                                 value="{{ $participant->health_issues_details }}" name="health_issues_details"
-                                placeholder="e.g. nuts, dairy, shellfish">
+                                placeholder="e.g. asthma, diabetes, epilepsy">
                         </div>
 
 

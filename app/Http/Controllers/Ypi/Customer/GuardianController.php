@@ -32,6 +32,7 @@ class GuardianController extends Controller
     //
     public function index()
     {
+        Log::info('inside GuardianController index');
         $participants = Participant::all();
         $events = Event::all();
         $participant_types = ParticipantType::all();
@@ -125,7 +126,7 @@ class GuardianController extends Controller
         $mds_schedule_rsp_filter = (request()->mds_schedule_rsp_filter) ? request()->mds_schedule_rsp_filter : "";
 
         $ops = Guardian::where('user_id', Auth::id())
-            ->where('event_id', session()->get('EVENT_ID'))
+            // ->where('event_id', session()->get('EVENT_ID'))
             ->firstOrFail();
 
         $ops = $ops->participants()->orderBy($sort, $order);
@@ -210,7 +211,7 @@ class GuardianController extends Controller
                 'jersey_size' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->jerseySize?->label . '</div>',
                 'jacket_size' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->jacketSize?->label . '</div>',
                 'shoe_size' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->shoeSize?->label . '</div>',
-                'food_allergies' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  ($op->food_allergy ? 'Yes' : 'No') . '</div>',
+                'food_allergies' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  ($op->food_allergy && $op->food_allergy_id == 22 ? 'No' : 'Yes') . '</div>',
                 'health_issues' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  ($op->health_issues ? 'Yes' : 'No') . '</div>',
                 'qid' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $qid_image_route . '</div>',
                 'nationality' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->nationality?->title . '</div>',

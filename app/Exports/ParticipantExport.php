@@ -10,8 +10,8 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 class ParticipantExport implements FromCollection, WithHeadings
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
 
     public function headings(): array
     {
@@ -33,7 +33,8 @@ class ParticipantExport implements FromCollection, WithHeadings
             'JACKET SIZE',
             'SHOE SIZE',
             'FOOD ALLERGY',
-            'FOOD ALLERGTY DETAILS',
+            'FOOD ALLERGY TYPE',
+            'FOOD ALLERGTY OTHERS',
             'HEALTH ISSUES',
             'HEALTH ISSUE DETAILS',
             'CREATED AT',
@@ -60,8 +61,9 @@ class ParticipantExport implements FromCollection, WithHeadings
                 'jersey_size' => $participant->jerseySize?->label,
                 'jacket_size' => $participant->jacketSize?->label,
                 'shoe_size' => $participant->shoeSize?->label,
-                'food_allergy' => $participant->food_allergy,
-                'food_allergy_details' => $participant->food_allergy_details,
+                'food_allergy' => ($participant->food_allergy && $participant->food_allergy_id == 22) ? 'No' : 'Yes',
+                'food_allergy_type' => $participant->allergen?->title,
+                'food_allergy_others' => $participant->food_allergy_others,
                 'health_issues' => $participant->health_issues,
                 'health_issue_details' => $participant->health_issue_details,
                 'created_at' => $participant->created_at,

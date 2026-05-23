@@ -24,7 +24,6 @@ class AccountCreationMail extends Mailable implements ShouldQueue
     {
         return $this->subject('YPI Account Creation')
             ->view('emails.user_account_creation')
-            ->from('mds@scqa0.onmicrosoft.com', 'YPI')
             ->with([
                 'details' => $this->details,
             ]);

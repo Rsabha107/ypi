@@ -430,6 +430,35 @@ Route::group(['middleware' => 'prevent-back-history'], function () {
         // })->name('b');
         /*************************************** End Play ground */
 
+        /*************************************** PDF Template Testing */
+        // Test PDF template generation
+        Route::get('/test-pdf-template', function () {
+            $pdfService = new \App\Services\PdfTemplateService();
+            
+            // Example: Generate certificate using HTML template
+            $replacements = [
+                'participant_name' => 'Ahmed Al-Mansoori',
+                'event_name' => 'Youth Leadership Program 2026',
+                'date' => now()->format('F d, Y'),
+                'certificate_id' => 'CERT-' . strtoupper(uniqid()),
+            ];
+            
+            try {
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML(
+                    str_replace(
+                        array_keys($replacements),
+                        array_values($replacements),
+                        \Illuminate\Support\Facades\Storage::get('templates/certificate.html')
+                    )
+                );
+                
+                return $pdf->stream('certificate.pdf');
+            } catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+        })->name('test.pdf.template');
+        /*************************************** End PDF Template Testing */
+
         // // Admin Booking Pick an event
         // Route::get('/vapp/admin/booking/pick', function () {
         //     return view('/vapp/admin/booking/pick');

@@ -111,7 +111,7 @@
                                     </div>
                                 </div>
                                 <x-formy.form_input class="col mb-3" floating="1" inputValue="{{ old('qid') }}" name="qid"
-                                    elementId="add_qid" inputType="text" inputAttributes="" label="QID"
+                                    elementId="add_qid" inputType="text" inputAttributes="" label="QID / Passport"
                                     required="required" disabled="" />
 
                                 <x-formy.form_input class="col mb-3" floating="1" inputValue="{{ old('phone') }}" name="phone"
@@ -126,11 +126,11 @@
                                         GIF</small>
                                 </div> --}}
                                 <div class="col mb-3">
-                                    <label class="form-label" for="qid_files">QID Image</label>
+                                    <label class="form-label" for="qid_files">QID / Passport Image</label>
                                     <input class="form-control" id="qid_files" name="qid_files[]" type="file"
                                         multiple required />
                                     <small class="form-text text-muted">Max size: 2MB. Accepted formats: JPG, PNG,
-                                        GIF</small>
+                                        GIF, PDF</small>
                                 </div>
 
                                 {{-- <x-formy.form_select class="col-sm-12 col-md-12 mb-3" floating="1"

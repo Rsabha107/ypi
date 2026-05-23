@@ -21,6 +21,7 @@
         "opcodesio/log-viewer": "^3.19",
         "owen-it/laravel-auditing": "^14.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "smalot/pdfparser": "^2.12",
         "socialiteproviders/microsoft": "^4.7",
         "spatie/browsershot": "^4.1",
         "spatie/laravel-pdf": "^1.5",

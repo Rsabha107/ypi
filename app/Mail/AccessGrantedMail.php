@@ -24,7 +24,6 @@ class AccessGrantedMail extends Mailable implements ShouldQueue
     {
         return $this->subject('Access Granted for VAPP System')
             ->view('emails.account_access')
-            ->from('mds@scqa0.onmicrosoft.com', 'VAPP')
             ->with([
                 'details' => $this->details,
             ]);

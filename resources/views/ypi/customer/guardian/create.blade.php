@@ -211,7 +211,7 @@
                         <div class="mb-0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="has_food_allergy"
-                                    name="food_allergy" value="0" required>
+                                    name="food_allergy" value="1" required>
 
                                 <label class="form-check-label fw-semibold" for="has_food_allergy">
                                     Any food allergies?

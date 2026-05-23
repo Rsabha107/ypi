@@ -35,6 +35,7 @@
                         <tr>
                             {{-- <th data-field="image"></th> --}}
                             <th data-field="participant_status">Participant Status</th>
+                            <th data-field="created_at" data-visible="true">Created At</th>
                             <th data-field="assigned_venue_id">Assigned Venue</th>
                             <th data-field="assigned_match_id">Assigned Match</th>
                             <th data-field="participant_cert">Certificate</th>
@@ -55,9 +56,7 @@
                             <th data-field="shoe_size">Shoes Size(EUR)</th>
                             <th data-field="food_allergies">Food Allergies</th>
                             <th data-field="health_issues">Medical Conditions</th>
-                            <th data-field="created_at" data-visible="false">Created At</th>
                             <th data-field="updated_at" data-visible="false">Updated At</th>
-
                             <th data-field="action" class="text-end">Actions</th>
                         </tr>
                     </thead>
