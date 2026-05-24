@@ -22,7 +22,7 @@
                 </h5>
             </div>
             <div class="mx-2 mb-2">
-                <table id="participant_table" data-toggle="table"
+                <table id="participant_table" data-toggle="table" data-sortable="true"
                     data-toolbar="#toolbar"
                     data-classes="table table-hover  fs-9 mb-0 border-top border-translucent"
                     data-loading-template="loadingTemplate" data-url="{{ route('ypi.customer.guardian.list') }}"
@@ -74,7 +74,7 @@
                         <th data-field="shoe_size">Shoes Size(EUR)</th>
                         <th data-field="food_allergies">Food Allergies</th>
                         <th data-field="health_issues">Medical Conditions</th>
-                        <th data-field="created_at" data-visible="true">Created At</th>
+                        <th data-sortable="true" data-field="created_at" data-visible="true">Created At</th>
                         <th data-field="updated_at" data-visible="false">Updated At</th>
 
                         <th data-field="action" class="text-end">Actions</th>

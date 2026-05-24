@@ -18,13 +18,13 @@
             {{ $slot }}
             <input type="hidden" id="data_type" value="booking">
             <div id="toolbar">
-                <h5 id="eventNameToolbar" class="mb-0 text-primary" style="display: {{ session('participant_filter_event_id') ? 'block' : 'none' }};">
+                <h5 id="eventNameToolbar" class="mb-0 text-primary"
+                    style="display: {{ session('participant_filter_event_id') ? 'block' : 'none' }};">
                     {{ session('participant_filter_event_id') ? optional(\App\Models\Ypi\Event::find(session('participant_filter_event_id')))->name : '' }}
                 </h5>
             </div>
             <div class="mx-2 mb-2">
-                <table id="participant_table" data-toggle="table"
-                    data-toolbar="#toolbar"
+                <table id="participant_table" data-toggle="table" data-sortable="true" data-toolbar="#toolbar"
                     data-classes="table table-hover  fs-9 mb-0 border-top border-translucent"
                     data-loading-template="loadingTemplate" data-url="{{ route('ypi.admin.participant.list') }}"
                     data-icons-prefix="bx" data-icons="icons" data-show-export="true"
@@ -41,7 +41,7 @@
                         <tr>
                             {{-- <th data-field="image"></th> --}}
                             <th data-field="participant_status">Participant Status</th>
-                            <th data-field="created_at" data-visible="true">Created At</th>
+                            <th data-sortable="true" data-field="created_at" data-visible="true">Created At</th>
                             <th data-field="assigned_venue_id">Assigned Venue</th>
                             <th data-field="assigned_match_id">Assigned Match</th>
                             <th data-field="participant_cert">Certificate</th>

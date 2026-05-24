@@ -22,7 +22,7 @@ class AccessGrantedMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('Access Granted for VAPP System')
+        return $this->subject('Access Granted for YPI System')
             ->view('emails.account_access')
             ->with([
                 'details' => $this->details,
@@ -35,7 +35,7 @@ class AccessGrantedMail extends Mailable implements ShouldQueue
     // public function envelope(): Envelope
     // {
     //     return new Envelope(
-    //         subject: 'Send User Creation Link',
+    //         subject: 'Access Granted for YPI System',
     //     );
     // }
 

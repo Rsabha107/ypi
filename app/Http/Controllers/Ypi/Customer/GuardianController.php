@@ -455,7 +455,9 @@ class GuardianController extends Controller
                 ];
                 // SendNewRequestEmailJob::dispatch($details);
                 $filePath = null; // Adjust if you generate a QR code file
-                Mail::to($user->email)->send(new NewRequestMail($details, $filePath));
+                Mail::to($user->email)
+                    ->cc(config('settings.admin_email'))
+                    ->send(new NewRequestMail($details, $filePath));
             }
 
             // Update filter to match the event of the newly created participant
