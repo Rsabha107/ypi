@@ -199,6 +199,13 @@
                     }
                 });
             });
+
+            // Handle export form submission - populate filters
+            $('#filter_booking_export_form').on('submit', function() {
+                var eventId = $('#filter_event_id').val();
+                $('#export_event_filter').val(eventId);
+                return true; // Allow form submission
+            });
         });
     </script>
 @endpush

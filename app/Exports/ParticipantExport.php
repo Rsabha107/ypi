@@ -9,6 +9,13 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class ParticipantExport implements FromCollection, WithHeadings
 {
+    protected $filters;
+
+    public function __construct($filters = [])
+    {
+        $this->filters = $filters;
+    }
+
     /**
      * @return \Illuminate\Support\Collection
      */
@@ -44,8 +51,28 @@ class ParticipantExport implements FromCollection, WithHeadings
     }
     public function collection()
     {
-        // Export all participants - users can filter in Excel if needed
-        $participants = Participant::with(['status', 'event', 'participantType', 'guardian', 'gender', 'nationality', 'venue', 'match'])->get();
+        // Start query with relationships
+        $query = Participant::with(['status', 'event', 'participantType', 'guardian', 'gender', 'nationality', 'venue', 'match']);
+
+        // Apply event filter if provided
+        if (!empty($this->filters['export_event_filter'])) {
+            $query->where('event_id', $this->filters['export_event_filter']);
+        }
+
+        // Apply venue filter if provided
+        if (!empty($this->filters['export_venue_filter'])) {
+            $query->where('assigned_venue_id', $this->filters['export_venue_filter']);
+        }
+
+        // Apply date range filter if provided
+        if (!empty($this->filters['export_date_range_filter'])) {
+            $dateRange = explode(' to ', $this->filters['export_date_range_filter']);
+            if (count($dateRange) === 2) {
+                $query->whereBetween('created_at', [$dateRange[0], $dateRange[1]]);
+            }
+        }
+
+        $participants = $query->get();
         $participants->transform(function ($participant) {
             return [
                 'participant_status' => $participant->status?->title,

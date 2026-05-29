@@ -82,6 +82,7 @@ class ImportExportController extends Controller
         Log::info('Exporting Report to Excel file');
         Log::info($request->all());
 
+        // Get filters from request or session
         $filters = $request->only([
             'export_event_filter',        // array
             'export_venue_filter',
@@ -91,9 +92,21 @@ class ImportExportController extends Controller
             // 'export_booking_status_filter'
         ]);
 
+        // If no event filter in request, check session
+        if (empty($filters['export_event_filter']) && session('participant_filter_event_id')) {
+            $filters['export_event_filter'] = session('participant_filter_event_id');
+        }
+
         Log::info('Filters applied: ' . json_encode($filters));
 
-        return Excel::download(new ParticipantExport($filters), 'participant_export.xlsx');
+        $filename = 'participant_export_' . date('Y-m-d_His') . '.xlsx';
+        
+        if (!empty($filters['export_event_filter'])) {
+            $event = \App\Models\Ypi\Event::find($filters['export_event_filter']);
+            $filename = 'participants_' . ($event ? str_replace(' ', '_', $event->name) : 'filtered') . '_' . date('Y-m-d_His') . '.xlsx';
+        }
+
+        return Excel::download(new ParticipantExport($filters), $filename);
     }
 
     public function import(Request $request) {}
