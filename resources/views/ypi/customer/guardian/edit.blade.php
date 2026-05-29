@@ -160,6 +160,7 @@
 
 
 
+                        @if(config('settings.show_uniform_section', 1))
                         <div class=" gy-3">
                             <hr />
                         </div>
@@ -219,6 +220,7 @@
                                 <label for="shoe_size_id">Shoe Size</label>
                             </div>
                         </div>
+                        @endif
 
                         @php
                             $hasAllergy = (int) old('has_food_allergy', $participant->food_allergy) === 1;

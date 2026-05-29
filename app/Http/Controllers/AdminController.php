@@ -400,7 +400,7 @@ class AdminController extends Controller
 
         $content = [
             'token'     => $token,
-            'subject'   => 'VAPP: Reset Password Link',
+            'subject'   => 'YPI: Reset Password Link',
             'url'       => "route('reset.password.get', $token)",
         ];
 

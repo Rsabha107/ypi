@@ -39,7 +39,7 @@ class GuardianController extends Controller
         $events = Event::where('name', 'not like', '%Admin%')
             ->where('active_flag', 1)
             ->get();
-        $participant_types = ParticipantType::all();
+        $participant_types = ParticipantType::where('active_flag', 1)->get();
         $genders = Gender::all();
         $nationalities = Nationality::all();
         $pant_sizes   = SizeLookup::type('pant')->get();
@@ -224,7 +224,7 @@ class GuardianController extends Controller
                 'participant_cert' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $cert_image_route . '</div>',
                 'event_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->event?->name . '</div>',
                 'assigned_venue_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->venue?->title . '</div>',
-                'assigned_match_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->match?->match_code . '</div>',
+                'assigned_match_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  ($op->match ? ($op->match->pma1 . ' vs ' . $op->match->pma2 . ' (' . $op->match->match_date?->format('d M Y') . ')') : '') . '</div>',
                 'participant_type' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->participantType?->title . '</div>',
                 'full_name' => '<div class="align-middle white-space-wrap fs-9 ps-2"><a href="javascript:void(0)" class="participant-name-link" data-participant-id="' . $op->id . '">' . $op->full_name . '</a></div>',
                 'date_of_birth' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  format_date($op->date_of_birth, 'd/m/Y') . '</div>',
@@ -255,7 +255,7 @@ class GuardianController extends Controller
         $events = Event::where('name', 'not like', '%Admin%')
             ->where('active_flag', 1)
             ->get();
-        $participant_types = ParticipantType::all();
+        $participant_types = ParticipantType::where('active_flag', 1)->get();
         $genders = Gender::all();
         $nationalities = Nationality::all();
         $pant_sizes   = SizeLookup::type('pant')->get();
@@ -286,7 +286,7 @@ class GuardianController extends Controller
         $events = Event::where('name', 'not like', '%Admin%')
             ->where('active_flag', 1)
             ->get();
-        $participant_types = ParticipantType::all();
+        $participant_types = ParticipantType::where('active_flag', 1)->get();
         $genders = Gender::all();
         $nationalities = Nationality::all();
         $pant_sizes   = SizeLookup::type('pant')->get();
@@ -326,10 +326,10 @@ class GuardianController extends Controller
             'nationality_id' => 'required',
             'school_name' => 'required',
             // 'guardian_id' => 'required',
-            'pants_size_id' => 'required',
-            'jersey_size_id' => 'required',
-            'jacket_size_id' => 'required',
-            'shoe_size_id' => 'required',
+            'pants_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'jersey_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'jacket_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'shoe_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
             'food_allergy' => 'required|boolean',
             // 'qid_file' => 'required|file|max:2048|mimes:jpg,jpeg,png,pdf',
             // 'food_allergy' => 'required',
@@ -511,10 +511,10 @@ class GuardianController extends Controller
             'nationality_id' => 'required',
             'school_name' => 'required',
             // 'guardian_id' => 'required',
-            'pants_size_id' => 'required',
-            'jersey_size_id' => 'required',
-            'jacket_size_id' => 'required',
-            'shoe_size_id' => 'required',
+            'pants_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'jersey_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'jacket_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'shoe_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
              'food_allergy' => 'required',
             // 'health_issues' => 'required',
             // FilePond temp ids
@@ -774,7 +774,7 @@ class GuardianController extends Controller
                 'status' => $participant->status?->title,
                 'status_color' => $participant->status?->color,
                 'assigned_venue' => $participant->venue?->title,
-                'assigned_match' => $participant->match?->match_code,
+                'assigned_match' => $participant->match ? ($participant->match->pma1 . ' vs ' . $participant->match->pma2 . ' (' . $participant->match->match_date?->format('d M Y') . ')') : '',
                 'pants_size' => $participant->pantSize?->label,
                 'jersey_size' => $participant->jerseySize?->label,
                 'jacket_size' => $participant->jacketSize?->label,

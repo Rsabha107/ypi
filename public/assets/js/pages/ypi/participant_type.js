@@ -24,6 +24,7 @@ $(document).ready(function () {
                 console.log(response)
                 $("#edit_participant_types_id").val(response.op.id);
                 $("#edit_participant_types_title").val(response.op.title);
+                $("#edit_participant_types_active_flag").val(response.op.active_flag ? 1 : 0);
                 $("#edit_participant_types_table").val(table);
                 // $("#edit_participant_types_modal").modal("show");
             },

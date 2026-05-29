@@ -27,6 +27,7 @@ class ParticipantTypeController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => ['required', 'string', 'max:255'],
+            'active_flag' => ['nullable', 'boolean'],
         ]);
 
         if ($validator->fails()) {
@@ -41,6 +42,7 @@ class ParticipantTypeController extends Controller
 
             $op = new ParticipantType();
             $op->title = $request->title;
+            $op->active_flag = $request->input('active_flag', true);
             $op->created_by = $userId;
             $op->updated_by = $userId;
             $op->save();
@@ -64,6 +66,7 @@ class ParticipantTypeController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => ['required', 'integer', 'exists:participant_types,id'],
             'title' => ['required', 'string', 'max:255'],
+            'active_flag' => ['nullable', 'boolean'],
         ]);
 
         if ($validator->fails()) {
@@ -78,6 +81,7 @@ class ParticipantTypeController extends Controller
             $oldTitle = $op->title;
 
             $op->title = $request->title;
+            $op->active_flag = $request->input('active_flag', true);
             $op->updated_by = Auth::id();
             $op->save();
 
@@ -126,6 +130,7 @@ class ParticipantTypeController extends Controller
             return [
                 'id' => $row->id,
                 'title' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . e($row->title) . '</div>',
+                'active_flag' => '<div class="align-middle text-center">' . ($row->active_flag ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>') . '</div>',
                 'created_at' => format_date($row->created_at, 'H:i:s'),
                 'updated_at' => format_date($row->updated_at, 'H:i:s'),
             ];

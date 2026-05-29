@@ -161,6 +161,8 @@
                                     data-allowed-file-extensions="jpg jpeg png pdf" data-max-file-size="2M" />
                             </div>
                         </div> --}}
+                        
+                        @if(config('settings.show_uniform_section', 1))
                         <div class=" gy-3">
                             <hr />
                         </div>
@@ -220,6 +222,7 @@
                                 <label for="shoe_size_id">Shoe Size</label>
                             </div>
                         </div>
+                        @endif
 
                         <div class="mb-0">
                             <div class="form-check form-switch">

@@ -87,9 +87,12 @@ Route::get('/', function () {
     $roleRoutes = [
         'SuperAdmin' => 'ypi.admin.participant',
         'Customer'   => 'ypi.customer',
+        'Catering'    => 'ypi.catering.participant',
+        'Uniform'    => 'ypi.uniform.participant',
     ];
 
     foreach ($roleRoutes as $role => $route) {
+        appLog("Checking role $role for user " . auth()->user()->email);
         if (auth()->user()->hasRole($role)) {
             appLog("Redirecting to $route for role $role");
             return redirect()->route($route);
@@ -554,6 +557,49 @@ Route::group(['middleware' => 'prevent-back-history'], function () {
             Route::get('/sec/rolesetup/add', 'addRolePermission')->name('sec.rolesetup.add');
         });  //
     });  //
+
+    // Catering READ-ONLY Routes - Access to view participants only
+    Route::middleware(['auth', 'otp', 'XssSanitizer', 'role:Catering', 'prevent-back-history', 'auth.session'])->group(function () {
+        
+        Route::controller(\App\Http\Controllers\Ypi\Catering\CateringController::class)->group(function () {
+            // Participant List (Read Only)
+            Route::get('/ypi/catering/participant', 'index')->name('ypi.catering.participant');
+            Route::get('/ypi/catering/participant/list', 'list')->name('ypi.catering.participant.list');
+            
+            // Participant Details (Read Only)
+            Route::get('/ypi/catering/participant/detail/{id}', 'detail')->name('ypi.catering.participant.detail');
+            Route::get('/ypi/catering/participant/{id}/details', 'getParticipantDetails')->name('ypi.catering.participant.details');
+            
+            // Filter Session (For event filtering)
+            Route::post('/ypi/catering/participant/filter/set', 'setFilter')->name('ypi.catering.participant.setFilter');
+            Route::post('/ypi/catering/participant/filter/clear', 'clearFilter')->name('ypi.catering.participant.clearFilter');
+            
+            // Export Dietary Information
+            Route::get('/ypi/catering/participant/export/dietary', 'exportDietary')->name('ypi.catering.participant.export.dietary');
+        });
+    });
+
+    // Uniform READ-ONLY Routes - Access to view participants and uniform sizes only
+    Route::middleware(['auth', 'otp', 'XssSanitizer', 'role:Uniform', 'prevent-back-history', 'auth.session'])->group(function () {
+        
+        Route::controller(\App\Http\Controllers\Ypi\Uniform\UniformController::class)->group(function () {
+            // Participant List (Read Only)
+            Route::get('/ypi/uniform/participant', 'index')->name('ypi.uniform.participant');
+            Route::get('/ypi/uniform/participant/list', 'list')->name('ypi.uniform.participant.list');
+            
+            // Participant Details (Read Only)
+            Route::get('/ypi/uniform/participant/detail/{id}', 'detail')->name('ypi.uniform.participant.detail');
+            Route::get('/ypi/uniform/participant/{id}/details', 'getParticipantDetails')->name('ypi.uniform.participant.details');
+            
+            // Filter Session (For event filtering)
+            Route::post('/ypi/uniform/participant/filter/set', 'setFilter')->name('ypi.uniform.participant.setFilter');
+            Route::post('/ypi/uniform/participant/filter/clear', 'clearFilter')->name('ypi.uniform.participant.clearFilter');
+            
+            // Export Uniform Sizes
+            Route::get('/ypi/uniform/participant/export/sizes', 'exportSizes')->name('ypi.uniform.participant.export.sizes');
+        });
+    });
+
     // Route::get('/run-migration', function () {
     //     Artisan::call('optimize:clear');
 

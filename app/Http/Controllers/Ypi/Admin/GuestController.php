@@ -37,7 +37,7 @@ class GuestController extends Controller
         $events = Event::where('name', 'not like', '%Admin%')
             ->where('active_flag', 1)
             ->get();
-        $participant_types = ParticipantType::all();
+        $participant_types = ParticipantType::where('active_flag', 1)->get();
         $genders = Gender::all();
         $nationalities = Nationality::all();
         $pant_sizes   = SizeLookup::type('pant')->get();
@@ -244,7 +244,7 @@ class GuestController extends Controller
                 'participant_status' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $order_status . '</div>',
                 'participant_type' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->participantType?->title . '</div>',
                 'assigned_venue_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->venue?->title . '</div>',
-                'assigned_match_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->match?->match_code . '</div>',
+                'assigned_match_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  ($op->match ? ($op->match->pma1 . ' vs ' . $op->match->pma2 . ' (' . $op->match->match_date?->format('d M Y') . ')') : '') . '</div>',
                 'event_id' => '<div class="align-middle white-space-wrap fs-9 ps-2">' .  $op->event?->name . '</div>',
                 'guest_type' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->guest_type?->title . '</div>',
                 'guardian_name' => '<div class="align-middle white-space-wrap fs-9 ps-2">' . $op->guardian->full_name . '</div>',
@@ -293,10 +293,10 @@ class GuestController extends Controller
             'nationality_id' => 'required',
             'school_name' => 'required',
             'guardian_id' => 'required',
-            'pants_size_id' => 'required',
-            'jersey_size_id' => 'required',
-            'jacket_size_id' => 'required',
-            'shoe_size_id' => 'required',
+            'pants_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'jersey_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'jacket_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'shoe_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
             'food_allergy' => 'required',
             'health_issues' => 'required',
         ];
@@ -399,10 +399,10 @@ class GuestController extends Controller
             'date_of_birth' => 'required',
             'nationality_id' => 'required',
             'school_name' => 'required',
-            'pants_size_id' => 'required',
-            'jersey_size_id' => 'required',
-            'jacket_size_id' => 'required',
-            'shoe_size_id' => 'required',
+            'pants_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'jersey_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'jacket_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'shoe_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -713,7 +713,7 @@ class GuestController extends Controller
         $events = Event::where('name', 'not like', '%Admin%')
             ->where('active_flag', 1)
             ->get();
-        $participant_types = ParticipantType::all();
+        $participant_types = ParticipantType::where('active_flag', 1)->get();
         $genders = Gender::all();
         $nationalities = Nationality::all();
         $pant_sizes   = SizeLookup::type('pant')->get();

@@ -15,6 +15,15 @@
                             <input required type="text" id="nameBasic" class="form-control" name="title" placeholder="<?= get_label('please_enter_title', 'Please enter title') ?>" />
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="active_flag" class="form-label"><?= get_label('status', 'Status') ?></label>
+                            <select class="form-select" id="active_flag" name="active_flag">
+                                <option value="1" selected><?= get_label('active', 'Active') ?></option>
+                                <option value="0"><?= get_label('inactive', 'Inactive') ?></option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -43,6 +52,15 @@
                         <div class="col mb-3">
                             <label for="nameBasic" class="form-label"><?= get_label('title', 'Title') ?> <span class="asterisk">*</span></label>
                             <input type="text" id="edit_participant_types_title" class="form-control" name="title" placeholder="<?= get_label('please_enter_title', 'Please enter title') ?>" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="edit_participant_types_active_flag" class="form-label"><?= get_label('status', 'Status') ?></label>
+                            <select class="form-select" id="edit_participant_types_active_flag" name="active_flag">
+                                <option value="1"><?= get_label('active', 'Active') ?></option>
+                                <option value="0"><?= get_label('inactive', 'Inactive') ?></option>
+                            </select>
                         </div>
                     </div>
                 </div>

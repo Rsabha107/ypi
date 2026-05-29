@@ -65,7 +65,7 @@ class ParticipantExport implements FromCollection, WithHeadings
                 'jacket_size' => $participant->jacketSize?->label,
                 'shoe_size' => $participant->shoeSize?->label,
                 'assigned_venue' => $participant->venue?->title,
-                'assigned_match' => $participant->match?->match_code,
+                'assigned_match' => $participant->match ? ($participant->match->pma1 . ' vs ' . $participant->match->pma2 . ' (' . $participant->match->match_date?->format('d M Y') . ')') : '',
                 'food_allergy' => ($participant->food_allergy && $participant->food_allergy_id == 22) ? 'No' : 'Yes',
                 'food_allergy_type' => $participant->allergen?->title,
                 'food_allergy_others' => $participant->food_allergy_others,

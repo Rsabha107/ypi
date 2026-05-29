@@ -122,6 +122,7 @@
                 disabled='' />
         </div>
 
+        @if(config('settings.show_uniform_section', 1))
         <div class="row mb-3">
             <x-formy.form_select
                 class="col-sm-6 col-md-3  mb-3"
@@ -183,6 +184,7 @@
                 addDynamicButton='0'
                 dynamicModal=null />
         </div>
+        @endif
 
         <div class="row mb-3">
             <div class="col-12">
