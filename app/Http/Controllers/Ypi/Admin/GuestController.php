@@ -200,7 +200,7 @@ class GuestController extends Controller
             $delete_actions =
                 '<a href="javascript:void(0)" class="btn btn-sm" data-table="participant_table" data-id="' .
                 $op->id .
-                '" id="deleteGuest" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">' .
+                '" id="deleteParticipant" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete">' .
                 '<i class="bx bx-trash text-danger"></i></a>';
             $upload_img_actions =
                 '<a href="javascript:void(0)" class="btn btn-sm" data-table="participant_table" data-id="' .
@@ -444,13 +444,13 @@ class GuestController extends Controller
     public function destroy($id)
     {
         // LOG::info('inside delete');
-        $op = Guest::find($id);
+        $op = Participant::find($id);
         Log::info($op);
         if (!$op) {
             $error = true;
-            $message = 'Guest not found.';
+            $message = 'Participant not found.';
             $notification = array(
-                'message'       => 'Guest not found',
+                'message'       => 'Participant not found',
                 'alert-type'    => 'error'
             );
             return response()->json(['error' => $error, 'message' => $message]);
@@ -463,10 +463,10 @@ class GuestController extends Controller
         $op->delete();
 
         $error = false;
-        $message = 'Guest deleted succesfully.';
+        $message = 'Participant deleted successfully.';
 
         $notification = array(
-            'message'       => 'Guest deleted successfully',
+            'message'       => 'Participant deleted successfully',
             'alert-type'    => 'success'
         );
 
