@@ -19,8 +19,8 @@
             <input type="hidden" id="data_type" value="booking">
             <div id="toolbar">
                 <h5 id="eventNameToolbar" class="mb-0 text-primary"
-                    style="display: {{ session('participant_filter_event_id') ? 'block' : 'none' }};">
-                    {{ session('participant_filter_event_id') ? optional(\App\Models\Ypi\Event::find(session('participant_filter_event_id')))->name : '' }}
+                    style="display: {{ current_event() ? 'block' : 'none' }};">
+                    {{ current_event()?->name }}
                 </h5>
             </div>
             <div class="mx-2 mb-2">

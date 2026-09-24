@@ -35,6 +35,7 @@
                             <!-- <th data-checkbox="true"></th> -->
                             <!-- <th data-sortable="true" data-field="id" class="align-middle white-space-wrap fw-bold fs-9"><?= get_label('id', 'ID') ?></th> -->
                             <th data-sortable="true" data-field="title" ><?= get_label('name', 'Name') ?></th>
+                            <th data-field="event"><?= get_label('event', 'Event') ?></th>
                             <th data-sortable="true" data-field="active_flag" class="text-center"><?= get_label('active', 'Active') ?></th>
                             <th data-sortable="true" data-field="created_at" data-visible="false"><?= get_label('created_at', 'Created at') ?></th>
                             <th data-sortable="true" data-field="updated_at" data-visible="false"><?= get_label('updated_at', 'Updated at') ?></th>

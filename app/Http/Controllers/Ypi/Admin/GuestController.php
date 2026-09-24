@@ -49,13 +49,7 @@ class GuestController extends Controller
         $venues = Venue::all();
 
         // Get selected event from session
-        $selectedEvent = null;
-        if (session()->has('participant_filter_event_id')) {
-            $selectedEvent = Event::find(session('participant_filter_event_id'));
-            Log::info('Selected event found: ' . ($selectedEvent ? $selectedEvent->name : 'null'));
-        } else {
-            Log::info('No filter in session');
-        }
+        $selectedEvent = current_event();
 
         // $guests = Guest::with('client', 'schedule_period', 'cargo', 'zone', 'status', 'driver')->get();
 
@@ -86,7 +80,7 @@ class GuestController extends Controller
 
         $search = request('search');
         $filter = request('filter');
-        $event_filter = session('participant_filter_event_id'); // Event filter from session
+        $event_filter = current_event_id(); // Event selected in the header switcher
         $sort = (request('sort')) ? request('sort') : "id";
         $order = (request('order')) ? request('order') : "DESC";
         $mds_schedule_event_filter = (request()->mds_schedule_event_filter) ? request()->mds_schedule_event_filter : "";
@@ -688,22 +682,15 @@ class GuestController extends Controller
 
     public function setFilter(Request $request)
     {
-        Log::info('setFilter called with event_id: ' . $request->event_id);
-        
-        if ($request->has('event_id') && $request->event_id) {
-            session(['participant_filter_event_id' => $request->event_id]);
-            Log::info('Filter set in session: ' . session('participant_filter_event_id'));
-        } else {
-            session()->forget('participant_filter_event_id');
-            Log::info('Filter cleared from session');
-        }
-        
+        set_current_event($request->input('event_id'));
+
         return response()->json(['success' => true]);
     }
 
     public function clearFilter()
     {
-        session()->forget('participant_filter_event_id');
+        set_current_event(null);
+
         return response()->json(['success' => true]);
     }
 

@@ -16,6 +16,18 @@
                         <input required type="text" id="nameBasic" class="form-control" name="name"
                             placeholder="<?= get_label('please_enter_name', 'Please enter name') ?>" />
                     </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="start_date" class="form-label"><?= get_label('start_date', 'Start date') ?></label>
+                            <input class="form-control datetimepicker" type="text" id="start_date" name="start_date"
+                                placeholder="dd/mm/yyyy" data-options='{"disableMobile":true,"dateFormat":"d/m/Y"}' />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="end_date" class="form-label"><?= get_label('end_date', 'End date') ?></label>
+                            <input class="form-control datetimepicker" type="text" id="end_date" name="end_date"
+                                placeholder="dd/mm/yyyy" data-options='{"disableMobile":true,"dateFormat":"d/m/Y"}' />
+                        </div>
+                    </div>
                     <div class="col-md-12 mb-3">
                         <x-formy.select_multiple class="col-md-12 mb-3" name="venue_id[]" elementId="venue_id"
                             label="Venue assignment (multiple)" :forLoopCollection="$venues" itemIdForeach="id"
@@ -63,6 +75,20 @@
                                     class="asterisk">*</span></label>
                             <input type="text" id="edit_event_name" class="form-control" name="name"
                                 placeholder="<?= get_label('please_enter_name', 'Please enter name') ?>" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_event_start_date" class="form-label"><?= get_label('start_date', 'Start date') ?></label>
+                            <input class="form-control datetimepicker" type="text" id="edit_event_start_date"
+                                name="start_date" placeholder="dd/mm/yyyy"
+                                data-options='{"disableMobile":true,"dateFormat":"d/m/Y"}' />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_event_end_date" class="form-label"><?= get_label('end_date', 'End date') ?></label>
+                            <input class="form-control datetimepicker" type="text" id="edit_event_end_date"
+                                name="end_date" placeholder="dd/mm/yyyy"
+                                data-options='{"disableMobile":true,"dateFormat":"d/m/Y"}' />
                         </div>
                     </div>
                     <div class="col-md-12 mb-3">

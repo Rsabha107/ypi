@@ -31,6 +31,7 @@ class SizeController extends Controller
             'type' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'integer'],
+            'event_scope' => ['nullable', 'in:current,global'],
         ]);
 
         if ($validator->fails()) {
@@ -44,6 +45,7 @@ class SizeController extends Controller
             $userId = Auth::id();
 
             $op = new SizeLookup();
+            $op->event_id = $request->input('event_scope') === 'global' ? null : current_event_id();
             $op->type = $request->type;
             $op->code = $request->code;
             $op->label = $request->label;
@@ -124,7 +126,7 @@ class SizeController extends Controller
         $limit = request("limit");
         $limit = max(1, min($limit, 100)); // min=1, max=100
 
-        $q = SizeLookup::query()->orderBy($sort, $order);
+        $q = SizeLookup::query()->with('event')->orderBy($sort, $order);
 
         if ($search) {
             $q->where(function ($query) use ($search) {
@@ -142,6 +144,7 @@ class SizeController extends Controller
                 'code' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . e($row->code) . '</div>',
                 'label' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . e($row->label) . '</div>',
                 'sort_order' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . e($row->sort_order) . '</div>',
+                'event' => event_scope_badge($row),
                 'created_at' => format_date($row->created_at, 'H:i:s'),
                 'updated_at' => format_date($row->updated_at, 'H:i:s'),
             ];

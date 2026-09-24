@@ -34,6 +34,7 @@ use App\Http\Controllers\Ypi\Setting\SizeController;
 use App\Http\Controllers\Vapp\Customer\BookingController as CustomerBookingController;
 use App\Http\Controllers\Vapp\Operator\BookingController as OperatorBookingController;
 use App\Http\Controllers\Ypi\Admin\ImportExportController;
+use App\Http\Controllers\Ypi\CurrentEventController;
 use App\Http\Controllers\Ypi\Setting\AppSettingController;
 
 use App\Http\Controllers\Ypi\Setting\EventImageController;
@@ -111,6 +112,12 @@ Route::controller(MicrosoftController::class)->group(function () {
 // Image Uploader
 Route::post('/uploads/process', [UploadController::class, 'process'])->name('uploads.process');
 Route::delete('/uploads/revert', [UploadController::class, 'revert'])->name('uploads.revert');
+
+// Global event switcher - available to every authenticated role
+Route::middleware(['auth', 'XssSanitizer'])->controller(CurrentEventController::class)->group(function () {
+    Route::post('/event/switch', 'switch')->name('event.switch');
+    Route::post('/event/clear', 'clear')->name('event.clear');
+});
 
 Route::group(['middleware' => 'prevent-back-history', 'XssSanitizer'], function () {
 

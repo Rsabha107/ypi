@@ -93,8 +93,8 @@ class ImportExportController extends Controller
         ]);
 
         // If no event filter in request, check session
-        if (empty($filters['export_event_filter']) && session('participant_filter_event_id')) {
-            $filters['export_event_filter'] = session('participant_filter_event_id');
+        if (empty($filters['export_event_filter']) && current_event_id()) {
+            $filters['export_event_filter'] = current_event_id();
         }
 
         Log::info('Filters applied: ' . json_encode($filters));

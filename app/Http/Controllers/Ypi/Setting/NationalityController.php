@@ -63,7 +63,7 @@ class NationalityController extends Controller
         $search = request('search');
         $sort = (request('sort')) ? request('sort') : "id";
         $order = (request('order')) ? request('order') : "DESC";
-        $nationalities = Nationality::orderBy($sort, $order);
+        $nationalities = Nationality::with('event')->orderBy($sort, $order);
 
         if ($search) {
             $nationalities = $nationalities->where(function ($query) use ($search) {
@@ -81,6 +81,7 @@ class NationalityController extends Controller
                 // 'id' => '<div class="align-middle white-space-wrap fw-bold fs-8 ps-2">' .$nationalities->id. '</div>',
                 'title' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . $nationalities->title . '</div>',
                 'alpha_3_code' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . $nationalities->alpha_3_code . '</div>',
+                'event' => event_scope_badge($nationalities),
                 'created_at' => format_date($nationalities->created_at,  'H:i:s'),
                 'updated_at' => format_date($nationalities->updated_at, 'H:i:s'),
             ];
@@ -99,6 +100,7 @@ class NationalityController extends Controller
 
         $rules = [
             'title' => 'required',
+            'event_scope' => ['nullable', 'in:current,global'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -112,6 +114,7 @@ class NationalityController extends Controller
             $error = false;
             $message = 'Nationality created succesfully.' . $nationalities->id;
 
+            $nationalities->event_id = $request->input('event_scope') === 'global' ? null : current_event_id();
             $nationalities->title = $request->title;
             $nationalities->num_code = $request->num_code;
             $nationalities->alpha_2_code = $request->alpha_2_code;

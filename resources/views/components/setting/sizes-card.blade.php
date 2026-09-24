@@ -37,6 +37,7 @@
                             <th data-sortable="true" data-field="code" ><?= get_label('code', 'Code') ?></th>
                             <th data-sortable="true" data-field="label" ><?= get_label('label', 'Label') ?></th>
                             <th data-sortable="true" data-field="sort_order" ><?= get_label('sort_order', 'Sort Order') ?></th>
+                            <th data-field="event"><?= get_label('event', 'Event') ?></th>
                             <th data-sortable="true" data-field="created_at" data-visible="false"><?= get_label('created_at', 'Created at') ?></th>
                             <th data-sortable="true" data-field="updated_at" data-visible="false"><?= get_label('updated_at', 'Updated at') ?></th>
                             <th data-formatter="actionsFormatter" class="text-end"><?= get_label('actions', 'Actions') ?></th>

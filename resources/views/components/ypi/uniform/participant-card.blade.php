@@ -1,7 +1,5 @@
 @php
-    $events = \App\Models\Ypi\Event::where('name', 'not like', '%Admin%')
-        ->where('active_flag', 1)
-        ->get();
+    $currentEvent = current_event();
 @endphp
 
 <div class="mx-n4 px-4 mx-lg-n6 px-lg-6 bg-body-emphasis pt-6 border-y">
@@ -13,11 +11,6 @@
             </div>
             <div class="col-12 col-md-auto">
                 <div class="d-flex align-items-center">
-                    <!-- Event Filter Button -->
-                    <button class="btn btn-primary me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" aria-controls="filterOffcanvas">
-                        <span class="fas fa-filter me-2"></span>Filter by Event
-                        <span id="filterIndicator" class="badge bg-danger ms-2" style="display: {{ session('participant_filter_event_id') ? 'inline' : 'none' }};">●</span>
-                    </button>
                     <!-- Export Sizes Button -->
                     <a href="{{ route('ypi.uniform.participant.export.sizes') }}" class="btn btn-success">
                         <span class="fas fa-file-excel me-2"></span>Export Uniform Sizes
@@ -26,37 +19,10 @@
             </div>
         </div>
 
-        <!-- Filter Offcanvas -->
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="filterOffcanvasLabel">Filter Participants</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <form id="filterForm">
-                    <div class="mb-3">
-                        <label for="filter_event_id" class="form-label">Event</label>
-                        <select class="form-select" id="filter_event_id" name="event_id">
-                            <option value="">All Events</option>
-                            @foreach($events as $event)
-                                <option value="{{ $event->id }}" {{ session('participant_filter_event_id') == $event->id ? 'selected' : '' }}>
-                                    {{ $event->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary flex-fill">Apply Filter</button>
-                        <button type="button" id="clearFilterBtn" class="btn btn-outline-secondary flex-fill">Clear</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Toolbar showing selected event -->
+        <!-- Toolbar showing the event selected in the header -->
         <div id="toolbar" class="mb-3">
-            <h5 id="eventNameToolbar" class="mb-0 text-primary" style="display: {{ session('participant_filter_event_id') ? 'block' : 'none' }};">
-                {{ session('participant_filter_event_id') ? optional(\App\Models\Ypi\Event::find(session('participant_filter_event_id')))->name : '' }}
+            <h5 id="eventNameToolbar" class="mb-0 text-primary" style="display: {{ $currentEvent ? 'block' : 'none' }};">
+                {{ $currentEvent?->name }}
             </h5>
         </div>
         <div class="mx-2 mb-2">
@@ -133,69 +99,4 @@
     function loadingTemplate(message) {
         return '<i class="bx bx-loader-circle bx-spin bx-flip-vertical"></i>';
     }
-
-    // Filter form submission
-    $('#filterForm').on('submit', function(e) {
-        e.preventDefault();
-        const eventId = $('#filter_event_id').val();
-        
-        $.ajax({
-            url: '{{ route("ypi.uniform.participant.setFilter") }}',
-            method: 'POST',
-            data: {
-                event_id: eventId,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                // Show/hide indicator
-                if (eventId) {
-                    $('#filterIndicator').show();
-                    const eventName = $('#filter_event_id option:selected').text();
-                    $('#eventNameToolbar').text(eventName).show();
-                } else {
-                    $('#filterIndicator').hide();
-                    $('#eventNameToolbar').hide();
-                }
-                
-                // Refresh table
-                $('#participant_table').bootstrapTable('refresh');
-                
-                // Close offcanvas
-                const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('filterOffcanvas'));
-                if (offcanvas) {
-                    offcanvas.hide();
-                }
-            },
-            error: function(xhr) {
-                console.error('Filter error:', xhr);
-            }
-        });
-    });
-
-    // Clear filter
-    $('#clearFilterBtn').on('click', function(e) {
-        e.preventDefault();
-        
-        $.ajax({
-            url: '{{ route("ypi.uniform.participant.clearFilter") }}',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                $('#filter_event_id').val('');
-                $('#filterIndicator').hide();
-                $('#eventNameToolbar').hide();
-                $('#participant_table').bootstrapTable('refresh');
-                
-                const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('filterOffcanvas'));
-                if (offcanvas) {
-                    offcanvas.hide();
-                }
-            },
-            error: function(xhr) {
-                console.error('Clear filter error:', xhr);
-            }
-        });
-    });
 </script>

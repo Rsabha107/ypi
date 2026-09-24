@@ -1,8 +1,7 @@
 @php
 
-
-    $current_event_id = session()->get('EVENT_ID');
-    $event = App\Models\Ypi\Event::find($current_event_id);
+    $event = current_event();
+    $current_event_id = $event?->id;
 
     $id = Auth::user()->id;
     $profileData = App\Models\User::find($id);
@@ -23,20 +22,27 @@
                         <img src="{{ asset(config('settings.website_logo')) }}" alt="{{ config('settings.site_title') }}"
                             width="150" />
                         <h3 class="logo-text ms-2 d-none d-sm-block text-white">{{ config('settings.website_name') }} </h3>
-                        <div class="theme-control-toggle fa-icon-wait px-2 d-none d-sm-block">
-                            <h6 class="mt-2 d-sm-block d-none text-primary text-white">({{ $event?->name }})</h6>
-                        </div>
                     </div>
                 </div>
             </a>
         </div>
         @php
-
-            $user_events = App\Models\Ypi\Event::where('active_flag', 1)->orderBy('name')->get();
+            $user_events = selectable_events();
         @endphp
 
-
         <ul class="navbar-nav navbar-nav-icons flex-row">
+            <li class="nav-item d-flex align-items-center me-2">
+                <label for="globalEventSelector" class="visually-hidden">Current event</label>
+                <select class="form-select form-select-sm" id="globalEventSelector"
+                    style="min-width: 14rem;" aria-label="Current event">
+                    <option value="">All Events</option>
+                    @foreach ($user_events as $user_event)
+                        <option value="{{ $user_event->id }}" @selected($current_event_id == $user_event->id)>
+                            {{ $user_event->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </li>
             <li class="nav-item">
                 <div class="theme-control-toggle fa-icon-wait px-2">
                     <h6 class="mt-2 text-white">{{ $profileData->name }}</h6>
@@ -143,3 +149,24 @@
         </ul>
     </div>
 </nav>
+
+<script>
+    document.getElementById('globalEventSelector')?.addEventListener('change', function () {
+        const selector = this;
+        selector.disabled = true;
+
+        fetch('{{ route('event.switch') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ event_id: selector.value || null }),
+        })
+            .then(response => response.json())
+            .then(() => window.location.reload())
+            .catch(() => { selector.disabled = false; });
+    });
+</script>

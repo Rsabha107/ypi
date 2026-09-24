@@ -1,5 +1,21 @@
+// Drives the theme's flatpickr instance instead of the raw input value.
+function setEventDate(selector, isoDate) {
+    const el = document.querySelector(selector);
+    if (!el) return;
+
+    const value = isoDate ? String(isoDate).substring(0, 10) : "";
+
+    if (el._flatpickr) {
+        value ? el._flatpickr.setDate(value, false, "Y-m-d") : el._flatpickr.clear();
+        return;
+    }
+
+    $(el).val(value ? value.split("-").reverse().join("/") : "");
+}
+
 $(document).ready(function () {
     console.log("events.js file");
+
 
     $(".js-select-event-assign-multiple-venue_id").select2({
         closeOnSelect: false,
@@ -17,6 +33,8 @@ $(document).ready(function () {
         function () {
             window.EventPondCreate?.clearUI();
             window.EventPondCreate?.resetDeletes();
+            setEventDate("#start_date", null);
+            setEventDate("#end_date", null);
         }
     );
 
@@ -42,6 +60,8 @@ $(document).ready(function () {
 
                 $("#edit_event_id").val(response.op.id);
                 $("#edit_event_name").val(response.op.name);
+                setEventDate("#edit_event_start_date", response.op.start_date);
+                setEventDate("#edit_event_end_date", response.op.end_date);
                 $("#edit_venue_id").val(eventVenues).trigger("change");
                 $("#editActiveFlag").val(response.op.active_flag);
                 $("#edit_event_table").val(table);

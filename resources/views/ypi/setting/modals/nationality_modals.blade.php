@@ -31,6 +31,7 @@
                             <input type="text" class="form-control" name="en_short_name" placeholder="Enter English short name" />
                         </div>
                     </div>
+                    @include('ypi.setting.partials.event_scope_select')
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><?= get_label('close', 'Close') ?></button>

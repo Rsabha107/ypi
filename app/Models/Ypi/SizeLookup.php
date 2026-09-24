@@ -2,12 +2,15 @@
 
 namespace App\Models\Ypi;
 
+use App\Models\Concerns\BelongsToEvent;
 use Illuminate\Database\Eloquent\Model;
 
 class SizeLookup extends Model
 {
+    use BelongsToEvent;
+
     protected $fillable = [
-        'type', 'code', 'label', 'gender', 'sort_order', 'active'
+        'event_id', 'type', 'code', 'label', 'gender', 'sort_order', 'active'
     ];
 
     public function scopeType($query, $type)

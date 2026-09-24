@@ -18,16 +18,82 @@ use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\Permission\Models\Role;
 
-if (! function_exists('get_current_event_id')) {
+if (! function_exists('current_event_id')) {
     /**
-     * Get the current event ID from session or default
-     *
-     * @return int|null
+     * ID of the event currently selected in the header switcher.
+     * 'participant_filter_event_id' is the legacy key, kept in sync for older screens.
      */
+    function current_event_id(): ?int
+    {
+        $id = session('EVENT_ID') ?: session('participant_filter_event_id');
+
+        return $id ? (int) $id : null;
+    }
+}
+
+if (! function_exists('get_current_event_id')) {
     function get_current_event_id()
     {
-        // Assuming event ID is stored in session
-        return session('EVENT_ID', null);
+        return current_event_id();
+    }
+}
+
+if (! function_exists('current_event')) {
+    function current_event(): ?\App\Models\Ypi\Event
+    {
+        static $cached = [];
+
+        $id = current_event_id();
+
+        if (! $id) {
+            return null;
+        }
+
+        return $cached[$id] ??= \App\Models\Ypi\Event::find($id);
+    }
+}
+
+if (! function_exists('set_current_event')) {
+    function set_current_event($eventId): void
+    {
+        if ($eventId) {
+            session([
+                'EVENT_ID' => (int) $eventId,
+                'participant_filter_event_id' => (int) $eventId,
+            ]);
+
+            return;
+        }
+
+        session()->forget(['EVENT_ID', 'participant_filter_event_id']);
+    }
+}
+
+if (! function_exists('event_scope_badge')) {
+    /**
+     * Renders whether a lookup row is shared or owned by a single event.
+     */
+    function event_scope_badge($model): string
+    {
+        if (is_null($model->event_id)) {
+            return '<div class="align-middle white-space-wrap fs-9 ps-3"><span class="badge bg-secondary">All Events</span></div>';
+        }
+
+        return '<div class="align-middle white-space-wrap fs-9 ps-3"><span class="badge bg-info">'
+            . e($model->event?->name ?? 'Unknown') . '</span></div>';
+    }
+}
+
+if (! function_exists('selectable_events')) {
+    /**
+     * Events offered in the header switcher.
+     */
+    function selectable_events()
+    {
+        return \App\Models\Ypi\Event::where('active_flag', 1)
+            ->where('name', 'not like', '%Admin%')
+            ->orderBy('name')
+            ->get(['id', 'name']);
     }
 }
 

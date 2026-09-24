@@ -28,6 +28,7 @@ class ParticipantTypeController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => ['required', 'string', 'max:255'],
             'active_flag' => ['nullable', 'boolean'],
+            'event_scope' => ['nullable', 'in:current,global'],
         ]);
 
         if ($validator->fails()) {
@@ -41,6 +42,7 @@ class ParticipantTypeController extends Controller
             $userId = Auth::id();
 
             $op = new ParticipantType();
+            $op->event_id = $request->input('event_scope') === 'global' ? null : current_event_id();
             $op->title = $request->title;
             $op->active_flag = $request->input('active_flag', true);
             $op->created_by = $userId;
@@ -115,7 +117,7 @@ class ParticipantTypeController extends Controller
         $limit = request("limit");
         $limit = max(1, min($limit, 100)); // min=1, max=100
 
-        $q = ParticipantType::query()->orderBy($sort, $order);
+        $q = ParticipantType::query()->with('event')->orderBy($sort, $order);
 
         if ($search) {
             $q->where(function ($query) use ($search) {
@@ -130,6 +132,7 @@ class ParticipantTypeController extends Controller
             return [
                 'id' => $row->id,
                 'title' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . e($row->title) . '</div>',
+                'event' => event_scope_badge($row),
                 'active_flag' => '<div class="align-middle text-center">' . ($row->active_flag ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>') . '</div>',
                 'created_at' => format_date($row->created_at, 'H:i:s'),
                 'updated_at' => format_date($row->updated_at, 'H:i:s'),

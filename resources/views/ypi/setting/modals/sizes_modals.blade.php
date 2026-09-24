@@ -42,6 +42,7 @@
                                 placeholder="<?= get_label('please_enter_sort_order', 'Please enter sort order') ?>" />
                         </div>
                     </div>
+                    @include('ypi.setting.partials.event_scope_select')
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">

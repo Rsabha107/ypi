@@ -29,6 +29,14 @@ class EventController extends Controller
         ]);
     }
 
+    // Flatpickr posts d/m/Y; the column stores Y-m-d.
+    private function toDate(?string $value): ?string
+    {
+        return $value
+            ? \Carbon\Carbon::createFromFormat('d/m/Y', $value)->format('Y-m-d')
+            : null;
+    }
+
     private function commitFilepondUploads(array $serverIds, int $model_id, string $category = 'qid'): void
     {
         foreach ($serverIds as $id) {
@@ -144,6 +152,8 @@ class EventController extends Controller
                 'image' => $image,
                 // 'id' => '<div class="align-middle white-space-wrap fw-bold fs-10 ps-2">' .$op->id. '</div>',
                 'title' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . $op->name . '</div>',
+                'start_date' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . ($op->start_date ? format_date($op->start_date) : '-') . '</div>',
+                'end_date' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . ($op->end_date ? format_date($op->end_date) : '-') . '</div>',
                 'venues' => '<div class="align-middle white-space-wrap fs-9 ps-3">' . $venues_display . '</div>',
                 'status' => '<span class="badge badge-phoenix fs--2 align-middle white-space-wrap ms-3 badge-phoenix-' . $op->active_status->color . ' " style="cursor: pointer;" id="editDriverStatus" data-id="' . $op->id . '" data-table="drivers_table"><span class="badge-label">' . $op->active_status->name . '</span><span class="ms-1 uil-edit-alt" style="height:12.8px;width:12.8px;cursor: pointer;"></span></span>',
                 'actions' => $update_action . $delete_action,
@@ -164,6 +174,8 @@ class EventController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name'        => 'required|string|max:255',
+            'start_date'  => 'nullable|date_format:d/m/Y',
+            'end_date'    => 'nullable|date_format:d/m/Y|after_or_equal:start_date',
             'venue_id'    => 'nullable|array',
             'venue_id.*'  => 'exists:venues,id',
 
@@ -195,6 +207,8 @@ class EventController extends Controller
         try {
             $op = new Event();
             $op->name        = $request->name;
+            $op->start_date  = $this->toDate($request->start_date);
+            $op->end_date    = $this->toDate($request->end_date);
             $op->active_flag = 1;
             $op->created_by  = $userId;
             $op->updated_by  = $userId;
@@ -273,6 +287,8 @@ class EventController extends Controller
         $rules = [
             'id'          => 'required|exists:events,id',
             'name'        => 'required|string|max:255',
+            'start_date'  => 'nullable|date_format:d/m/Y',
+            'end_date'    => 'nullable|date_format:d/m/Y|after_or_equal:start_date',
             'active_flag' => 'required|in:1,2',
             'venue_id'    => 'nullable|array',
             'venue_id.*'  => 'exists:venues,id',
@@ -303,6 +319,8 @@ class EventController extends Controller
             // 1) Update event fields
             // =========================
             $op->name       = $request->name;
+            $op->start_date = $this->toDate($request->start_date);
+            $op->end_date   = $this->toDate($request->end_date);
             $op->active_flag = $request->active_flag;
             $op->updated_by = $userId;
 

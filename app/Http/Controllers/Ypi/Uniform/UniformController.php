@@ -22,7 +22,6 @@ class UniformController extends Controller
     public function index(Request $request)
     {
         Log::info('inside UniformController index');
-        Log::info('Session participant_filter_event_id: ' . session('participant_filter_event_id'));
         
         $events = Event::where('name', 'not like', '%Admin%')
             ->where('active_flag', 1)
@@ -35,14 +34,8 @@ class UniformController extends Controller
         $shoe_sizes   = SizeLookup::type('shoe')->get();
         $jacket_sizes = SizeLookup::type('jacket')->get();
 
-        // Get selected event from session
-        $selectedEvent = null;
-        if (session()->has('participant_filter_event_id')) {
-            $selectedEvent = Event::find(session('participant_filter_event_id'));
-            Log::info('Selected event found: ' . ($selectedEvent ? $selectedEvent->name : 'null'));
-        } else {
-            Log::info('No filter in session');
-        }
+        // Event selected in the header switcher
+        $selectedEvent = current_event();
 
         return view('ypi.uniform.participant.list', compact(
             'events',
@@ -64,7 +57,7 @@ class UniformController extends Controller
     {
         $search = request('search');
         $filter = request('filter');
-        $event_filter = session('participant_filter_event_id');
+        $event_filter = current_event_id();
         $sort = (request('sort')) ? request('sort') : "id";
         $order = (request('order')) ? request('order') : "DESC";
 
@@ -244,16 +237,8 @@ class UniformController extends Controller
      */
     public function setFilter(Request $request)
     {
-        Log::info('Uniform setFilter called with event_id: ' . $request->event_id);
-        
-        if ($request->has('event_id') && $request->event_id) {
-            session(['participant_filter_event_id' => $request->event_id]);
-            Log::info('Filter set in session: ' . session('participant_filter_event_id'));
-        } else {
-            session()->forget('participant_filter_event_id');
-            Log::info('Filter cleared from session');
-        }
-        
+        set_current_event($request->input('event_id'));
+
         return response()->json(['success' => true]);
     }
 
@@ -262,7 +247,8 @@ class UniformController extends Controller
      */
     public function clearFilter()
     {
-        session()->forget('participant_filter_event_id');
+        set_current_event(null);
+
         return response()->json(['success' => true]);
     }
 
@@ -271,7 +257,7 @@ class UniformController extends Controller
      */
     public function exportSizes()
     {
-        $event_filter = session('participant_filter_event_id');
+        $event_filter = current_event_id();
         
         $filename = 'uniform_sizes_' . date('Y-m-d_His') . '.xlsx';
         

@@ -38,6 +38,8 @@
                             <th data-sortable="true" data-field="id" data-visible="false"><?= get_label('id', 'ID') ?></th>
                             <th data-sortable="false" data-field="image" data-align="center"></th>
                             <th data-sortable="true" data-field="title"><?= get_label('title', 'Title') ?></th>
+                            <th data-sortable="true" data-field="start_date"><?= get_label('start_date', 'Start date') ?></th>
+                            <th data-sortable="true" data-field="end_date"><?= get_label('end_date', 'End date') ?></th>
                             <th data-sortable="false" data-field="venues"><?= get_label('venues', 'Venues') ?></th>
                             <th data-sortable="true" data-field="status"><?= get_label('preview', 'Status') ?></th>
                             <th data-sortable="true" data-field="actions" class="text-end">Actions</th>
