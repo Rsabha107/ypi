@@ -270,6 +270,33 @@ class GuardianController extends Controller
         ));
     }
 
+    /**
+     * Lookups for the event picked in the form, which may differ from the session event.
+     * A NULL event_id means the row is shared by every event.
+     */
+    public function eventLookups($event)
+    {
+        $scoped = function ($query) use ($event) {
+            return $query->where(function ($q) use ($event) {
+                $q->whereNull('event_id')->orWhere('event_id', $event);
+            });
+        };
+
+        $sizes = fn(string $type) => $scoped(
+            SizeLookup::allEvents()->where('type', $type)->where('active', 1)
+        )->orderBy('sort_order')->get(['id', 'label']);
+
+        return response()->json([
+            'participant_types' => $scoped(
+                ParticipantType::allEvents()->where('active_flag', 1)
+            )->orderBy('title')->get(['id', 'title']),
+            'pant_sizes'   => $sizes('pant'),
+            'jersey_sizes' => $sizes('jersey'),
+            'jacket_sizes' => $sizes('jacket'),
+            'shoe_sizes'   => $sizes('shoe'),
+        ]);
+    }
+
     public function edit($id)
     {
         $participant = Participant::findOrFail($id);

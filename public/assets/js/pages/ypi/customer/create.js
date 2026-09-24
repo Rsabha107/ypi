@@ -283,4 +283,64 @@ $(document).ready(function () {
     pond.on("removefile", () => {
         if (!anyUploading()) setButtonDisabled(false);
     });
+
+    // ****************************** event-scoped lookups
+    function fillLookupSelect(selector, items, labelKey) {
+        const $select = $(selector);
+        if (!$select.length) return;
+
+        const previous = $select.val();
+        const placeholder = $select.find('option[value=""]').first().text();
+
+        $select.empty().append(
+            $("<option>").attr("value", "").text(placeholder || "Select")
+        );
+
+        (items || []).forEach(function (item) {
+            $select.append(
+                $("<option>").attr("value", item.id).text(item[labelKey])
+            );
+        });
+
+        // Keep the current choice when it is still valid for the new event.
+        if (previous && $select.find('option[value="' + previous + '"]').length) {
+            $select.val(previous);
+        } else {
+            $select.val("");
+        }
+    }
+
+    function loadEventLookups(eventId) {
+        if (!eventId) {
+            fillLookupSelect("#participant_type_id", [], "title");
+            fillLookupSelect("#pants_size_id", [], "label");
+            fillLookupSelect("#jersey_size_id", [], "label");
+            fillLookupSelect("#jacket_size_id", [], "label");
+            fillLookupSelect("#shoe_size_id", [], "label");
+            return;
+        }
+
+        $.getJSON(
+            "/ypi/customer/participant/event-lookups/" + eventId,
+            function (data) {
+                fillLookupSelect("#participant_type_id", data.participant_types, "title");
+                fillLookupSelect("#pants_size_id", data.pant_sizes, "label");
+                fillLookupSelect("#jersey_size_id", data.jersey_sizes, "label");
+                fillLookupSelect("#jacket_size_id", data.jacket_sizes, "label");
+                fillLookupSelect("#shoe_size_id", data.shoe_sizes, "label");
+            }
+        ).fail(function () {
+            if (window.toastr) {
+                toastr.error("Could not load the options for the selected event.");
+            }
+        });
+    }
+
+    $("#event_id").on("change", function () {
+        loadEventLookups($(this).val());
+    });
+
+    if ($("#event_id").val()) {
+        loadEventLookups($("#event_id").val());
+    }
 });

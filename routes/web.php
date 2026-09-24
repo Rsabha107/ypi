@@ -382,6 +382,7 @@ Route::middleware(['auth', 'otp', 'mutli.event', 'XssSanitizer', 'firstlogin', '
         Route::post('/ypi/customer/guardian/filter/clear', 'clearFilter')->name('ypi.customer.guardian.clearFilter');
         Route::get('/ypi/customer/participant/create', 'create')->name('ypi.customer.participant.create');
         Route::get('/ypi/customer/participant/edit/{id}', 'edit')->name('ypi.customer.participant.edit');
+        Route::get('/ypi/customer/participant/event-lookups/{event}', 'eventLookups')->name('ypi.customer.participant.eventLookups');
         // Route::get('/ypi/customer/dashboard', 'dashboard')->name('ypi.customer.dashboard');
     });
 });

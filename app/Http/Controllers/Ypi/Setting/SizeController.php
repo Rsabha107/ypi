@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class SizeController extends Controller
 {
@@ -26,12 +27,22 @@ class SizeController extends Controller
 
     public function store(Request $request)
     {
+        $eventId = $request->input('event_scope') === 'global' ? null : current_event_id();
+
         $validator = Validator::make($request->all(), [
             'label' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('size_lookups', 'code')
+                    ->where(fn($q) => $q->where('type', $request->type)->where('event_id', $eventId)),
+            ],
             'sort_order' => ['required', 'integer'],
             'event_scope' => ['nullable', 'in:current,global'],
+        ], [
+            'code.unique' => 'This size code already exists for the selected size type and event.',
         ]);
 
         if ($validator->fails()) {
@@ -45,7 +56,7 @@ class SizeController extends Controller
             $userId = Auth::id();
 
             $op = new SizeLookup();
-            $op->event_id = $request->input('event_scope') === 'global' ? null : current_event_id();
+            $op->event_id = $eventId;
             $op->type = $request->type;
             $op->code = $request->code;
             $op->label = $request->label;
@@ -70,12 +81,24 @@ class SizeController extends Controller
 
     public function update(Request $request)
     {
+        $current = SizeLookup::find($request->id);
+
         $validator = Validator::make($request->all(), [
             'id' => ['required', 'integer', 'exists:size_lookups,id'],
             'type' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('size_lookups', 'code')
+                    ->ignore($request->id)
+                    ->where(fn($q) => $q->where('type', $request->type)
+                        ->where('event_id', $current?->event_id)),
+            ],
             'label' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'integer'],
+        ], [
+            'code.unique' => 'This size code already exists for the selected size type and event.',
         ]);
 
         if ($validator->fails()) {
