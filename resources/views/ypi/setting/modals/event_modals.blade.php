@@ -33,6 +33,13 @@
                             label="Venue assignment (multiple)" :forLoopCollection="$venues" itemIdForeach="id"
                             itemTitleForeach="title" required="" style="width: 100%" edit="0" />
                     </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="show_uniform_section" class="form-label">Uniform section</label>
+                        <select class="form-select" name="show_uniform_section" id="show_uniform_section">
+                            <option value="1" selected>Show (collect sizes)</option>
+                            <option value="0">Hide</option>
+                        </select>
+                    </div>
                     <input type="file" id="qid_upload_create" name="qid_files" multiple />
                     <input type="hidden" name="qid_server_ids" id="qid_server_ids_create" value="[]">
                     <input type="hidden" name="delete_doc_ids" id="delete_doc_ids_create" value="[]">
@@ -102,6 +109,13 @@
                             <option value="">Select</option>
                             <option value="1" selected>Active</option>
                             <option value="2">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="edit_show_uniform_section" class="text-1000 fw-bold mb-2">Uniform section</label>
+                        <select class="form-select" name="show_uniform_section" id="edit_show_uniform_section" required>
+                            <option value="1">Show (collect sizes)</option>
+                            <option value="0">Hide</option>
                         </select>
                     </div>
                     <input type="file" id="qid_upload_edit" name="qid_files" multiple />

@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Laravel\Sanctum\Guard;
 
 class GuardianController extends Controller
@@ -287,6 +288,7 @@ class GuardianController extends Controller
         )->orderBy('sort_order')->get(['id', 'label']);
 
         return response()->json([
+            'show_uniform_section' => Event::showsUniform($event),
             'participant_types' => $scoped(
                 ParticipantType::allEvents()->where('active_flag', 1)
             )->orderBy('title')->get(['id', 'title']),
@@ -335,10 +337,22 @@ class GuardianController extends Controller
 
     public function store(Request $request)
     {
+        $eventId = $request->input('event_id');
+        $uniformRequired = Event::showsUniform($eventId) ? 'required' : 'nullable';
+
+        // Lookup must be global (NULL event) or belong to the submitted event.
+        $inEvent = fn(string $table, ?string $type = null) => Rule::exists($table, 'id')->where(
+            function ($q) use ($eventId, $type) {
+                $q->where(fn($w) => $w->whereNull('event_id')->orWhere('event_id', $eventId));
+                if ($type) {
+                    $q->where('type', $type);
+                }
+            }
+        );
 
         $rules = [
             'event_id' => 'required|exists:events,id',
-            'participant_type_id' => 'required',
+            'participant_type_id' => ['required', $inEvent('participant_types')],
             'gender_id' => 'required',
             'full_name' => 'required',
             'qid' => 'required|unique:participants,qid',
@@ -346,10 +360,10 @@ class GuardianController extends Controller
             'nationality_id' => 'required',
             'school_name' => 'required',
             // 'guardian_id' => 'required',
-            'pants_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'jersey_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'jacket_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'shoe_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'pants_size_id' => [$uniformRequired, $inEvent('size_lookups', 'pant')],
+            'jersey_size_id' => [$uniformRequired, $inEvent('size_lookups', 'jersey')],
+            'jacket_size_id' => [$uniformRequired, $inEvent('size_lookups', 'jacket')],
+            'shoe_size_id' => [$uniformRequired, $inEvent('size_lookups', 'shoe')],
             'food_allergy' => 'required|boolean',
             // 'qid_file' => 'required|file|max:2048|mimes:jpg,jpeg,png,pdf',
             // 'food_allergy' => 'required',
@@ -521,8 +535,11 @@ class GuardianController extends Controller
         Log::info('inside GuardianController update');
         Log::info('request data: ' . json_encode($request->all()));
 
+        $uniformRequired = Event::showsUniform(
+            Participant::whereKey($request->participant_id)->value('event_id')
+        ) ? 'required' : 'nullable';
+
         $rules = [
-            'event_id' => 'required|exists:events,id',
             'participant_type_id' => 'required',
             'gender_id' => 'required',
             'full_name' => 'required',
@@ -531,10 +548,10 @@ class GuardianController extends Controller
             'nationality_id' => 'required',
             'school_name' => 'required',
             // 'guardian_id' => 'required',
-            'pants_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'jersey_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'jacket_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'shoe_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'pants_size_id' => $uniformRequired,
+            'jersey_size_id' => $uniformRequired,
+            'jacket_size_id' => $uniformRequired,
+            'shoe_size_id' => $uniformRequired,
              'food_allergy' => 'required',
             // 'health_issues' => 'required',
             // FilePond temp ids
@@ -558,7 +575,10 @@ class GuardianController extends Controller
 
         DB::beginTransaction();
         try {
-            $op = Participant::findOrFail($request->participant_id);
+            $guardian = Guardian::where('user_id', auth()->id())->firstOrFail();
+
+            $op = Participant::where('guardian_id', $guardian->id)
+                ->findOrFail($request->participant_id);
 
             if ($request->hasFile('file_name')) {
 
@@ -583,12 +603,8 @@ class GuardianController extends Controller
                 $op->photo = $fileNameToStore;
             }
 
-            $userId = auth()->id();
-
-            $guardian = Guardian::where('user_id', $userId)->firstOrFail();
-
+            // event_id is intentionally not updated; it is fixed at creation
             $op->participant_type_id = $request->participant_type_id;
-            $op->event_id = $request->event_id;
             $op->date_of_birth = $request->date_of_birth ? Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->toDateString() : null;
             $op->full_name = $request->full_name;
             $op->qid = $request->qid;
@@ -635,7 +651,7 @@ class GuardianController extends Controller
             DB::commit();
 
             // Update filter to match the event of the updated participant
-            set_current_event($request->event_id);
+            set_current_event($op->event_id);
 
             $toastr_message = [
                 'alert-type' => 'success',

@@ -178,6 +178,7 @@ class EventController extends Controller
             'end_date'    => 'nullable|date_format:d/m/Y|after_or_equal:start_date',
             'venue_id'    => 'nullable|array',
             'venue_id.*'  => 'exists:venues,id',
+            'show_uniform_section' => 'nullable|in:0,1',
 
             // only for the logo (Dropify)
             'file_name'   => 'nullable|file|mimes:jpeg,png,jpg,webp|max:5120',
@@ -210,6 +211,7 @@ class EventController extends Controller
             $op->start_date  = $this->toDate($request->start_date);
             $op->end_date    = $this->toDate($request->end_date);
             $op->active_flag = 1;
+            $op->show_uniform_section = $request->boolean('show_uniform_section', true);
             $op->created_by  = $userId;
             $op->updated_by  = $userId;
 
@@ -290,6 +292,7 @@ class EventController extends Controller
             'start_date'  => 'nullable|date_format:d/m/Y',
             'end_date'    => 'nullable|date_format:d/m/Y|after_or_equal:start_date',
             'active_flag' => 'required|in:1,2',
+            'show_uniform_section' => 'required|in:0,1',
             'venue_id'    => 'nullable|array',
             'venue_id.*'  => 'exists:venues,id',
 
@@ -322,6 +325,7 @@ class EventController extends Controller
             $op->start_date = $this->toDate($request->start_date);
             $op->end_date   = $this->toDate($request->end_date);
             $op->active_flag = $request->active_flag;
+            $op->show_uniform_section = $request->boolean('show_uniform_section');
             $op->updated_by = $userId;
 
             // =========================

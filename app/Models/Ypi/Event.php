@@ -25,9 +25,18 @@ class Event extends Model
     //   ];
     protected $appends = ["open"];
 
+    protected $casts = [
+        'show_uniform_section' => 'boolean',
+    ];
+
     public function getOpenAttribute()
     {
         return true;
+    }
+
+    public static function showsUniform($eventId): bool
+    {
+        return (bool) (static::whereKey($eventId)->value('show_uniform_section') ?? true);
     }
 
 

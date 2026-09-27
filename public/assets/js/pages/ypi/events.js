@@ -64,6 +64,7 @@ $(document).ready(function () {
                 setEventDate("#edit_event_end_date", response.op.end_date);
                 $("#edit_venue_id").val(eventVenues).trigger("change");
                 $("#editActiveFlag").val(response.op.active_flag);
+                $("#edit_show_uniform_section").val(response.op.show_uniform_section ? "1" : "0");
                 $("#edit_event_table").val(table);
 
                 // ✅ preload docs via EventPond

@@ -51,12 +51,12 @@
                         <input type="hidden" name="participant_id" value="{{ $participant->id }}" />
                         <div class="col-sm-12 col-md-12">
                             <div class="form-floating">
-                                <select class="form-select" id="event_id" name="event_id" required>
-                                    <option selected="selected" value="">Select event</option>
+                                {{-- Event is locked after creation: sizes and participant types are event-scoped --}}
+                                <select class="form-select" id="event_id" disabled>
                                     @foreach ($events as $evt)
-                                        <option value="{{ $evt->id }}"
-                                            {{ $participant->event_id == $evt->id ? 'selected' : '' }}>
-                                            {{ $evt->name }}</option>
+                                        @if ($participant->event_id == $evt->id)
+                                            <option value="{{ $evt->id }}" selected>{{ $evt->name }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                                 <label for="event_id">Event</label>
@@ -160,7 +160,7 @@
 
 
 
-                        @if(config('settings.show_uniform_section', 1))
+                        @if(\App\Models\Ypi\Event::showsUniform($participant->event_id))
                         <div class=" gy-3">
                             <hr />
                         </div>

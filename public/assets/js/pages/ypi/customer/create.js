@@ -1,3 +1,75 @@
+// Event-scoped lookups: kept in their own ready block so errors elsewhere cannot unbind them.
+$(function () {
+    function fillLookupSelect(selector, items, labelKey) {
+        const $select = $(selector);
+        if (!$select.length) return;
+
+        const previous = $select.val();
+        const placeholder = $select.find('option[value=""]').first().text();
+
+        $select.empty().append(
+            $("<option>").attr("value", "").text(placeholder || "Select")
+        );
+
+        (items || []).forEach(function (item) {
+            $select.append(
+                $("<option>").attr("value", item.id).text(item[labelKey])
+            );
+        });
+
+        // Keep the current choice when it is still valid for the new event.
+        if (previous && $select.find('option[value="' + previous + '"]').length) {
+            $select.val(previous);
+        } else {
+            $select.val("");
+        }
+        $select.trigger("change");
+    }
+
+    // Disabled selects are skipped by HTML validation and not submitted.
+    function toggleUniformSection(show) {
+        const $section = $("#uniform_section");
+        if (!$section.length) return;
+        $section.toggleClass("d-none", !show);
+        $section.find("select").prop("disabled", !show);
+    }
+
+    function loadEventLookups(eventId) {
+        if (!eventId) {
+            toggleUniformSection(false);
+            fillLookupSelect("#participant_type_id", [], "title");
+            fillLookupSelect("#pants_size_id", [], "label");
+            fillLookupSelect("#jersey_size_id", [], "label");
+            fillLookupSelect("#jacket_size_id", [], "label");
+            fillLookupSelect("#shoe_size_id", [], "label");
+            return;
+        }
+
+        $.getJSON(
+            "/ypi/customer/participant/event-lookups/" + encodeURIComponent(eventId),
+            function (data) {
+                toggleUniformSection(data.show_uniform_section);
+                fillLookupSelect("#participant_type_id", data.participant_types, "title");
+                fillLookupSelect("#pants_size_id", data.pant_sizes, "label");
+                fillLookupSelect("#jersey_size_id", data.jersey_sizes, "label");
+                fillLookupSelect("#jacket_size_id", data.jacket_sizes, "label");
+                fillLookupSelect("#shoe_size_id", data.shoe_sizes, "label");
+            }
+        ).fail(function () {
+            if (window.toastr) {
+                toastr.error("Could not load the options for the selected event.");
+            }
+        });
+    }
+
+    $(document).on("change", "#event_id", function () {
+        loadEventLookups($(this).val());
+    });
+
+    // Create page with no event picked: don't show the session event's options.
+    loadEventLookups($("#event_id").val());
+});
+
 $(document).ready(function () {
     console.log("customer create.js loaded");
 
@@ -41,9 +113,9 @@ $(document).ready(function () {
         return age;
     }
 
-    const fpAdd = document.querySelector("#date_of_birth")._flatpickr;
+    const fpAdd = document.querySelector("#date_of_birth")?._flatpickr;
 
-    fpAdd.config.onChange.push(function (selectedDates) {
+    fpAdd?.config.onChange.push(function (selectedDates) {
         if (!selectedDates.length) return;
 
         valid = true;
@@ -284,63 +356,4 @@ $(document).ready(function () {
         if (!anyUploading()) setButtonDisabled(false);
     });
 
-    // ****************************** event-scoped lookups
-    function fillLookupSelect(selector, items, labelKey) {
-        const $select = $(selector);
-        if (!$select.length) return;
-
-        const previous = $select.val();
-        const placeholder = $select.find('option[value=""]').first().text();
-
-        $select.empty().append(
-            $("<option>").attr("value", "").text(placeholder || "Select")
-        );
-
-        (items || []).forEach(function (item) {
-            $select.append(
-                $("<option>").attr("value", item.id).text(item[labelKey])
-            );
-        });
-
-        // Keep the current choice when it is still valid for the new event.
-        if (previous && $select.find('option[value="' + previous + '"]').length) {
-            $select.val(previous);
-        } else {
-            $select.val("");
-        }
-    }
-
-    function loadEventLookups(eventId) {
-        if (!eventId) {
-            fillLookupSelect("#participant_type_id", [], "title");
-            fillLookupSelect("#pants_size_id", [], "label");
-            fillLookupSelect("#jersey_size_id", [], "label");
-            fillLookupSelect("#jacket_size_id", [], "label");
-            fillLookupSelect("#shoe_size_id", [], "label");
-            return;
-        }
-
-        $.getJSON(
-            "/ypi/customer/participant/event-lookups/" + eventId,
-            function (data) {
-                fillLookupSelect("#participant_type_id", data.participant_types, "title");
-                fillLookupSelect("#pants_size_id", data.pant_sizes, "label");
-                fillLookupSelect("#jersey_size_id", data.jersey_sizes, "label");
-                fillLookupSelect("#jacket_size_id", data.jacket_sizes, "label");
-                fillLookupSelect("#shoe_size_id", data.shoe_sizes, "label");
-            }
-        ).fail(function () {
-            if (window.toastr) {
-                toastr.error("Could not load the options for the selected event.");
-            }
-        });
-    }
-
-    $("#event_id").on("change", function () {
-        loadEventLookups($(this).val());
-    });
-
-    if ($("#event_id").val()) {
-        loadEventLookups($("#event_id").val());
-    }
 });

@@ -287,10 +287,10 @@ class GuestController extends Controller
             'nationality_id' => 'required',
             'school_name' => 'required',
             'guardian_id' => 'required',
-            'pants_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'jersey_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'jacket_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'shoe_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'pants_size_id' => Event::showsUniform($request->event_id) ? 'required' : 'nullable',
+            'jersey_size_id' => Event::showsUniform($request->event_id) ? 'required' : 'nullable',
+            'jacket_size_id' => Event::showsUniform($request->event_id) ? 'required' : 'nullable',
+            'shoe_size_id' => Event::showsUniform($request->event_id) ? 'required' : 'nullable',
             'food_allergy' => 'required',
             'health_issues' => 'required',
         ];
@@ -393,10 +393,10 @@ class GuestController extends Controller
             'date_of_birth' => 'required',
             'nationality_id' => 'required',
             'school_name' => 'required',
-            'pants_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'jersey_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'jacket_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
-            'shoe_size_id' => config('settings.show_uniform_section', 1) ? 'required' : 'nullable',
+            'pants_size_id' => Event::showsUniform($request->event_id) ? 'required' : 'nullable',
+            'jersey_size_id' => Event::showsUniform($request->event_id) ? 'required' : 'nullable',
+            'jacket_size_id' => Event::showsUniform($request->event_id) ? 'required' : 'nullable',
+            'shoe_size_id' => Event::showsUniform($request->event_id) ? 'required' : 'nullable',
         ];
 
         $validator = Validator::make($request->all(), $rules);

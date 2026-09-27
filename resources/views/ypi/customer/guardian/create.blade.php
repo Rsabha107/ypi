@@ -162,7 +162,12 @@
                             </div>
                         </div> --}}
                         
-                        @if(config('settings.show_uniform_section', 1))
+                        @php
+                            $showUniform = old('event_id') && \App\Models\Ypi\Event::showsUniform(old('event_id'));
+                        @endphp
+                        {{-- Toggled per event by create.js --}}
+                        <div id="uniform_section" class="col-12 {{ $showUniform ? '' : 'd-none' }}">
+                        <div class="row g-3">
                         <div class=" gy-3">
                             <hr />
                         </div>
@@ -222,7 +227,8 @@
                                 <label for="shoe_size_id">Shoe Size</label>
                             </div>
                         </div>
-                        @endif
+                        </div>
+                        </div>
 
                         <div class="mb-0">
                             <div class="form-check form-switch">

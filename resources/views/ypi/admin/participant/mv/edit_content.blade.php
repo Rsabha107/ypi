@@ -122,7 +122,7 @@
                 disabled='' />
         </div>
 
-        @if(config('settings.show_uniform_section', 1))
+        @if(\App\Models\Ypi\Event::showsUniform($participant->event_id))
         <div class="row mb-3">
             <x-formy.form_select
                 class="col-sm-6 col-md-3  mb-3"
